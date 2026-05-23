@@ -27,6 +27,11 @@ export async function getDb(): Promise<DatabaseClient> {
     await pgAdapter.connect();
     dbInstance = pgAdapter;
   } else {
+    // Se estiver rodando na Vercel (produção na nuvem), proibir o uso do SQLite
+    if (process.env.VERCEL === '1' || process.env.NODE_ENV === 'production') {
+      throw new Error('Banco de dados PostgreSQL não configurado. Por favor, adicione a variável de ambiente DATABASE_URL nas configurações do seu projeto na Vercel com a conexão do Supabase.');
+    }
+
     console.log('Ambiente de desenvolvimento local detectado. Conectando ao SQLite...');
     const sqliteAdapter = new SQLiteAdapter();
     await sqliteAdapter.connect();
