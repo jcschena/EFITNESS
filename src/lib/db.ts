@@ -16,7 +16,10 @@ let dbInstance: DatabaseClient | null = null;
 export async function getDb(): Promise<DatabaseClient> {
   if (dbInstance) return dbInstance;
 
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = process.env.DATABASE_URL || 
+                      process.env.SUPABASE_DATABASE_URL || 
+                      process.env.POSTGRES_URL_NON_POOLING || 
+                      process.env.POSTGRES_URL;
 
   if (databaseUrl) {
     console.log('Ambiente de produção/nuvem detectado. Conectando ao PostgreSQL (Supabase)...');
