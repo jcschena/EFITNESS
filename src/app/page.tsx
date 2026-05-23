@@ -646,7 +646,7 @@ export default function Home() {
               <span style={{ color: 'var(--text-secondary)' }}>Atleta:</span>
               <strong style={{ color: '#fff' }}>{user?.name}</strong>
               <span style={{ fontSize: '0.75rem', padding: '1px 6px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: user?.level === 'elite' ? 'var(--neon-green)' : 'var(--neon-cyan)' }}>
-                {user?.level.toUpperCase()}
+                {user?.level?.toUpperCase() || ''}
               </span>
             </div>
             <button 
