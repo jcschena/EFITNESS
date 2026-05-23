@@ -114,9 +114,13 @@ export default function Home() {
             }
           ]);
         }
+      } else {
+        const errData = await res.json();
+        alert(`Erro ao buscar dados do dashboard: ${errData.error || 'Erro interno no servidor'}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erro ao buscar dados do dashboard:', err);
+      alert(`Erro ao conectar ao servidor do dashboard: ${err.message || 'Erro de conexão'}`);
     } finally {
       setRefreshing(false);
       setLoading(false);
@@ -201,9 +205,15 @@ export default function Home() {
         const data = await res.json();
         setChatMessages([]); // Limpar chat antigo
         setActiveUser(data.userId);
+      } else {
+        const errData = await res.json();
+        alert(`Erro no banco de dados de onboarding: ${errData.error || 'Erro no servidor'}`);
+        setLoading(false);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erro ao enviar onboarding:', err);
+      alert(`Falha ao conectar no onboarding: ${err.message || 'Erro de conexão'}`);
+      setLoading(false);
     }
   };
 
