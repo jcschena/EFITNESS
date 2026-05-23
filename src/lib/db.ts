@@ -1,7 +1,6 @@
-import sqlite3 from 'sqlite3';
-import { open, Database } from 'sqlite';
 import { Pool } from 'pg';
 import path from 'path';
+import type { Database } from 'sqlite';
 
 // Interface unificada para abstrair o banco de dados (SQLite ou PostgreSQL)
 export interface DatabaseClient {
@@ -122,6 +121,9 @@ class SQLiteAdapter implements DatabaseClient {
   private db!: Database;
 
   async connect() {
+    const sqlite3 = (await import('sqlite3')).default;
+    const { open } = await import('sqlite');
+
     const dbPath = path.resolve(process.cwd(), 'efitness.db');
     this.db = await open({
       filename: dbPath,
