@@ -134,7 +134,7 @@ Diretrizes de Comportamento (Persona do Coach):
 
     // 6. Chamar a API do Gemini
     const model = ai.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction: systemInstruction
     });
     
