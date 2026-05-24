@@ -66,6 +66,9 @@ export default function Home() {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
+  // Relógio e Data em tempo real
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
+
   // Estados de Onboarding
   const [onboardStep, setOnboardStep] = useState<number>(1);
   const [onboardForm, setOnboardForm] = useState({
@@ -148,6 +151,22 @@ export default function Home() {
   const [passwordInput, setPasswordInput] = useState<string>('');
   const [loginError, setLoginError] = useState<string>('');
   const [loginLoading, setLoginLoading] = useState<boolean>(false);
+
+  // Estados de Edição do Perfil
+  const [profileSaving, setProfileSaving] = useState<boolean>(false);
+  const [profileMessage, setProfileMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showProfileCelebration, setShowProfileCelebration] = useState<boolean>(false);
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    birth_date: '',
+    weight: '',
+    level: 'intermediario',
+    threshold_hr: '',
+    threshold_pace: '',
+    weekly_target_hours: '',
+    username: '',
+    password: ''
+  });
 
   // Enviar Login
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -236,6 +255,73 @@ export default function Home() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages, chatLoading]);
 
+  // Atualizar relógio em tempo real no cliente
+  useEffect(() => {
+    setCurrentTime(new Date());
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Sincronizar dados do banco com o formulário de perfil
+  useEffect(() => {
+    if (dashboardData?.user) {
+      setProfileForm({
+        name: dashboardData.user.name || '',
+        birth_date: dashboardData.user.birth_date || '',
+        weight: String(dashboardData.user.weight || ''),
+        level: dashboardData.user.level || 'intermediario',
+        threshold_hr: String(dashboardData.user.threshold_hr || ''),
+        threshold_pace: dashboardData.user.threshold_pace || '',
+        weekly_target_hours: String(dashboardData.user.weekly_target_hours || ''),
+        username: dashboardData.user.username || '',
+        password: dashboardData.user.password || ''
+      });
+    }
+  }, [dashboardData]);
+
+  // Enviar alteração do Perfil para a API
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (profileSaving || !activeUser) return;
+
+    setProfileSaving(true);
+    setProfileMessage(null);
+    setShowProfileCelebration(false);
+
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: activeUser,
+          ...profileForm
+        })
+      });
+
+      if (res.ok) {
+        setProfileMessage({ type: 'success', text: 'Dados pessoais e senha atualizados com sucesso!' });
+        setShowProfileCelebration(true);
+        await fetchDashboard(activeUser);
+        setTimeout(() => {
+          setProfileMessage(null);
+        }, 5000);
+        setTimeout(() => {
+          setShowProfileCelebration(false);
+        }, 6000);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setProfileMessage({ type: 'error', text: errData.error || 'Erro ao atualizar dados.' });
+      }
+    } catch (err: any) {
+      console.error('Erro ao atualizar perfil:', err);
+      setProfileMessage({ type: 'error', text: 'Falha de conexão ao salvar os dados.' });
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
   // Handler de seleção de cenário no simulador
   useEffect(() => {
     if (simType === 'Corrida') {
@@ -316,6 +402,28 @@ export default function Home() {
       alert(`Falha ao conectar no onboarding: ${err.message || 'Erro de conexão'}`);
       setLoading(false);
     }
+  };
+
+  // Formatadores de data e hora para o Cockpit
+  const getWeekdayName = (date: Date) => {
+    const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+    return days[date.getDay()];
+  };
+
+  const getFormattedLongDate = (date: Date) => {
+    return date.toLocaleDateString('pt-BR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
+
+  const getFormattedTime = (date: Date) => {
+    return date.toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
   };
 
   // Enviar Mensagem no Chat
@@ -581,6 +689,9 @@ export default function Home() {
   // SE JÁ EXISTE UM USUÁRIO ATIVO CARREGADO E COM DADOS DO DASHBOARD
   const { user, goal, plan, workouts, activityLogs, notifications, metrics, lastSyncedActivity, celebration } = dashboardData || {};
 
+  const todayDateStr = currentTime ? currentTime.toLocaleDateString('en-CA') : new Date().toLocaleDateString('en-CA');
+  const todayWorkout = workouts?.find((w: any) => w.date === todayDateStr);
+
   // Formatar dados do gráfico comparativo planejado vs executado
   // Vamos plotar a carga TSS planejada para cada dia de Segunda (1) a Domingo (7) versus a carga executada
   const tssLabels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
@@ -802,7 +913,232 @@ export default function Home() {
 
       {/* CORE CONTENT LAYOUT */}
       <main style={{ flex: 1, width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {celebration && <ConfettiShower />}
+        {(celebration || showProfileCelebration) && <ConfettiShower />}
+
+        {/* COCKPIT CHRONOMETER & CALENDAR WIDGET */}
+        <section className="animate-slide-up" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+          gap: '20px',
+          width: '100%'
+        }}>
+          {/* Card 1: Calendário & Relógio Digital */}
+          <div className="premium-card" style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'center', 
+            position: 'relative', 
+            overflow: 'hidden',
+            background: 'linear-gradient(135deg, rgba(13, 21, 39, 0.85) 0%, rgba(6, 9, 19, 0.85) 100%)',
+            minHeight: '160px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ 
+                  color: 'var(--neon-cyan)', 
+                  textTransform: 'uppercase', 
+                  fontSize: '0.8rem', 
+                  fontWeight: 800, 
+                  letterSpacing: '0.15em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <Calendar size={14} />
+                  {currentTime ? getWeekdayName(currentTime) : 'Carregando Dia...'}
+                </span>
+                <h3 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 700, marginTop: '2px' }}>
+                  {currentTime ? getFormattedLongDate(currentTime) : 'Carregando Data...'}
+                </h3>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.03)', padding: '6px 12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <Clock size={16} style={{ color: 'var(--neon-cyan)', animation: 'pulseGlow 2s infinite' }} />
+                <span style={{ 
+                  fontFamily: 'monospace', 
+                  fontSize: '1.15rem', 
+                  fontWeight: 700, 
+                  color: '#fff',
+                  letterSpacing: '0.05em'
+                }}>
+                  {currentTime ? getFormattedTime(currentTime) : '00:00:00'}
+                </span>
+              </div>
+            </div>
+
+            {celebration && (
+              <div style={{
+                marginTop: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                background: celebration.type === 'birthday' 
+                  ? 'rgba(252, 76, 2, 0.12)' 
+                  : 'rgba(0, 240, 255, 0.08)',
+                border: celebration.type === 'birthday' 
+                  ? '1px solid rgba(252, 76, 2, 0.25)' 
+                  : '1px solid rgba(0, 240, 255, 0.2)',
+                boxShadow: celebration.type === 'birthday' 
+                  ? '0 0 15px rgba(252, 76, 2, 0.15)' 
+                  : '0 0 15px rgba(0, 240, 255, 0.1)'
+              }}>
+                <span style={{ fontSize: '1.1rem' }}>
+                  {celebration.type === 'birthday' ? '🎂' : '🎉'}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <strong style={{ 
+                    fontSize: '0.8rem', 
+                    color: celebration.type === 'birthday' ? '#fc4c02' : 'var(--neon-cyan)',
+                    display: 'block',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    {celebration.type === 'birthday' ? 'Aniversário!' : celebration.name}
+                  </strong>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                    {celebration.type === 'birthday' ? 'Comemore hoje com ótimos quilômetros!' : celebration.message.substring(0, 75) + '...'}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Card 2: Status do Treino de Hoje */}
+          <div className="premium-card" style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'space-between',
+            background: 'linear-gradient(135deg, rgba(13, 21, 39, 0.85) 0%, rgba(6, 9, 19, 0.85) 100%)',
+            border: todayWorkout && todayWorkout.type !== 'Descanso' ? '1px solid rgba(0, 240, 255, 0.3)' : '1px solid var(--border-color)',
+            boxShadow: todayWorkout && todayWorkout.type !== 'Descanso' ? '0 0 15px rgba(0, 240, 255, 0.1)' : 'none',
+            minHeight: '160px'
+          }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                <span style={{ 
+                  color: 'var(--text-secondary)', 
+                  textTransform: 'uppercase', 
+                  fontSize: '0.75rem', 
+                  fontWeight: 600, 
+                  letterSpacing: '0.05em' 
+                }}>
+                  Hoje na Planilha
+                </span>
+                {(() => {
+                  if (!todayWorkout) return null;
+                  const isCompleted = todayWorkout.status === 'completed';
+                  const isAdjusted = todayWorkout.status === 'adjusted';
+                  
+                  let badgeBg = 'rgba(255, 255, 255, 0.05)';
+                  let badgeBorder = 'rgba(255, 255, 255, 0.1)';
+                  let badgeColor = 'var(--text-secondary)';
+                  let badgeText = 'Pendente';
+                  
+                  if (isCompleted) {
+                    badgeBg = 'rgba(57, 255, 20, 0.1)';
+                    badgeBorder = 'rgba(57, 255, 20, 0.2)';
+                    badgeColor = 'var(--neon-green)';
+                    badgeText = 'Concluído';
+                  } else if (isAdjusted) {
+                    badgeBg = 'rgba(255, 107, 53, 0.12)';
+                    badgeBorder = 'rgba(255, 107, 53, 0.25)';
+                    badgeColor = 'var(--neon-orange)';
+                    badgeText = 'Ajustado';
+                  }
+                  
+                  return (
+                    <span style={{ 
+                      fontSize: '0.65rem', 
+                      padding: '2px 8px', 
+                      background: badgeBg, 
+                      border: `1px solid ${badgeBorder}`, 
+                      borderRadius: '4px', 
+                      color: badgeColor, 
+                      fontWeight: 700, 
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase'
+                    }}>
+                      {badgeText}
+                    </span>
+                  );
+                })()}
+              </div>
+
+              {todayWorkout ? (
+                todayWorkout.type === 'Descanso' ? (
+                  <div>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--neon-cyan)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      💤 OFF Fisiológico
+                    </h4>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', lineHeight: '1.3' }}>
+                      Dia de repouso completo. Permita que as fibras musculares se recuperem e consolidem a supercompensação!
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: getWorkoutColor(todayWorkout.type), display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {todayWorkout.type === 'Corrida' ? '🏃‍♂️' : todayWorkout.type === 'Ciclismo' ? '🚴‍♂️' : todayWorkout.type === 'Natacao' ? '🏊‍♂️' : '💪'} {todayWorkout.title}
+                    </h4>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', lineHeight: '1.3', lineClamp: 2, WebkitLineClamp: 2, display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {todayWorkout.description}
+                    </p>
+                    <div style={{ display: 'flex', gap: '12px', marginTop: '10px', fontSize: '0.8rem' }}>
+                      <span>Prescrito: <strong>{todayWorkout.distance_target > 0 ? todayWorkout.distance_target + ' km' : ''}{todayWorkout.duration_target > 0 ? ` (${Math.round(todayWorkout.duration_target/60)} min)` : ''}</strong></span>
+                      <span>Carga: <strong style={{ color: 'var(--neon-green)' }}>{todayWorkout.tss_target} TSS</strong></span>
+                    </div>
+                  </div>
+                )
+              ) : (
+                <div>
+                  <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                    Nenhum treino agendado
+                  </h4>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                    Não encontramos nenhuma prescrição para a data de hoje nesta planilha.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {todayWorkout && todayWorkout.type !== 'Descanso' && todayWorkout.status !== 'completed' && (
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <button 
+                  onClick={() => {
+                    setSimType(todayWorkout.type);
+                    setSimDistance(String(todayWorkout.distance_target));
+                    setSimDuration(String(todayWorkout.duration_target || 3600));
+                    setSimTss(String(todayWorkout.tss_target));
+                    setActiveTab('simulador');
+                    setShowSimulator(true);
+                  }}
+                  style={{ 
+                    flex: 1,
+                    background: 'rgba(0, 240, 255, 0.1)', 
+                    border: '1px solid rgba(0, 240, 255, 0.25)', 
+                    borderRadius: '8px', 
+                    padding: '6px 12px', 
+                    fontSize: '0.75rem', 
+                    color: 'var(--neon-cyan)', 
+                    fontWeight: 600, 
+                    cursor: 'pointer',
+                    transition: 'var(--transition-smooth)',
+                    textAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px'
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.background = 'rgba(0, 240, 255, 0.18)'; }}
+                  onMouseOut={e => { e.currentTarget.style.background = 'rgba(0, 240, 255, 0.1)'; }}
+                >
+                  <Activity size={14} />
+                  Simular Sincronização
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
 
         {/* BANNER TEMÁTICO COMEMORATIVO */}
         {celebration && (
@@ -987,6 +1323,28 @@ export default function Home() {
             Último Treino Strava
             <span style={{ fontSize: '0.65rem', background: '#fc4c02', padding: '1px 5px', color: '#fff', borderRadius: '4px', fontWeight: 700 }}>CONECTADO</span>
           </button>
+
+          <button 
+            className="tab-btn" 
+            onClick={() => setActiveTab('perfil')}
+            style={{ 
+              background: 'transparent', 
+              border: 'none', 
+              borderBottom: activeTab === 'perfil' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              color: activeTab === 'perfil' ? '#fff' : 'var(--text-secondary)', 
+              fontWeight: activeTab === 'perfil' ? 700 : 500,
+              padding: '10px 16px',
+              cursor: 'pointer',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'var(--transition-smooth)'
+            }}
+          >
+            <User size={18} style={{ color: activeTab === 'perfil' ? 'var(--neon-cyan)' : 'inherit' }} />
+            Perfil & Dados
+          </button>
         </div>
 
         {/* TAB CONTENTS */}
@@ -1065,6 +1423,7 @@ export default function Home() {
                   const isRest = w.type === 'Descanso';
                   const isCompleted = w.status === 'completed';
                   const isAdjusted = w.status === 'adjusted';
+                  const isToday = w.date === todayDateStr;
 
                   return (
                     <div 
@@ -1076,23 +1435,56 @@ export default function Home() {
                         alignItems: 'center', 
                         gap: '16px',
                         padding: '16px 20px',
-                        borderColor: isCompleted 
-                          ? 'rgba(57, 255, 20, 0.15)' 
-                          : isAdjusted 
-                            ? 'rgba(255, 107, 53, 0.2)' 
-                            : 'var(--glass-border)',
-                        background: isRest 
-                          ? 'rgba(255,255,255,0.01)' 
+                        borderColor: isToday
+                          ? 'var(--neon-cyan)'
                           : isCompleted 
-                            ? 'rgba(57, 255, 20, 0.02)' 
-                            : 'var(--glass-bg)'
+                            ? 'rgba(57, 255, 20, 0.15)' 
+                            : isAdjusted 
+                              ? 'rgba(255, 107, 53, 0.2)' 
+                              : 'var(--glass-border)',
+                        background: isToday
+                          ? 'rgba(0, 240, 255, 0.04)'
+                          : isRest 
+                            ? 'rgba(255,255,255,0.01)' 
+                            : isCompleted 
+                              ? 'rgba(57, 255, 20, 0.02)' 
+                              : 'var(--glass-bg)',
+                        boxShadow: isToday
+                          ? '0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.05)'
+                          : 'none',
+                        transform: isToday ? 'scale(1.01)' : 'none',
+                        zIndex: isToday ? 2 : 1
                       }}
                     >
                       {/* Dia e Tipo */}
                       <div>
-                        <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)', display: 'block' }}>
-                          {tssLabels[w.day_of_week - 1]}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ 
+                            fontSize: '0.75rem', 
+                            textTransform: 'uppercase', 
+                            letterSpacing: '0.05em', 
+                            color: isToday ? 'var(--neon-cyan)' : 'var(--text-secondary)', 
+                            display: 'block',
+                            fontWeight: isToday ? 800 : 500
+                          }}>
+                            {tssLabels[w.day_of_week - 1]}
+                          </span>
+                          {isToday && (
+                            <span style={{ 
+                              fontSize: '0.55rem', 
+                              padding: '1px 4px', 
+                              background: 'rgba(0, 240, 255, 0.15)', 
+                              border: '1px solid var(--neon-cyan)', 
+                              borderRadius: '4px', 
+                              color: 'var(--neon-cyan)', 
+                              fontWeight: 800,
+                              letterSpacing: '0.05em',
+                              animation: 'pulseGlow 2s infinite'
+                            }}>
+                              HOJE
+                            </span>
+                          )}
+                        </div>
                         <strong style={{ fontSize: '1rem', color: getWorkoutColor(w.type) }}>
                           {w.type}
                         </strong>
@@ -1632,6 +2024,248 @@ export default function Home() {
               )}
             </div>
 
+          </div>
+        )}
+
+        {/* 4. PERFIL E DADOS PESSOAIS */}
+        {activeTab === 'perfil' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
+            {profileMessage && (
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '12px', 
+                  padding: '16px 20px', 
+                  background: profileMessage.type === 'success' ? 'rgba(57, 255, 20, 0.06)' : 'rgba(255, 59, 48, 0.06)', 
+                  border: profileMessage.type === 'success' ? '1px solid rgba(57, 255, 20, 0.2)' : '1px solid rgba(255, 59, 48, 0.2)', 
+                  borderRadius: '12px', 
+                  color: profileMessage.type === 'success' ? 'var(--neon-green)' : 'var(--neon-red)', 
+                  fontSize: '0.9rem', 
+                  fontWeight: 500 
+                }} 
+                className="animate-slide-up"
+              >
+                {profileMessage.type === 'success' ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
+                <span>{profileMessage.text}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleProfileSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+                
+                {/* CARD 1: DADOS PESSOAIS E ACESSO */}
+                <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', color: '#fff' }}>
+                      <User size={20} style={{ color: 'var(--neon-cyan)' }} />
+                      Dados Pessoais & Acesso
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '4px' }}>
+                      Gerencie suas informações de perfil e credenciais de acesso ao cockpit.
+                    </p>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div>
+                      <label htmlFor="profile-name" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Nome Completo</label>
+                      <input 
+                        id="profile-name"
+                        type="text" 
+                        className="glass-input" 
+                        placeholder="Nome completo do atleta"
+                        value={profileForm.name} 
+                        onChange={e => setProfileForm({ ...profileForm, name: e.target.value })} 
+                        required 
+                        disabled={profileSaving}
+                      />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <div>
+                        <label htmlFor="profile-birth" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Data de Nascimento</label>
+                        <input 
+                          id="profile-birth"
+                          type="date" 
+                          className="glass-input" 
+                          value={profileForm.birth_date} 
+                          onChange={e => setProfileForm({ ...profileForm, birth_date: e.target.value })} 
+                          disabled={profileSaving}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="profile-weight" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Peso (kg)</label>
+                        <input 
+                          id="profile-weight"
+                          type="number" 
+                          step="0.1"
+                          className="glass-input" 
+                          placeholder="Ex: 75.0"
+                          value={profileForm.weight} 
+                          onChange={e => setProfileForm({ ...profileForm, weight: e.target.value })} 
+                          required 
+                          disabled={profileSaving}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '20px' }}>
+                      <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--neon-lime)', marginBottom: '16px' }}>Credenciais de Acesso</h4>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div>
+                          <label htmlFor="profile-username" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Usuário de Login</label>
+                          <input 
+                            id="profile-username"
+                            type="text" 
+                            className="glass-input" 
+                            placeholder="Seu login"
+                            value={profileForm.username} 
+                            onChange={e => setProfileForm({ ...profileForm, username: e.target.value })} 
+                            required 
+                            disabled={profileSaving}
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="profile-password" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Nova Senha</label>
+                          <input 
+                            id="profile-password"
+                            type="password" 
+                            className="glass-input" 
+                            placeholder="Nova senha de acesso"
+                            value={profileForm.password} 
+                            onChange={e => setProfileForm({ ...profileForm, password: e.target.value })} 
+                            required 
+                            disabled={profileSaving}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CARD 2: CONFIGURAÇÕES FISIOLÓGICAS E METAS */}
+                <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', color: '#fff' }}>
+                      <Sliders size={20} style={{ color: 'var(--neon-cyan)' }} />
+                      Limiares Fisiológicos & Nível
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '4px' }}>
+                      Calibre seus limiares para que o ULTRA COACH calcule sua fadiga (TSS) de forma precisa.
+                    </p>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    
+                    {/* Seleção de Nível Esportivo */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '10px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Nível de Condicionamento</label>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                        {[
+                          { value: 'sedentario', label: 'Iniciante', desc: 'Saindo do sedentarismo' },
+                          { value: 'intermediario', label: 'Intermediário', desc: 'Treinos estruturados' },
+                          { value: 'elite', label: 'Elite / Avançado', desc: 'Treinos em alta intensidade' }
+                        ].map(l => {
+                          const isActive = profileForm.level === l.value;
+                          return (
+                            <button
+                              key={l.value}
+                              type="button"
+                              onClick={() => setProfileForm({ ...profileForm, level: l.value })}
+                              disabled={profileSaving}
+                              style={{
+                                background: isActive ? 'rgba(0, 240, 255, 0.06)' : 'rgba(255,255,255,0.01)',
+                                border: isActive ? '1.5px solid var(--neon-cyan)' : '1px solid rgba(255,255,255,0.06)',
+                                borderRadius: '10px',
+                                padding: '12px 8px',
+                                cursor: 'pointer',
+                                transition: 'var(--transition-smooth)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '4px',
+                                textAlign: 'center',
+                                boxShadow: isActive ? '0 0 15px rgba(0, 240, 255, 0.1)' : 'none'
+                              }}
+                            >
+                              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: isActive ? '#fff' : 'var(--text-primary)' }}>{l.label}</span>
+                              <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)' }}>{l.desc}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Inputs de Limiares */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <div>
+                        <label htmlFor="profile-thr" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Frequência Limiar (bpm)</label>
+                        <input 
+                          id="profile-thr"
+                          type="number" 
+                          className="glass-input" 
+                          placeholder="Ex: 162"
+                          value={profileForm.threshold_hr} 
+                          onChange={e => setProfileForm({ ...profileForm, threshold_hr: e.target.value })} 
+                          required 
+                          disabled={profileSaving}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="profile-pace" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Ritmo de Limiar (Pace)</label>
+                        <input 
+                          id="profile-pace"
+                          type="text" 
+                          className="glass-input" 
+                          placeholder="Ex: 5:15"
+                          value={profileForm.threshold_pace} 
+                          onChange={e => setProfileForm({ ...profileForm, threshold_pace: e.target.value })} 
+                          required 
+                          disabled={profileSaving}
+                        />
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>Formato MM:SS por km</span>
+                      </div>
+                    </div>
+
+                    {/* Meta Semanal de Horas */}
+                    <div>
+                      <label htmlFor="profile-hours" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Meta de Horas Semanais</label>
+                      <input 
+                        id="profile-hours"
+                        type="number" 
+                        className="glass-input" 
+                        placeholder="Ex: 6"
+                        value={profileForm.weekly_target_hours} 
+                        onChange={e => setProfileForm({ ...profileForm, weekly_target_hours: e.target.value })} 
+                        required 
+                        disabled={profileSaving}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botão de Submissão */}
+              <button 
+                type="submit" 
+                className={profileForm.level === 'elite' ? "glow-btn-lime" : "glow-btn"} 
+                style={{ width: '100%', padding: '16px', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '12px' }}
+                disabled={profileSaving}
+              >
+                {profileSaving ? (
+                  <>
+                    <RefreshCw style={{ animation: 'spin 1.5s linear infinite' }} size={20} />
+                    Salvando Alterações Fisiológicas...
+                  </>
+                ) : (
+                  <>
+                    Salvar Alterações e Recalibrar Cockpit
+                    <Check size={20} />
+                  </>
+                )}
+              </button>
+            </form>
           </div>
         )}
 

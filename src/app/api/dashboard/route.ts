@@ -26,6 +26,44 @@ export async function GET(req: Request) {
     
     let workouts: any[] = [];
     if (activePlan) {
+      // Alinhamento automático de datas para a semana corrente
+      const today = clientDate ? new Date(clientDate + 'T12:00:00') : new Date();
+      const day = today.getDay();
+      const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(today);
+      monday.setDate(diff);
+      
+      const formatYmd = (date: Date) => {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      };
+      
+      const startOfWeekStr = formatYmd(monday);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const endOfWeekStr = formatYmd(sunday);
+      
+      if (activePlan.start_date !== startOfWeekStr || activePlan.end_date !== endOfWeekStr) {
+        await db.run('UPDATE training_plans SET start_date = ?, end_date = ? WHERE id = ?', startOfWeekStr, endOfWeekStr, activePlan.id);
+        activePlan.start_date = startOfWeekStr;
+        activePlan.end_date = endOfWeekStr;
+        
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(monday);
+          d.setDate(monday.getDate() + i);
+          const workoutDateStr = formatYmd(d);
+          const dayOfWeek = i + 1;
+          await db.run(
+            'UPDATE workouts SET date = ? WHERE plan_id = ? AND day_of_week = ?',
+            workoutDateStr,
+            activePlan.id,
+            dayOfWeek
+          );
+        }
+      }
+
       // Obter treinos da planilha ativa
       workouts = await db.all('SELECT * FROM workouts WHERE plan_id = ? ORDER BY day_of_week ASC', activePlan.id);
     }

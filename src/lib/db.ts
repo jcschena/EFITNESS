@@ -117,6 +117,16 @@ class PostgreSQLAdapter implements DatabaseClient {
         console.warn('Erro ao rodar migration birth_date no Postgres:', e);
       }
       try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS username TEXT;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration username no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS password TEXT;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration password no Postgres:', e);
+      }
+      try {
         await this.exec('ALTER TABLE activity_logs ADD COLUMN IF NOT EXISTS user_id INTEGER;');
       } catch (e) {
         console.warn('Erro ao rodar migration user_id no Postgres:', e);
@@ -193,6 +203,16 @@ class SQLiteAdapter implements DatabaseClient {
     // Migrations incrementais no SQLite
     try {
       await this.db.exec('ALTER TABLE users ADD COLUMN birth_date TEXT;');
+    } catch (e) {
+      // Ignorar se já existe
+    }
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN username TEXT;');
+    } catch (e) {
+      // Ignorar se já existe
+    }
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN password TEXT;');
     } catch (e) {
       // Ignorar se já existe
     }
@@ -279,7 +299,9 @@ function getInitialSchemaDDL(): string {
       strava_access_token TEXT,
       strava_refresh_token TEXT,
       strava_token_expires INTEGER,
-      birth_date TEXT
+      birth_date TEXT,
+      username TEXT,
+      password TEXT
     );
 
     CREATE TABLE IF NOT EXISTS goals (
@@ -377,18 +399,18 @@ function formatDate(date: Date): string {
 async function seedDatabase(db: DatabaseClient) {
   // 1. Inserir usuários
   const eliteUserId = (await db.run(`
-    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, strava_access_token, birth_date)
-    VALUES ('Tiago "Aço" Silva', 'elite', 32, 68.5, 172, '3:45', 18, 1, 'mock_strava_token_elite', '1994-05-24')
+    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, strava_access_token, birth_date, username, password)
+    VALUES ('Tiago "Aço" Silva', 'elite', 32, 68.5, 172, '3:45', 18, 1, 'mock_strava_token_elite', '1994-05-24', 'tiago', '123456')
   `)).lastID;
 
   const sedentarioUserId = (await db.run(`
-    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date)
-    VALUES ('Ana Santos', 'sedentario', 45, 82.0, 145, '8:30', 4, 0, '1981-05-24')
+    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password)
+    VALUES ('Ana Santos', 'sedentario', 45, 82.0, 145, '8:30', 4, 0, '1981-05-24', 'ana', '123456')
   `)).lastID;
 
   const joaoUserId = (await db.run(`
-    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date)
-    VALUES ('JOAO CLAUDIO SCHENA', 'intermediario', 40, 75.0, 162, '5:15', 6, 0, '1985-05-23')
+    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password)
+    VALUES ('JOAO CLAUDIO SCHENA', 'intermediario', 40, 75.0, 162, '5:15', 6, 0, '1985-05-23', 'jcschena', '1953Bigu$')
   `)).lastID;
 
   if (!eliteUserId || !sedentarioUserId || !joaoUserId) return;
