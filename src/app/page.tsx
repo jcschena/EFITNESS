@@ -649,6 +649,27 @@ export default function Home() {
                 {user?.level?.toUpperCase() || ''}
               </span>
             </div>
+            {!user?.strava_connected && (
+              <a 
+                href={`/api/strava/auth?userId=${user?.id}`}
+                style={{ 
+                  background: 'linear-gradient(135deg, #fc4c02 0%, #d83c01 100%)', 
+                  color: '#fff', 
+                  borderRadius: '8px', 
+                  padding: '6px 12px', 
+                  fontSize: '0.75rem', 
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  boxShadow: '0 4px 12px rgba(252, 76, 2, 0.25)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  transition: 'var(--transition-smooth)' 
+                }}
+              >
+                Conectar Strava Real
+              </a>
+            )}
             <button 
               onClick={() => {
                 setActiveUser(null);
