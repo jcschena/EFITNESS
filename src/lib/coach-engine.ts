@@ -126,7 +126,7 @@ export async function autoRegulateTrainingPlan(db: DatabaseClient, userId: numbe
   if (lastWorkout.type === 'Descanso') return;
 
   const tssDiff = lastTssReal - tssTarget;
-  const percentDiff = tssTarget > 0 ? (tssDiff / tssTarget) * 100 : 0;
+  const percentDiff = tssTarget > 0 ? (tssDiff / tssTarget) * 100 : (lastTssReal > 0 ? 100 : 0);
 
   // Pegar os treinos restantes da semana para este plano (dias posteriores)
   const futureWorkouts = await db.all<{

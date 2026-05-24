@@ -524,3 +524,22 @@ async function seedDatabase(db: DatabaseClient) {
     VALUES (?, ?, 'Bem-vindo ao ULTRA!', 'Olá, João Claudio! Analisei seus dados e configurei sua planilha semanal de treinos dinâmicos. Use o Strava para que eu acompanhe sua evolução e faça ajustes automáticos!')
   `, joaoUserId, formatDate(new Date()));
 }
+
+export async function autoCompleteExpiredRests(db: DatabaseClient, planId: number, today: Date) {
+  const pendingRests = await db.all(
+    "SELECT * FROM workouts WHERE plan_id = ? AND type = 'Descanso' AND status = 'pending'",
+    planId
+  );
+  
+  for (const w of pendingRests) {
+    if (!w.date) continue;
+    const targetDateEnd = new Date(w.date + 'T23:59:59');
+    const diffTime = today.getTime() - targetDateEnd.getTime();
+    if (diffTime > 48 * 60 * 60 * 1000) {
+      await db.run(
+        "UPDATE workouts SET status = 'completed' WHERE id = ?",
+        w.id
+      );
+    }
+  }
+}

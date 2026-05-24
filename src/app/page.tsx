@@ -22,7 +22,9 @@ import {
   ArrowRight,
   Wifi,
   ChevronRight,
-  Check
+  Check,
+  X,
+  Plus
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -60,7 +62,7 @@ export default function Home() {
   const [activeUser, setActiveUser] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<string>('planilha'); // 'planilha', 'coach', 'simulador'
-  const [showSimulator, setShowSimulator] = useState<boolean>(false);
+  const [selectedWorkout, setSelectedWorkout] = useState<any>(null);
   
   // Dados do Dashboard carregados do Backend
   const [dashboardData, setDashboardData] = useState<any>(null);
@@ -90,16 +92,193 @@ export default function Home() {
   const [chatLoading, setChatLoading] = useState<boolean>(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Estados do Simulador
-  const [simType, setSimType] = useState<string>('Corrida');
-  const [simScenario, setSimScenario] = useState<string>('normal'); // 'normal', 'overtraining', 'missed'
-  const [simDistance, setSimDistance] = useState<string>('14.0');
-  const [simDuration, setSimDuration] = useState<string>('3960'); // em segundos (1h06min)
-  const [simHr, setSimHr] = useState<string>('162');
-  const [simPace, setSimPace] = useState<string>('4:45');
-  const [simPower, setSimPower] = useState<string>('0');
-  const [simTss, setSimTss] = useState<string>('0');
-  const [simStatusMsg, setSimStatusMsg] = useState<string>('');
+  // Estados de Lançamento Manual de Treino
+  const [showManualLogModal, setShowManualLogModal] = useState<boolean>(false);
+  const [isSubmittingManualLog, setIsSubmittingManualLog] = useState<boolean>(false);
+  const [manualLogForm, setManualLogForm] = useState({
+    workoutId: '' as string | number,
+    date: '',
+    type: 'Corrida',
+    title: '',
+    description: '',
+    distanceReal: '',
+    durationTime: '',
+    paceReal: '0:00/km',
+    avgHr: '',
+    avgPower: '',
+    tssReal: ''
+  });
+
+  const paceToSeconds = (paceStr: string): number => {
+    const clean = paceStr.replace('/km', '').trim();
+    const parts = clean.split(':');
+    if (parts.length === 2) {
+      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    }
+    return 300;
+  };
+
+  const secondsToPace = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.round(seconds % 60);
+    return `${mins}:${String(secs).padStart(2, '0')}/km`;
+  };
+
+  const formatDistance = (dist: number | undefined | null): string => {
+    if (dist === undefined || dist === null || isNaN(dist)) return '0,00';
+    return dist.toFixed(2).replace('.', ',');
+  };
+
+  const secondsToTime = (secs: number | undefined | null): string => {
+    if (secs === undefined || secs === null || isNaN(secs) || secs <= 0) return '00:00:00';
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = Math.round(secs % 60);
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  };
+
+  const timeToSeconds = (timeStr: string | undefined | null): number => {
+    if (!timeStr) return 0;
+    const parts = timeStr.split(':');
+    let h = 0, m = 0, s = 0;
+    if (parts.length === 3) {
+      h = parseInt(parts[0], 10) || 0;
+      m = parseInt(parts[1], 10) || 0;
+      s = parseInt(parts[2], 10) || 0;
+    } else if (parts.length === 2) {
+      m = parseInt(parts[0], 10) || 0;
+      s = parseInt(parts[1], 10) || 0;
+    } else if (parts.length === 1) {
+      m = parseInt(parts[0], 10) || 0;
+    }
+    return h * 3600 + m * 60 + s;
+  };
+
+  const maskTimeInput = (val: string): string => {
+    const clean = val.replace(/\D/g, '').slice(0, 6);
+    if (clean.length === 0) return '';
+    if (clean.length <= 2) return clean;
+    if (clean.length <= 4) return `${clean.slice(0, 2)}:${clean.slice(2)}`;
+    return `${clean.slice(0, 2)}:${clean.slice(2, 4)}:${clean.slice(4, 6)}`;
+  };
+
+  const calcPace = (dist: string, durationStr: string): string => {
+    const d = parseFloat(dist.replace(',', '.')) || 0;
+    const secs = timeToSeconds(durationStr);
+    if (d <= 0 || secs <= 0) return '0:00/km';
+    const secondsPerKm = secs / d;
+    const pMins = Math.floor(secondsPerKm / 60);
+    const pSecs = Math.round(secondsPerKm % 60);
+    return `${pMins}:${String(pSecs).padStart(2, '0')}/km`;
+  };
+
+  const estimateTSS = (type: string, dist: string, durationStr: string, avgHrVal: string): number => {
+    const d = parseFloat(dist.replace(',', '.')) || 0;
+    const durSecs = timeToSeconds(durationStr);
+    if (durSecs <= 0) return 0;
+    
+    let estimatedTss = Math.round((durSecs / 3600) * 60);
+    
+    const userThresholdPace = dashboardData?.user?.threshold_pace || '5:00';
+    const userThresholdHr = dashboardData?.user?.threshold_hr || 160;
+    
+    if (type === 'Corrida') {
+      const paceStr = calcPace(dist, durationStr);
+      if (paceStr !== '0:00/km') {
+        const paceSecs = paceToSeconds(paceStr);
+        const thresholdSecs = paceToSeconds(userThresholdPace);
+        if (paceSecs > 0 && thresholdSecs > 0) {
+          const intensityFactor = thresholdSecs / paceSecs;
+          estimatedTss = Math.round((durSecs * Math.pow(intensityFactor, 2) / 3600) * 100);
+        }
+      }
+    } else if (avgHrVal) {
+      const hr = parseInt(avgHrVal, 10);
+      if (hr > 0 && userThresholdHr > 0) {
+        const intensityFactor = hr / userThresholdHr;
+        estimatedTss = Math.round((durSecs * Math.pow(intensityFactor, 2) / 3600) * 100);
+      }
+    }
+    
+    return estimatedTss;
+  };
+
+  const openManualLog = (workout: any = null) => {
+    const todayYmd = new Date().toLocaleDateString('en-CA');
+    if (workout) {
+      setManualLogForm({
+        workoutId: workout.id,
+        date: workout.date || todayYmd,
+        type: workout.type || 'Corrida',
+        title: workout.title || '',
+        description: workout.description || '',
+        distanceReal: workout.distance_target ? formatDistance(workout.distance_target) : '',
+        durationTime: workout.duration_target ? secondsToTime(workout.duration_target) : '',
+        paceReal: workout.pace_target && workout.pace_target !== 'N/A' ? workout.pace_target : '0:00/km',
+        avgHr: '',
+        avgPower: workout.power_target > 0 ? workout.power_target.toString() : '',
+        tssReal: workout.tss_target ? workout.tss_target.toString() : ''
+      });
+    } else {
+      setManualLogForm({
+        workoutId: '',
+        date: todayYmd,
+        type: 'Corrida',
+        title: '',
+        description: '',
+        distanceReal: '',
+        durationTime: '',
+        paceReal: '0:00/km',
+        avgHr: '',
+        avgPower: '',
+        tssReal: ''
+      });
+    }
+    setShowManualLogModal(true);
+  };
+
+  const handleSaveManualLog = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeUser) return;
+    
+    setIsSubmittingManualLog(true);
+    try {
+      const payload = {
+        workoutId: manualLogForm.workoutId || null,
+        userId: activeUser,
+        date: manualLogForm.date,
+        type: manualLogForm.type,
+        title: manualLogForm.title || `Treino Extra de ${manualLogForm.type}`,
+        description: manualLogForm.description,
+        distanceReal: parseFloat(manualLogForm.distanceReal.replace(',', '.')) || 0,
+        durationReal: timeToSeconds(manualLogForm.durationTime),
+        paceReal: manualLogForm.paceReal,
+        avgHr: manualLogForm.avgHr ? parseInt(manualLogForm.avgHr, 10) : null,
+        avgPower: manualLogForm.avgPower ? parseInt(manualLogForm.avgPower, 10) : null,
+        tssReal: manualLogForm.tssReal ? parseInt(manualLogForm.tssReal, 10) : null
+      };
+
+      const res = await fetch('/api/workouts/manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        setShowManualLogModal(false);
+        setSelectedWorkout(null);
+        await fetchDashboard(activeUser);
+      } else {
+        const errorData = await res.json();
+        alert('Erro ao salvar treino: ' + (errorData.error || 'Erro desconhecido'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro de conexão ao salvar treino.');
+    } finally {
+      setIsSubmittingManualLog(false);
+    }
+  };
 
   // Carregar dados do usuário ativo
   const fetchDashboard = async (userId: number) => {
@@ -167,6 +346,12 @@ export default function Home() {
     username: '',
     password: ''
   });
+
+  // Estados para Calibração Strava
+  const [calibrationPeriod, setCalibrationPeriod] = useState<number>(60);
+  const [calibrationLoading, setCalibrationLoading] = useState<boolean>(false);
+  const [calibrationResult, setCalibrationResult] = useState<any>(null);
+  const [calibrationError, setCalibrationError] = useState<string>('');
 
   // Enviar Login
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -322,57 +507,101 @@ export default function Home() {
     }
   };
 
-  // Handler de seleção de cenário no simulador
-  useEffect(() => {
-    if (simType === 'Corrida') {
-      if (simScenario === 'normal') {
-        setSimDistance('14.0');
-        setSimDuration('3960');
-        setSimHr('160');
-        setSimPace('4:45');
-        setSimPower('0');
-        setSimTss('85');
-      } else if (simScenario === 'overtraining') {
-        setSimDistance('16.5');
-        setSimDuration('4400');
-        setSimHr('176'); // Muito alto (limiar é 172)
-        setSimPace('4:25'); // Muito rápido
-        setSimPower('0');
-        setSimTss('145'); // Prescrito é 85
+  // Disparar análise de calibração via Strava
+  const handleCalibrateStrava = async () => {
+    if (!activeUser) return;
+    setCalibrationLoading(true);
+    setCalibrationError('');
+    setCalibrationResult(null);
+
+    try {
+      const res = await fetch('/api/strava/calibrate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: activeUser,
+          days: calibrationPeriod
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCalibrationResult(data);
       } else {
-        // Pulado
-        setSimDistance('0');
-        setSimDuration('0');
-        setSimHr('0');
-        setSimPace('0:00');
-        setSimPower('0');
-        setSimTss('0');
+        const errData = await res.json().catch(() => ({}));
+        setCalibrationError(errData.error || 'Erro ao processar calibração.');
       }
-    } else if (simType === 'Ciclismo') {
-      if (simScenario === 'normal') {
-        setSimDistance('40.0');
-        setSimDuration('4800');
-        setSimHr('135');
-        setSimPace('30.0');
-        setSimPower('195');
-        setSimTss('55');
-      } else if (simScenario === 'overtraining') {
-        setSimDistance('45.0');
-        setSimDuration('5200');
-        setSimHr('155');
-        setSimPace('33.5');
-        setSimPower('255'); // Acima do Sweet Spot
-        setSimTss('120');
-      } else {
-        setSimDistance('0');
-        setSimDuration('0');
-        setSimHr('0');
-        setSimPace('0');
-        setSimPower('0');
-        setSimTss('0');
-      }
+    } catch (err: any) {
+      console.error('Erro de rede na calibração:', err);
+      setCalibrationError('Erro de conexão ao servidor de calibração.');
+    } finally {
+      setCalibrationLoading(false);
     }
-  }, [simType, simScenario]);
+  };
+
+  // Aplicar as sugestões da calibração no perfil
+  const handleApplyCalibration = async () => {
+    if (!activeUser || !calibrationResult) return;
+    setProfileSaving(true);
+    setProfileMessage(null);
+
+    try {
+      // 1. Atualizar o formulário local do perfil com as métricas sugeridas
+      const updatedForm = {
+        ...profileForm,
+        level: calibrationResult.suggestedMetrics.level,
+        threshold_hr: String(calibrationResult.suggestedMetrics.threshold_hr),
+        threshold_pace: calibrationResult.suggestedMetrics.threshold_pace
+      };
+      
+      setProfileForm(updatedForm);
+
+      // 2. Enviar a atualização do perfil para persistir no banco de dados
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: activeUser,
+          ...updatedForm
+        })
+      });
+
+      if (res.ok) {
+        setProfileMessage({ 
+          type: 'success', 
+          text: `Calibração concluída! Nível ajustado para ${
+            calibrationResult.suggestedMetrics.level === 'elite' 
+              ? 'Elite' 
+              : calibrationResult.suggestedMetrics.level === 'intermediario' 
+                ? 'Intermediário' 
+                : 'Iniciante'
+          }, FC Limiar para ${calibrationResult.suggestedMetrics.threshold_hr} bpm e Pace Limiar para ${calibrationResult.suggestedMetrics.threshold_pace}.` 
+        });
+        
+        setShowProfileCelebration(true);
+        setCalibrationResult(null); // Limpar resultado de calibração para fechar o painel
+
+        // Recarregar os dados do dashboard
+        await fetchDashboard(activeUser);
+
+        setTimeout(() => {
+          setProfileMessage(null);
+        }, 6000);
+        setTimeout(() => {
+          setShowProfileCelebration(false);
+        }, 7000);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setProfileMessage({ type: 'error', text: errData.error || 'Erro ao aplicar limiares.' });
+      }
+    } catch (err: any) {
+      console.error('Erro ao aplicar calibração:', err);
+      setProfileMessage({ type: 'error', text: 'Falha ao aplicar calibração fisiológica.' });
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
 
   // Submeter Onboarding
   const handleOnboardSubmit = async (e: React.FormEvent) => {
@@ -469,47 +698,6 @@ export default function Home() {
     }
   };
 
-  // Enviar Treino Simulador (Webhook)
-  const handleSimulateWebhook = async () => {
-    try {
-      setSimStatusMsg('Disparando Webhook Strava...');
-      const payload = {
-        isMock: true,
-        userId: activeUser,
-        type: simType,
-        distance: simDistance,
-        duration: simDuration,
-        avgHr: simHr !== '0' ? simHr : undefined,
-        pace: simPace !== '0:00' ? simPace + '/km' : undefined,
-        avgPower: simPower !== '0' ? simPower : undefined,
-        tss: simTss !== '0' ? simTss : undefined,
-        timestamp: new Date().toISOString()
-      };
-
-      const res = await fetch('/api/strava/webhook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setSimStatusMsg(`Sucesso! TSS calculado: ${data.calculatedTss}. Atividade associada: ${data.workoutAssociated ? 'Sim' : 'Não'}.`);
-        
-        // Recarregar os dados do dashboard em 1 segundo
-        setTimeout(() => {
-          if (activeUser) {
-            fetchDashboard(activeUser);
-          }
-        }, 1200);
-      } else {
-        setSimStatusMsg('Erro ao disparar webhook.');
-      }
-    } catch (err) {
-      console.error('Erro no simulador Strava:', err);
-      setSimStatusMsg('Erro de conexão no simulador.');
-    }
-  };
 
   // Sugestões rápidas de chat
   const handleQuickQuestion = (question: string) => {
@@ -794,6 +982,15 @@ export default function Home() {
       case 'Forca': return 'var(--neon-orange)';
       default: return 'var(--text-muted)';
     }
+  };
+
+  // Verifica se o treino já expirou o limite de 48 horas para realização
+  const isWorkoutOverdue = (dateStr: string) => {
+    if (!dateStr) return false;
+    const today = currentTime ? new Date(currentTime) : new Date();
+    const targetDateEnd = new Date(dateStr + 'T23:59:59');
+    const diffTime = today.getTime() - targetDateEnd.getTime();
+    return diffTime > 48 * 60 * 60 * 1000;
   };
 
   return (
@@ -1084,7 +1281,7 @@ export default function Home() {
                       {todayWorkout.description}
                     </p>
                     <div style={{ display: 'flex', gap: '12px', marginTop: '10px', fontSize: '0.8rem' }}>
-                      <span>Prescrito: <strong>{todayWorkout.distance_target > 0 ? todayWorkout.distance_target + ' km' : ''}{todayWorkout.duration_target > 0 ? ` (${Math.round(todayWorkout.duration_target/60)} min)` : ''}</strong></span>
+                      <span>Prescrito: <strong>{todayWorkout.distance_target > 0 ? formatDistance(todayWorkout.distance_target) + ' km' : ''}{todayWorkout.duration_target > 0 ? ` (${secondsToTime(todayWorkout.duration_target)})` : ''}</strong></span>
                       <span>Carga: <strong style={{ color: 'var(--neon-green)' }}>{todayWorkout.tss_target} TSS</strong></span>
                     </div>
                   </div>
@@ -1101,42 +1298,6 @@ export default function Home() {
               )}
             </div>
 
-            {todayWorkout && todayWorkout.type !== 'Descanso' && todayWorkout.status !== 'completed' && (
-              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                <button 
-                  onClick={() => {
-                    setSimType(todayWorkout.type);
-                    setSimDistance(String(todayWorkout.distance_target));
-                    setSimDuration(String(todayWorkout.duration_target || 3600));
-                    setSimTss(String(todayWorkout.tss_target));
-                    setActiveTab('simulador');
-                    setShowSimulator(true);
-                  }}
-                  style={{ 
-                    flex: 1,
-                    background: 'rgba(0, 240, 255, 0.1)', 
-                    border: '1px solid rgba(0, 240, 255, 0.25)', 
-                    borderRadius: '8px', 
-                    padding: '6px 12px', 
-                    fontSize: '0.75rem', 
-                    color: 'var(--neon-cyan)', 
-                    fontWeight: 600, 
-                    cursor: 'pointer',
-                    transition: 'var(--transition-smooth)',
-                    textAlign: 'center',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '4px'
-                  }}
-                  onMouseOver={e => { e.currentTarget.style.background = 'rgba(0, 240, 255, 0.18)'; }}
-                  onMouseOut={e => { e.currentTarget.style.background = 'rgba(0, 240, 255, 0.1)'; }}
-                >
-                  <Activity size={14} />
-                  Simular Sincronização
-                </button>
-              </div>
-            )}
           </div>
         </section>
 
@@ -1385,7 +1546,7 @@ export default function Home() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', margin: '20px 0' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
                       <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Grande Objetivo</span>
-                      <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.type} ({goal?.distance} km)</strong>
+                      <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.type} ({formatDistance(goal?.distance)} km)</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
                       <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Data Alvo da Prova</span>
@@ -1412,10 +1573,32 @@ export default function Home() {
 
             {/* Lista da Planilha Semanal */}
             <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                Planilha Semanal
-                <span style={{ fontSize: '0.8rem', fontWeight: 400, color: 'var(--text-secondary)' }}>({plan?.name})</span>
-              </h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                  Planilha Semanal
+                  <span style={{ fontSize: '0.8rem', fontWeight: 400, color: 'var(--text-secondary)' }}>({plan?.name})</span>
+                </h3>
+                <button
+                  onClick={() => openManualLog(null)}
+                  className="glow-btn"
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '0.8rem',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'linear-gradient(90deg, var(--neon-cyan) 0%, #00f0ff 100%)',
+                    border: 'none',
+                    color: '#030712',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 0 10px rgba(0, 240, 255, 0.2)'
+                  }}
+                >
+                  <Plus size={14} /> Lançar Treino Manual
+                </button>
+              </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {workouts && workouts.map((w: any) => {
@@ -1424,36 +1607,62 @@ export default function Home() {
                   const isCompleted = w.status === 'completed';
                   const isAdjusted = w.status === 'adjusted';
                   const isToday = w.date === todayDateStr;
+                  const isOverdue = !isCompleted && !isRest && isWorkoutOverdue(w.date);
 
                   return (
                     <div 
                       key={w.id} 
                       className="premium-card" 
+                      onClick={() => setSelectedWorkout(w)}
                       style={{ 
                         display: 'grid', 
                         gridTemplateColumns: '80px 1.5fr 2fr 1.2fr', 
                         alignItems: 'center', 
                         gap: '16px',
                         padding: '16px 20px',
+                        cursor: 'pointer',
                         borderColor: isToday
                           ? 'var(--neon-cyan)'
                           : isCompleted 
                             ? 'rgba(57, 255, 20, 0.15)' 
                             : isAdjusted 
                               ? 'rgba(255, 107, 53, 0.2)' 
-                              : 'var(--glass-border)',
+                              : isOverdue
+                                ? 'rgba(255, 59, 48, 0.25)'
+                                : 'var(--glass-border)',
                         background: isToday
                           ? 'rgba(0, 240, 255, 0.04)'
                           : isRest 
                             ? 'rgba(255,255,255,0.01)' 
                             : isCompleted 
                               ? 'rgba(57, 255, 20, 0.02)' 
-                              : 'var(--glass-bg)',
+                              : isOverdue
+                                ? 'rgba(255, 59, 48, 0.03)'
+                                : 'var(--glass-bg)',
                         boxShadow: isToday
                           ? '0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.05)'
                           : 'none',
                         transform: isToday ? 'scale(1.01)' : 'none',
-                        zIndex: isToday ? 2 : 1
+                        zIndex: isToday ? 2 : 1,
+                        transition: 'var(--transition-smooth), transform 0.2s ease, box-shadow 0.2s ease'
+                      }}
+                      onMouseOver={e => {
+                        e.currentTarget.style.transform = isToday ? 'scale(1.02)' : 'scale(1.01)';
+                        e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
+                        e.currentTarget.style.borderColor = isToday ? 'var(--neon-cyan)' : isOverdue ? 'rgba(255, 59, 48, 0.4)' : 'rgba(255, 255, 255, 0.2)';
+                      }}
+                      onMouseOut={e => {
+                        e.currentTarget.style.transform = isToday ? 'scale(1.01)' : 'none';
+                        e.currentTarget.style.boxShadow = isToday ? '0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.05)' : 'none';
+                        e.currentTarget.style.borderColor = isToday
+                          ? 'var(--neon-cyan)'
+                          : isCompleted 
+                            ? 'rgba(57, 255, 20, 0.15)' 
+                            : isAdjusted 
+                              ? 'rgba(255, 107, 53, 0.2)' 
+                              : isOverdue
+                                ? 'rgba(255, 59, 48, 0.25)'
+                                : 'var(--glass-border)';
                       }}
                     >
                       {/* Dia e Tipo */}
@@ -1510,8 +1719,8 @@ export default function Home() {
                         <div>
                           <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.7rem' }}>Prescrito</span>
                           <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
-                            {w.distance_target > 0 ? w.distance_target + ' km' : ''}
-                            {w.duration_target > 0 ? ` (${Math.round(w.duration_target/60)} min)` : ''}
+                            {w.distance_target > 0 ? formatDistance(w.distance_target) + ' km' : ''}
+                            {w.duration_target > 0 ? ` (${secondsToTime(w.duration_target)})` : ''}
                             {w.type === 'Forca' ? 'Funcional Core' : ''}
                             {isRest ? 'Off Fisiológico' : ''}
                           </span>
@@ -1527,7 +1736,7 @@ export default function Home() {
                           <div>
                             <span style={{ color: '#fc4c02', display: 'block', fontSize: '0.7rem', fontWeight: 600 }}>Sinc. Strava ✔</span>
                             <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                              {hasLog.distance_real} km ({Math.round(hasLog.duration_real/60)} min)
+                              {formatDistance(hasLog.distance_real)} km ({secondsToTime(hasLog.duration_real)})
                             </span>
                             <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                               @ {hasLog.pace_real} {hasLog.avg_power > 0 ? `| ${hasLog.avg_power}W` : ''}
@@ -1537,8 +1746,13 @@ export default function Home() {
                           <div>
                             <span style={{ color: 'var(--neon-green)', display: 'block', fontSize: '0.7rem', fontWeight: 600 }}>Manual ✔</span>
                             <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
-                              {w.distance_target} km
+                              {formatDistance(w.distance_target)} km
                             </span>
+                          </div>
+                        ) : isOverdue ? (
+                          <div>
+                            <span style={{ color: 'var(--neon-red)', display: 'block', fontSize: '0.7rem', fontWeight: 600 }}>Não Realizado</span>
+                            <span style={{ color: 'var(--text-muted)' }}>Expirado 48h</span>
                           </div>
                         ) : (
                           <div>
@@ -1562,7 +1776,9 @@ export default function Home() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontSize: '0.7rem' }}>
                             {isCompleted && hasLog ? (
                               <span style={{ color: '#fc4c02', background: 'rgba(0, 240, 255, 0.1)', padding: '1px 6px', borderRadius: '4px', fontWeight: 600 }}>Strava Link</span>
-                            ) : isRest ? null : (
+                            ) : isRest ? null : isOverdue ? (
+                              <span style={{ color: 'var(--neon-red)', background: 'rgba(255, 59, 48, 0.1)', padding: '1px 6px', borderRadius: '4px', fontWeight: 600 }}>Não Realizado</span>
+                            ) : (
                               <span style={{ color: 'var(--text-muted)', background: 'rgba(255,255,255,0.03)', padding: '1px 6px', borderRadius: '4px' }}>Manual/Pendente</span>
                             )}
                           </div>
@@ -1748,7 +1964,7 @@ export default function Home() {
                     <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>Distância</span>
                       <strong style={{ fontSize: '1.25rem', color: '#fff', display: 'block', marginTop: '4px' }}>
-                        {lastSyncedActivity.distance_real} km
+                        {formatDistance(lastSyncedActivity.distance_real)} km
                       </strong>
                     </div>
 
@@ -1756,15 +1972,7 @@ export default function Home() {
                     <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>Tempo Decorrido</span>
                       <strong style={{ fontSize: '1.25rem', color: '#fff', display: 'block', marginTop: '4px' }}>
-                        {(() => {
-                          const secs = lastSyncedActivity.duration_real;
-                          const hrs = Math.floor(secs / 3600);
-                          const mins = Math.floor((secs % 3600) / 60);
-                          const remainingSecs = secs % 60;
-                          return hrs > 0 
-                            ? `${hrs}h ${mins}m ${remainingSecs}s` 
-                            : `${mins}m ${remainingSecs}s`;
-                        })()}
+                        {secondsToTime(lastSyncedActivity.duration_real)}
                       </strong>
                     </div>
 
@@ -1854,175 +2062,6 @@ export default function Home() {
               )}
             </div>
 
-            {/* Simulador colapsável */}
-            <div className="premium-card" style={{ padding: 0, overflow: 'hidden' }}>
-              <button 
-                onClick={() => setShowSimulator(!showSimulator)}
-                style={{ 
-                  width: '100%', 
-                  background: 'rgba(255,255,255,0.02)', 
-                  border: 'none', 
-                  padding: '16px 20px', 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                  color: 'var(--text-secondary)',
-                  fontWeight: 600,
-                  fontSize: '0.9rem',
-                  textAlign: 'left'
-                }}
-              >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Database size={16} style={{ color: 'var(--neon-orange)' }} />
-                  Ferramentas do Desenvolvedor (Simulador Webhook Strava)
-                </span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {showSimulator ? 'Recolher [-]' : 'Expandir [+]'}
-                </span>
-              </button>
-
-              {showSimulator && (
-                <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.4' }}>
-                    Esta ferramenta simula a chamada da API Webhook do Strava enviando os dados em push. Altere as variáveis fisiológicas abaixo para testar a auto-regulação adaptativa do coach.
-                  </p>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-                    
-                    {/* Form de Variáveis */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                      
-                      {/* Tipo de atividade */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Modalidade</label>
-                          <select 
-                            className="glass-input" 
-                            style={{ background: '#0d1527', color: '#fff' }}
-                            value={simType} 
-                            onChange={e => setSimType(e.target.value)}
-                          >
-                            <option value="Corrida">Corrida de Rua</option>
-                            <option value="Ciclismo">Ciclismo</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Cenário Fisiológico</label>
-                          <select 
-                            className="glass-input" 
-                            style={{ background: '#0d1527', color: '#fff' }}
-                            value={simScenario} 
-                            onChange={e => setSimScenario(e.target.value)}
-                          >
-                            <option value="normal">Normal (Dentro da Prescrição)</option>
-                            <option value="overtraining">Sobrecarga (Overtraining Risco)</option>
-                            <option value="missed">Sessão Pulada / Zero Carga</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      {/* Métricas específicas */}
-                      {simScenario !== 'missed' && (
-                        <>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Distância Realizada (km)</label>
-                              <input 
-                                type="number" 
-                                step="0.01" 
-                                className="glass-input" 
-                                value={simDistance}
-                                onChange={e => setSimDistance(e.target.value)}
-                              />
-                            </div>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Duração Real (segundos)</label>
-                              <input 
-                                type="number" 
-                                className="glass-input" 
-                                value={simDuration}
-                                onChange={e => setSimDuration(e.target.value)}
-                              />
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Frequência Cardíaca Média (bpm)</label>
-                              <input 
-                                type="number" 
-                                className="glass-input" 
-                                value={simHr}
-                                onChange={e => setSimHr(e.target.value)}
-                              />
-                            </div>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                {simType === 'Corrida' ? 'Ritmo Médio (Pace MM:SS)' : 'Potência Média (Watts)'}
-                              </label>
-                              {simType === 'Corrida' ? (
-                                <input 
-                                  type="text" 
-                                  className="glass-input" 
-                                  value={simPace}
-                                  onChange={e => setSimPace(e.target.value)}
-                                />
-                              ) : (
-                                <input 
-                                  type="number" 
-                                  className="glass-input" 
-                                  value={simPower}
-                                  onChange={e => setSimPower(e.target.value)}
-                                />
-                              )}
-                            </div>
-                          </div>
-
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                              TSS Estimado da Atividade (Se 0, a IA calculará com base nos Limiares)
-                            </label>
-                            <input 
-                              type="number" 
-                              className="glass-input" 
-                              value={simTss}
-                              onChange={e => setSimTss(e.target.value)}
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      <button 
-                        type="button" 
-                        className="glow-btn-lime" 
-                        style={{ marginTop: '10px' }}
-                        onClick={handleSimulateWebhook}
-                      >
-                        Disparar Webhook Strava push
-                      </button>
-                    </div>
-
-                    {/* Explicação da Auto-Regulação Fisiológica */}
-                    <div style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--neon-lime)' }}>Como testar:</h4>
-                      <ol style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', paddingLeft: '16px', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <li>Escolha a modalidade e o cenário fisiológico (ex: Sobrecarga).</li>
-                        <li>Clique em <strong>Disparar Webhook Strava push</strong>.</li>
-                        <li>Verifique o sucesso e veja as métricas atualizarem na aba atual e na planilha semanal de treinos!</li>
-                      </ol>
-
-                      {simStatusMsg && (
-                        <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', fontSize: '0.85rem', color: '#fc4c02', fontFamily: 'monospace', textAlign: 'center' }}>
-                          {simStatusMsg}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
 
           </div>
         )}
@@ -2050,6 +2089,399 @@ export default function Home() {
                 <span>{profileMessage.text}</span>
               </div>
             )}
+
+            {/* SEÇÃO DE CALIBRAÇÃO INTELIGENTE VIA STRAVA */}
+            <div className="premium-card" style={{ 
+              background: 'linear-gradient(135deg, rgba(252, 76, 2, 0.08) 0%, rgba(13, 21, 39, 0.8) 100%)',
+              border: '1px solid rgba(252, 76, 2, 0.25)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(252, 76, 2, 0.05)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+                  <div style={{ 
+                    width: '45px', 
+                    height: '45px', 
+                    background: 'rgba(252, 76, 2, 0.15)', 
+                    borderRadius: '12px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    border: '1px solid rgba(252, 76, 2, 0.3)'
+                  }}>
+                    <Activity style={{ color: '#fc4c02' }} size={24} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff', fontFamily: 'var(--font-title)' }}>
+                      Calibração Fisiológica Inteligente (Strava)
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
+                      Analise seus treinos recentes no Strava ou sua última corrida de no mínimo 30 minutos cadastrada para calibrar limiares de esforço e nível.
+                    </p>
+                  </div>
+                </div>
+                
+                <span style={{ 
+                  fontSize: '0.75rem', 
+                  color: '#fc4c02', 
+                  background: 'rgba(252, 76, 2, 0.1)', 
+                  padding: '6px 14px', 
+                  borderRadius: '20px', 
+                  border: '1px solid rgba(252, 76, 2, 0.25)', 
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <Wifi size={12} />
+                  {dashboardData?.user?.strava_connected && !dashboardData?.user?.strava_access_token?.startsWith('mock_') ? 'Strava Real Conectado' : 'Sincronização Indisponível'}
+                </span>
+              </div>
+
+              <div style={{ 
+                borderTop: '1px solid rgba(255, 255, 255, 0.06)', 
+                paddingTop: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '20px'
+              }}>
+                {/* Seleção do Período de Análise */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '10px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                    Selecione o Período de Análise Fisiológica
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setCalibrationPeriod(30)}
+                      style={{
+                        background: calibrationPeriod === 30 ? 'rgba(252, 76, 2, 0.08)' : 'rgba(255,255,255,0.01)',
+                        border: calibrationPeriod === 30 ? '2px solid #fc4c02' : '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
+                        padding: '16px',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'var(--transition-smooth)',
+                        boxShadow: calibrationPeriod === 30 ? '0 0 15px rgba(252, 76, 2, 0.15)' : 'none'
+                      }}
+                    >
+                      <strong style={{ display: 'block', fontSize: '1rem', color: '#fff' }}>Últimos 30 dias</strong>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
+                        Adequado para reajustes rápidos após férias ou retorno recente de lesões.
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setCalibrationPeriod(60)}
+                      style={{
+                        background: calibrationPeriod === 60 ? 'rgba(252, 76, 2, 0.08)' : 'rgba(255,255,255,0.01)',
+                        border: calibrationPeriod === 60 ? '2px solid #fc4c02' : '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
+                        padding: '16px',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        position: 'relative',
+                        transition: 'var(--transition-smooth)',
+                        boxShadow: calibrationPeriod === 60 ? '0 0 15px rgba(252, 76, 2, 0.15)' : 'none'
+                      }}
+                    >
+                      {/* Badge Recomendado */}
+                      <span style={{ 
+                        position: 'absolute', 
+                        top: '-10px', 
+                        right: '12px', 
+                        fontSize: '0.65rem', 
+                        background: 'linear-gradient(135deg, var(--neon-green) 0%, #00cc3f 100%)', 
+                        color: '#030712', 
+                        padding: '3px 8px', 
+                        borderRadius: '8px', 
+                        fontWeight: 800,
+                        boxShadow: '0 0 10px rgba(57, 255, 20, 0.3)'
+                      }}>
+                        RECOMENDADO
+                      </span>
+                      <strong style={{ display: 'block', fontSize: '1rem', color: '#fff' }}>Últimos 60 dias (Padrão Fisiológico)</strong>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
+                        Analisa o condicionamento crônico (CTL). Ideal para estabilização de limiares.
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Botão de Disparo */}
+                {!calibrationResult && !calibrationLoading && (
+                  <button
+                    type="button"
+                    onClick={handleCalibrateStrava}
+                    style={{
+                      background: 'linear-gradient(135deg, #fc4c02 0%, #e23e00 100%)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      fontWeight: 700,
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '10px',
+                      transition: 'var(--transition-smooth)',
+                      boxShadow: '0 4px 15px rgba(252, 76, 2, 0.25)'
+                    }}
+                    onMouseOver={e => e.currentTarget.style.boxShadow = '0 6px 20px rgba(252, 76, 2, 0.4)'}
+                    onMouseOut={e => e.currentTarget.style.boxShadow = '0 4px 15px rgba(252, 76, 2, 0.25)'}
+                  >
+                    <RefreshCw size={20} />
+                    Analisar Atividades do Strava
+                  </button>
+                )}
+
+                {/* Mensagens de erro */}
+                {calibrationError && (
+                  <div style={{ 
+                    padding: '12px 16px', 
+                    background: 'rgba(255, 59, 48, 0.08)', 
+                    border: '1px solid rgba(255, 59, 48, 0.2)', 
+                    borderRadius: '8px', 
+                    color: 'var(--neon-red)', 
+                    fontSize: '0.85rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <AlertTriangle size={16} />
+                    <span>{calibrationError}</span>
+                  </div>
+                )}
+
+                {/* Loader da Calibração */}
+                {calibrationLoading && (
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    gap: '16px', 
+                    padding: '30px 20px',
+                    background: 'rgba(255, 255, 255, 0.01)',
+                    borderRadius: '12px',
+                    border: '1px dashed rgba(255, 255, 255, 0.08)'
+                  }} className="animate-fade-in">
+                    <RefreshCw style={{ animation: 'spin 1.5s linear infinite', color: '#fc4c02' }} size={32} />
+                    <div style={{ textAlign: 'center' }}>
+                      <strong style={{ display: 'block', color: '#fff', fontSize: '0.95rem' }}>Analisando atividades do Strava...</strong>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '4px' }}>
+                        Calculando carga crônica de treino (CTL), identificando frequências limiares e velocidades ideais.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* RESULTADO DA ANÁLISE DE CALIBRAÇÃO */}
+                {calibrationResult && (
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '20px',
+                    padding: '20px',
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '12px'
+                  }} className="animate-slide-up">
+                    
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--neon-cyan)', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '10px' }}>
+                      Relatório de Análise Fisiológica ({calibrationResult.analysis.days} dias)
+                    </h4>
+
+                    {calibrationResult.analysis.isFallback && (
+                      <div style={{ 
+                        padding: '12px 16px', 
+                        background: 'rgba(255, 107, 53, 0.06)', 
+                        border: '1px solid rgba(255, 107, 53, 0.2)', 
+                        borderRadius: '8px', 
+                        color: 'var(--neon-orange)', 
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '10px',
+                        lineHeight: '1.4'
+                      }}>
+                        <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
+                        <span>
+                          <strong>Nota do ULTRA COACH:</strong> Não localizamos atividades de treino recentes sincronizadas no Strava. A calibração foi baseada na sua <strong>última corrida de no mínimo 30 minutos</strong> encontrada no histórico local: <em>{calibrationResult.analysis.fallbackActivityName}</em>.
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Grid de Resumo das Atividades */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
+                      <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block' }}>Treinos Analisados</span>
+                        <strong style={{ fontSize: '1.2rem', color: '#fff', display: 'block', marginTop: '2px' }}>
+                          {calibrationResult.analysis.totalActivities}
+                        </strong>
+                      </div>
+                      <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block' }}>Distância Acumulada</span>
+                        <strong style={{ fontSize: '1.2rem', color: '#fff', display: 'block', marginTop: '2px' }}>
+                          {formatDistance(calibrationResult.analysis.totalDistance)} km
+                        </strong>
+                      </div>
+                      <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block' }}>Média de Volume Semanal</span>
+                        <strong style={{ fontSize: '1.2rem', color: 'var(--neon-green)', display: 'block', marginTop: '2px' }}>
+                          {calibrationResult.analysis.weeklyAvgHours} horas/sem
+                        </strong>
+                      </div>
+                      <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block' }}>Frequência Máxima Real</span>
+                        <strong style={{ fontSize: '1.2rem', color: 'var(--neon-red)', display: 'block', marginTop: '2px' }}>
+                          {calibrationResult.analysis.maxHrObserved ? `${calibrationResult.analysis.maxHrObserved} bpm` : 'Não reg.'}
+                        </strong>
+                      </div>
+                    </div>
+
+                    {/* Comparativo de Limiares */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                        Comparação e Ajustes Sugeridos pelo Coach
+                      </span>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        
+                        {/* Linha 1: Nível */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                          <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600 }}>Nível Esportivo</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                              {calibrationResult.currentMetrics.level === 'elite' ? 'Elite' : calibrationResult.currentMetrics.level === 'intermediario' ? 'Intermediário' : 'Iniciante'}
+                            </span>
+                            <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} />
+                            <span style={{ 
+                              fontSize: '0.85rem', 
+                              fontWeight: 800, 
+                              color: calibrationResult.suggestedMetrics.level === 'elite' ? 'var(--neon-cyan)' : calibrationResult.suggestedMetrics.level === 'intermediario' ? 'var(--neon-orange)' : 'var(--neon-lime)',
+                              background: 'rgba(255,255,255,0.03)',
+                              padding: '2px 8px',
+                              borderRadius: '4px'
+                            }}>
+                              {calibrationResult.suggestedMetrics.level === 'elite' ? 'Elite' : calibrationResult.suggestedMetrics.level === 'intermediario' ? 'Intermediário' : 'Iniciante'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Linha 2: Frequência Cardíaca */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                          <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600 }}>Frequência Limiar</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                              {calibrationResult.currentMetrics.threshold_hr} bpm
+                            </span>
+                            <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} />
+                            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--neon-cyan)' }}>
+                              {calibrationResult.suggestedMetrics.threshold_hr} bpm
+                            </span>
+                            {calibrationResult.comparison.hrDiff !== 0 && (
+                              <span style={{ 
+                                fontSize: '0.75rem', 
+                                fontWeight: 700, 
+                                color: calibrationResult.comparison.hrDiff > 0 ? 'var(--neon-red)' : 'var(--neon-green)',
+                                background: calibrationResult.comparison.hrDiff > 0 ? 'rgba(255, 59, 48, 0.08)' : 'rgba(57, 255, 20, 0.08)',
+                                padding: '1px 6px',
+                                borderRadius: '4px'
+                              }}>
+                                {calibrationResult.comparison.hrDiff > 0 ? `+${calibrationResult.comparison.hrDiff}` : calibrationResult.comparison.hrDiff} bpm
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Linha 3: Pace */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                          <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600 }}>Ritmo de Limiar (Pace)</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                              {calibrationResult.currentMetrics.threshold_pace}/km
+                            </span>
+                            <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} />
+                            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--neon-cyan)' }}>
+                              {calibrationResult.suggestedMetrics.threshold_pace}/km
+                            </span>
+                            {calibrationResult.comparison.paceDiffSecs !== 0 && (
+                              <span style={{ 
+                                fontSize: '0.75rem', 
+                                fontWeight: 700, 
+                                color: calibrationResult.comparison.paceDiffSecs > 0 ? 'var(--neon-green)' : 'var(--neon-red)',
+                                background: calibrationResult.comparison.paceDiffSecs > 0 ? 'rgba(57, 255, 20, 0.08)' : 'rgba(255, 59, 48, 0.08)',
+                                padding: '1px 6px',
+                                borderRadius: '4px'
+                              }}>
+                                {calibrationResult.comparison.paceDiffSecs > 0 ? 'Mais rápido' : 'Mais lento'} ({calibrationResult.comparison.paceDiffStr}/km)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    {/* Explicação do Coach */}
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '14px', background: 'rgba(0, 240, 255, 0.04)', borderRadius: '8px', border: '1px solid rgba(0, 240, 255, 0.12)' }}>
+                      <Sparkles size={16} style={{ color: 'var(--neon-cyan)', marginTop: '2px', flexShrink: 0 }} />
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-primary)', lineHeight: '1.4' }}>
+                        <strong>Análise do ULTRA COACH:</strong> {(() => {
+                          const userLevel = calibrationResult.suggestedMetrics.level;
+                          if (userLevel === 'elite') {
+                            return 'O atleta apresenta um volume e intensidade consistentes de alto nível. Recomenda-se manter limiares agressivos para forçar a supercompensação aeróbia.';
+                          } else if (userLevel === 'intermediario') {
+                            return 'Excelente regularidade! A resposta cardiovascular indica uma sólida base aeróbia. Ajustar os limiares permitirá otimizar os treinos de tempo-run e intervalados.';
+                          } else {
+                            return 'Nível ideal para o fortalecimento e ganho de capacidade pulmonar inicial. Foco em manter o conforto cardiovascular e consistência nos treinos leves.';
+                          }
+                        })()}
+                      </p>
+                    </div>
+
+                    {/* Botões de Ação */}
+                    <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={handleApplyCalibration}
+                        className="glow-btn"
+                        style={{ flex: 2, padding: '14px' }}
+                      >
+                        <Check size={18} />
+                        Aplicar Calibração no Perfil
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCalibrationResult(null)}
+                        style={{ 
+                          flex: 1, 
+                          padding: '14px', 
+                          background: 'rgba(255,255,255,0.03)', 
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          color: 'var(--text-secondary)',
+                          borderRadius: '12px',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: '0.9rem',
+                          transition: 'var(--transition-smooth)'
+                        }}
+                        onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                        onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
+                      >
+                        Descartar
+                      </button>
+                    </div>
+
+                  </div>
+                )}
+              </div>
+            </div>
 
             <form onSubmit={handleProfileSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
@@ -2285,6 +2717,680 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* MODAL DE DETALHES DO TREINO */}
+      {selectedWorkout && (
+        <div 
+          onClick={() => setSelectedWorkout(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(3, 7, 18, 0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+            boxSizing: 'border-box'
+          }}
+        >
+          <div 
+            onClick={e => e.stopPropagation()}
+            className="premium-card animate-fade-in"
+            style={{
+              width: '100%',
+              maxWidth: '550px',
+              padding: '28px',
+              background: 'linear-gradient(135deg, rgba(13, 21, 39, 0.95) 0%, rgba(6, 9, 19, 0.95) 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.15)',
+              position: 'relative',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              borderRadius: '16px'
+            }}
+          >
+            {/* Botão de Fechar */}
+            <button 
+              onClick={() => setSelectedWorkout(null)}
+              aria-label="Fechar Detalhes"
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                padding: '8px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'var(--transition-smooth)'
+              }}
+              onMouseOver={e => {
+                e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)';
+                e.currentTarget.style.color = 'var(--neon-red)';
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            {/* Cabeçalho */}
+            <div style={{ marginBottom: '20px' }}>
+              <span style={{ 
+                fontSize: '0.75rem', 
+                fontWeight: 800, 
+                color: 'var(--neon-cyan)', 
+                textTransform: 'uppercase', 
+                letterSpacing: '0.15em',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <Calendar size={14} />
+                {(() => {
+                  const names = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+                  return names[selectedWorkout.day_of_week - 1] || 'Dia da Semana';
+                })()} — {(() => {
+                  if (!selectedWorkout.date) return '';
+                  const parts = selectedWorkout.date.split('-');
+                  return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : selectedWorkout.date;
+                })()}
+              </span>
+              <h2 style={{ 
+                fontSize: '1.5rem', 
+                fontWeight: 800, 
+                color: '#fff', 
+                marginTop: '6px',
+                lineHeight: '1.2' 
+              }}>
+                {selectedWorkout.title}
+              </h2>
+              
+              <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+                <span style={{ 
+                  fontSize: '0.75rem', 
+                  fontWeight: 700, 
+                  color: getWorkoutColor(selectedWorkout.type),
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  {selectedWorkout.type === 'Corrida' ? '🏃‍♂️' : selectedWorkout.type === 'Ciclismo' ? '🚴‍♂️' : selectedWorkout.type === 'Natacao' ? '🏊‍♂️' : selectedWorkout.type === 'Forca' ? '💪' : '💤'} {selectedWorkout.type}
+                </span>
+                
+                {(() => {
+                  const isCompleted = selectedWorkout.status === 'completed';
+                  const isAdjusted = selectedWorkout.status === 'adjusted';
+                  const isRest = selectedWorkout.type === 'Descanso';
+                  const isOverdue = !isCompleted && !isRest && isWorkoutOverdue(selectedWorkout.date);
+                  
+                  let bg = 'rgba(255, 255, 255, 0.05)';
+                  let border = 'rgba(255, 255, 255, 0.1)';
+                  let color = 'var(--text-secondary)';
+                  let text = 'Pendente';
+                  
+                  if (isCompleted) {
+                    bg = 'rgba(57, 255, 20, 0.1)';
+                    border = 'rgba(57, 255, 20, 0.2)';
+                    color = 'var(--neon-green)';
+                    text = 'Concluído';
+                  } else if (isAdjusted) {
+                    bg = 'rgba(255, 107, 53, 0.12)';
+                    border = 'rgba(255, 107, 53, 0.25)';
+                    color = 'var(--neon-orange)';
+                    text = 'Ajustado pela IA';
+                  } else if (isOverdue) {
+                    bg = 'rgba(255, 59, 48, 0.1)';
+                    border = 'rgba(255, 59, 48, 0.25)';
+                    color = 'var(--neon-red)';
+                    text = 'Não Realizado';
+                  }
+                  
+                  return (
+                    <span style={{ 
+                      fontSize: '0.75rem', 
+                      fontWeight: 700, 
+                      color,
+                      background: bg,
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      border: `1px solid ${border}`,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}>
+                      {text}
+                    </span>
+                  );
+                })()}
+              </div>
+            </div>
+
+            <hr style={{ border: 'none', height: '1px', background: 'rgba(255,255,255,0.08)', margin: '20px 0' }} />
+
+            {/* Prescrição / Descrição do Treino */}
+            <div style={{ marginBottom: '24px' }}>
+              <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', fontWeight: 600 }}>
+                Prescrição Detalhada
+              </h4>
+              <p style={{ 
+                fontSize: '0.95rem', 
+                color: '#fff', 
+                lineHeight: '1.6', 
+                background: 'rgba(255,255,255,0.02)', 
+                padding: '16px', 
+                borderRadius: '12px',
+                border: '1px solid rgba(255,255,255,0.04)',
+                whiteSpace: 'pre-line'
+              }}>
+                {selectedWorkout.description || 'Nenhuma descrição detalhada disponível.'}
+              </p>
+            </div>
+
+            {/* Metricas Alvo vs Realizado */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+              {/* Alvo */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <h4 style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '6px' }}>
+                  Métricas Alvo
+                </h4>
+                
+                {selectedWorkout.type !== 'Descanso' ? (
+                  <>
+                    {selectedWorkout.distance_target > 0 && (
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Distância:</span>
+                        <strong style={{ fontSize: '1rem', color: '#fff' }}>{formatDistance(selectedWorkout.distance_target)} km</strong>
+                      </div>
+                    )}
+                    {selectedWorkout.duration_target > 0 && (
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Duração:</span>
+                        <strong style={{ fontSize: '1rem', color: '#fff' }}>{secondsToTime(selectedWorkout.duration_target)}</strong>
+                      </div>
+                    )}
+                    {selectedWorkout.pace_target && selectedWorkout.pace_target !== 'N/A' && (
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Ritmo (Pace):</span>
+                        <strong style={{ fontSize: '1rem', color: '#fff' }}>{selectedWorkout.pace_target} /km</strong>
+                      </div>
+                    )}
+                    {selectedWorkout.power_target > 0 && (
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Potência Alvo:</span>
+                        <strong style={{ fontSize: '1rem', color: '#fff' }}>{selectedWorkout.power_target} W</strong>
+                      </div>
+                    )}
+                    <div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Carga de Estresse:</span>
+                      <strong style={{ fontSize: '1rem', color: 'var(--neon-cyan)' }}>{selectedWorkout.tss_target} TSS</strong>
+                    </div>
+                  </>
+                ) : (
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                    Off Fisiológico (Descanso)
+                  </span>
+                )}
+              </div>
+
+              {/* Realizado */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <h4 style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '6px' }}>
+                  Realizado
+                </h4>
+                
+                {(() => {
+                  const hasLog = activityLogs?.find((l: any) => l.workout_id === selectedWorkout.id);
+                  if (selectedWorkout.status === 'completed') {
+                    if (hasLog) {
+                      return (
+                        <>
+                          <div>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Distância:</span>
+                            <strong style={{ fontSize: '1rem', color: 'var(--neon-green)' }}>{formatDistance(hasLog.distance_real)} km</strong>
+                          </div>
+                          <div>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Duração:</span>
+                            <strong style={{ fontSize: '1rem', color: '#fff' }}>{secondsToTime(hasLog.duration_real)}</strong>
+                          </div>
+                          <div>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Ritmo Médio:</span>
+                            <strong style={{ fontSize: '1rem', color: '#fff' }}>{hasLog.pace_real} /km</strong>
+                          </div>
+                          {hasLog.avg_power > 0 && (
+                            <div>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Potência Média:</span>
+                              <strong style={{ fontSize: '1rem', color: '#fff' }}>{hasLog.avg_power} W</strong>
+                            </div>
+                          )}
+                          {hasLog.avg_hr > 0 && (
+                            <div>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Frequência Cardíaca:</span>
+                              <strong style={{ display: 'block', fontSize: '0.9rem', color: '#fff' }}>Média: {hasLog.avg_hr} bpm {hasLog.max_hr ? `| Máx: ${hasLog.max_hr}` : ''}</strong>
+                            </div>
+                          )}
+                          <div>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Estresse Realizado:</span>
+                            <strong style={{ fontSize: '1rem', color: 'var(--neon-green)' }}>{hasLog.tss_real} TSS</strong>
+                          </div>
+                        </>
+                      );
+                    } else {
+                      return (
+                        <>
+                          <div style={{ color: 'var(--neon-green)', fontWeight: 600, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <CheckCircle size={16} /> Concluído Manualmente
+                          </div>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                            As métricas alvo foram consideradas como realizadas neste treino marcado manualmente.
+                          </p>
+                        </>
+                      );
+                    }
+                  } else {
+                    const isRest = selectedWorkout.type === 'Descanso';
+                    const isOverdue = !isRest && isWorkoutOverdue(selectedWorkout.date);
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center', height: '100%' }}>
+                        {isOverdue ? (
+                          <>
+                            <span style={{ color: 'var(--neon-red)', fontWeight: 600, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <AlertTriangle size={16} /> Não Realizado
+                            </span>
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
+                              O limite de 48 horas para realizar e sincronizar este treino expirou.
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '0.85rem' }}>
+                              Pendente de sincronização
+                            </span>
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
+                              Aguardando atividade correspondente ser sincronizada via Strava.
+                            </span>
+                          </>
+                        )}
+                        <button
+                          onClick={() => openManualLog(selectedWorkout)}
+                          className="glow-btn"
+                          style={{
+                            marginTop: '12px',
+                            padding: '10px 16px',
+                            fontSize: '0.85rem',
+                            borderRadius: '8px',
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            background: 'linear-gradient(90deg, var(--neon-green) 0%, #10b981 100%)',
+                            border: 'none',
+                            color: '#030712',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <CheckCircle size={14} /> Lançar Treino Manualmente
+                        </button>
+                      </div>
+                    );
+                  }
+                })()}
+              </div>
+            </div>
+
+            {/* Rodapé do Modal */}
+            {selectedWorkout.status === 'completed' && (
+              <div style={{ 
+                background: 'rgba(252, 76, 2, 0.05)', 
+                border: '1px solid rgba(252, 76, 2, 0.15)', 
+                borderRadius: '10px', 
+                padding: '12px', 
+                fontSize: '0.75rem', 
+                color: '#fc4c02',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                justifyContent: 'center'
+              }}>
+                <Wifi size={14} />
+                Treino sincronizado via API Strava
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE LANÇAMENTO MANUAL DE TREINO */}
+      {showManualLogModal && (
+        <div 
+          onClick={() => setShowManualLogModal(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(3, 7, 18, 0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1010,
+            padding: '20px',
+            boxSizing: 'border-box'
+          }}
+        >
+          <form 
+            onSubmit={handleSaveManualLog}
+            onClick={e => e.stopPropagation()}
+            className="premium-card animate-fade-in"
+            style={{
+              width: '100%',
+              maxWidth: '550px',
+              padding: '28px',
+              background: 'linear-gradient(135deg, rgba(13, 21, 39, 0.95) 0%, rgba(6, 9, 19, 0.95) 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.15)',
+              position: 'relative',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              borderRadius: '16px'
+            }}
+          >
+            {/* Botão de Fechar */}
+            <button 
+              type="button"
+              onClick={() => setShowManualLogModal(false)}
+              aria-label="Fechar Lançamento"
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                padding: '8px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'var(--transition-smooth)'
+              }}
+              onMouseOver={e => {
+                e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)';
+                e.currentTarget.style.color = 'var(--neon-red)';
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            {/* Cabeçalho */}
+            <div style={{ marginBottom: '24px' }}>
+              <span style={{ 
+                fontSize: '0.75rem', 
+                fontWeight: 800, 
+                color: 'var(--neon-green)', 
+                textTransform: 'uppercase', 
+                letterSpacing: '0.15em',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <Dumbbell size={14} />
+                Lançamento Manual
+              </span>
+              <h2 style={{ 
+                fontSize: '1.5rem', 
+                fontWeight: 800, 
+                color: '#fff', 
+                marginTop: '6px',
+                lineHeight: '1.2' 
+              }}>
+                {manualLogForm.workoutId ? `Completar: ${manualLogForm.title}` : 'Lançar Novo Treino Extra'}
+              </h2>
+            </div>
+
+            {/* Campos do Formulário */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              
+              {!manualLogForm.workoutId && (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                        Data do Treino
+                      </label>
+                      <input 
+                        type="date"
+                        required
+                        className="glass-input"
+                        value={manualLogForm.date}
+                        onChange={e => setManualLogForm({ ...manualLogForm, date: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                        Modalidade
+                      </label>
+                      <select
+                        className="glass-input"
+                        style={{ height: '42px', background: '#0d1527', border: '1px solid var(--border-color)', color: '#fff', width: '100%', padding: '0 12px', borderRadius: '8px' }}
+                        value={manualLogForm.type}
+                        onChange={e => setManualLogForm({ ...manualLogForm, type: e.target.value })}
+                      >
+                        <option value="Corrida">🏃‍♂️ Corrida</option>
+                        <option value="Ciclismo">🚴‍♂️ Ciclismo</option>
+                        <option value="Natacao">🏊‍♂️ Natação</option>
+                        <option value="Forca">💪 Fortalecimento</option>
+                        <option value="Descanso">💤 Descanso</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                      Título do Treino
+                    </label>
+                    <input 
+                      type="text"
+                      required
+                      placeholder="Ex: Corrida de Ritmo Z3, Pedal de Giro..."
+                      className="glass-input"
+                      value={manualLogForm.title}
+                      onChange={e => setManualLogForm({ ...manualLogForm, title: e.target.value })}
+                    />
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                  Descrição / Comentários da Execução
+                </label>
+                <textarea 
+                  placeholder="Como foi o treino? Sentiu algum incômodo ou cansaço?"
+                  className="glass-input"
+                  style={{ minHeight: '60px', resize: 'vertical', paddingTop: '8px' }}
+                  value={manualLogForm.description}
+                  onChange={e => setManualLogForm({ ...manualLogForm, description: e.target.value })}
+                />
+              </div>
+
+              {manualLogForm.type !== 'Descanso' && (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                        Distância Realizada (km)
+                      </label>
+                      <input 
+                        type="text"
+                        placeholder="0,00"
+                        className="glass-input"
+                        value={manualLogForm.distanceReal}
+                        onChange={e => {
+                          const val = e.target.value.replace(/[^0-9.,]/g, '');
+                          const tssEst = estimateTSS(manualLogForm.type, val, manualLogForm.durationTime, manualLogForm.avgHr);
+                          setManualLogForm({ 
+                            ...manualLogForm, 
+                            distanceReal: val,
+                            paceReal: calcPace(val, manualLogForm.durationTime),
+                            tssReal: tssEst > 0 ? tssEst.toString() : manualLogForm.tssReal
+                          });
+                        }}
+                        onBlur={e => {
+                          const numericVal = parseFloat(manualLogForm.distanceReal.replace(',', '.')) || 0;
+                          setManualLogForm(prev => ({
+                            ...prev,
+                            distanceReal: numericVal > 0 ? numericVal.toFixed(2).replace('.', ',') : ''
+                          }));
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                        Duração Realizada (HH:MM:SS)
+                      </label>
+                      <input 
+                        type="text"
+                        required
+                        placeholder="00:00:00"
+                        className="glass-input"
+                        value={manualLogForm.durationTime}
+                        onChange={e => {
+                          const val = maskTimeInput(e.target.value);
+                          const tssEst = estimateTSS(manualLogForm.type, manualLogForm.distanceReal, val, manualLogForm.avgHr);
+                          setManualLogForm({ 
+                            ...manualLogForm, 
+                            durationTime: val,
+                            paceReal: calcPace(manualLogForm.distanceReal, val),
+                            tssReal: tssEst > 0 ? tssEst.toString() : manualLogForm.tssReal
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                        Ritmo Médio (Pace)
+                      </label>
+                      <input 
+                        type="text"
+                        placeholder="5:00/km"
+                        className="glass-input"
+                        value={manualLogForm.paceReal}
+                        onChange={e => setManualLogForm({ ...manualLogForm, paceReal: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                        Carga Estimada (TSS)
+                      </label>
+                      <input 
+                        type="number"
+                        required
+                        placeholder="0"
+                        className="glass-input"
+                        value={manualLogForm.tssReal}
+                        onChange={e => setManualLogForm({ ...manualLogForm, tssReal: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                        Frequência Cardíaca Média (bpm)
+                      </label>
+                      <input 
+                        type="number"
+                        placeholder="Ex: 145"
+                        className="glass-input"
+                        value={manualLogForm.avgHr}
+                        onChange={e => {
+                          const val = e.target.value;
+                          const tssEst = estimateTSS(manualLogForm.type, manualLogForm.distanceReal, manualLogForm.durationTime, val);
+                          setManualLogForm({ 
+                            ...manualLogForm, 
+                            avgHr: val,
+                            tssReal: tssEst > 0 ? tssEst.toString() : manualLogForm.tssReal
+                          });
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                        Potência Média (Watts)
+                      </label>
+                      <input 
+                        type="number"
+                        placeholder="Ex: 220"
+                        className="glass-input"
+                        value={manualLogForm.avgPower}
+                        onChange={e => setManualLogForm({ ...manualLogForm, avgPower: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+            </div>
+
+            {/* Rodapé e Ações */}
+            <div style={{ marginTop: '28px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button 
+                type="button"
+                className="glass-btn"
+                onClick={() => setShowManualLogModal(false)}
+                style={{ padding: '12px 24px', borderRadius: '10px' }}
+                disabled={isSubmittingManualLog}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="submit"
+                className="glow-btn"
+                style={{ 
+                  padding: '12px 24px', 
+                  borderRadius: '10px',
+                  background: 'linear-gradient(90deg, var(--neon-cyan) 0%, #00f0ff 100%)',
+                  color: '#030712',
+                  fontWeight: 700
+                }}
+                disabled={isSubmittingManualLog}
+              >
+                {isSubmittingManualLog ? 'Salvando...' : 'Salvar Treino'}
+              </button>
+            </div>
+
+          </form>
+        </div>
+      )}
     </div>
   );
 }

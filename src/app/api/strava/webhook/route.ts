@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { calculateHrTSS, calculatePaceTSS, autoRegulateTrainingPlan } from '@/lib/coach-engine';
+import { getStravaAccessToken } from '@/lib/strava';
 
 const VERIFY_TOKEN = 'APEX_STRAVA_TOKEN';
 
@@ -71,7 +72,7 @@ export async function POST(req: Request) {
 
       // Buscar os detalhes completos da atividade na API do Strava usando o Token do usuário
       // Como no ambiente dev as chaves podem ser simuladas, faremos uma chamada mockada se o token for 'mock_...'
-      const accessToken = userByStrava.strava_access_token;
+      const accessToken = await getStravaAccessToken(db, userId);
       
       if (accessToken && !accessToken.startsWith('mock_')) {
         try {
@@ -182,20 +183,70 @@ export async function POST(req: Request) {
       await autoRegulateTrainingPlan(db, userId, workoutId, tssReal);
     }
 
+    // RECALIBRAÇÃO FISIOLÓGICA AUTOMÁTICA
+    // Se a atividade for de Corrida e durou pelo menos 30 minutos (1800 segundos)
+    let autoCalibrated = false;
+    let autoCalibrateMsg = '';
+    if (activityType === 'Corrida' && durationReal >= 1800) {
+      const currentUser = await db.get<{
+        threshold_hr: number;
+        threshold_pace: string;
+        name: string;
+      }>('SELECT threshold_hr, threshold_pace, name FROM users WHERE id = ?', userId);
+
+      if (currentUser) {
+        let newLthr = currentUser.threshold_hr;
+        if (avgHr) {
+          newLthr = avgHr;
+        } else if (maxHr) {
+          newLthr = Math.round(maxHr * 0.90);
+        }
+
+        const cleanPaceReal = paceReal.replace('/km', '').trim();
+
+        if (newLthr !== currentUser.threshold_hr || cleanPaceReal !== currentUser.threshold_pace) {
+          await db.run(
+            'UPDATE users SET threshold_hr = ?, threshold_pace = ? WHERE id = ?',
+            newLthr,
+            cleanPaceReal,
+            userId
+          );
+
+          autoCalibrated = true;
+          const durationMins = Math.round(durationReal / 60);
+          autoCalibrateMsg = `Identifiquei sua corrida de hoje com duração de ${durationMins} min (${distanceReal} km). Com base nela, recalibrei automaticamente seus limiares fisiológicos no seu perfil. Nova Frequência Limiar: ${newLthr} bpm. Novo Pace Limiar: ${cleanPaceReal}/km.`;
+
+          const todayYmd = new Date().toISOString().split('T')[0];
+          await db.run(
+            `INSERT INTO coach_notifs (user_id, date, title, content, read)
+             VALUES (?, ?, 'Recalibração Fisiológica Automática 🏃‍♂️', ?, 0)`,
+            userId,
+            todayYmd,
+            autoCalibrateMsg
+          );
+          
+          console.log(`[Recalibração Automática] Usuário ${currentUser.name} (id=${userId}) recalibrado: LTHR=${newLthr} bpm, Pace=${cleanPaceReal}.`);
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Atividade sincronizada via Strava com sucesso!',
       workoutAssociated: !!workoutId,
       workoutId,
       calculatedTss: tssReal,
-      activityId: payload.object_id || null
+      activityId: payload.object_id || null,
+      autoCalibrated,
+      autoCalibrateMsg
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro no processamento do Strava Webhook:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erro interno no servidor';
     return NextResponse.json({ 
       success: false, 
-      error: error.message || 'Erro interno no servidor' 
+      error: errorMessage
     }, { status: 500 });
   }
 }

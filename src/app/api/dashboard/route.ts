@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { getDb, autoCompleteExpiredRests } from '@/lib/db';
 import { calculatePhysioMetrics } from '@/lib/coach-engine';
 import { getCelebration } from '@/lib/celebrations';
 
@@ -63,6 +63,9 @@ export async function GET(req: Request) {
           );
         }
       }
+      
+      // Autoconcluir treinos de Descanso expirados há mais de 48h
+      await autoCompleteExpiredRests(db, activePlan.id, today);
 
       // Obter treinos da planilha ativa
       workouts = await db.all('SELECT * FROM workouts WHERE plan_id = ? ORDER BY day_of_week ASC', activePlan.id);
