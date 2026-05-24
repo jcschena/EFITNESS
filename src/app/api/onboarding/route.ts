@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     const userInsert = await db.run(`
       INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, name, level, age, weight, thresholdHr, thresholdPace, weeklyHours, stravaConnected);
+    `, name, level, age, weight, thresholdHr, thresholdPace, weeklyHours, 0); // Always start as 0 (authorization is done via OAuth redirect after onboarding)
     
     const userId = userInsert.lastID;
 
@@ -146,6 +146,20 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error('Erro no processamento do Onboarding:', error);
+    return NextResponse.json({ 
+      success: false, 
+      error: error.message || 'Erro interno no servidor' 
+    }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    const db = await getDb();
+    const athletes = await db.all('SELECT id, name, level FROM users ORDER BY id ASC');
+    return NextResponse.json({ success: true, athletes });
+  } catch (error: any) {
+    console.error('Erro ao listar atletas:', error);
     return NextResponse.json({ 
       success: false, 
       error: error.message || 'Erro interno no servidor' 

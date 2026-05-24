@@ -3,9 +3,9 @@ import { getDb } from '@/lib/db';
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
+    const { searchParams, origin } = new URL(req.url);
     const code = searchParams.get('code');
-    const userIdStr = searchParams.get('userId') || '1';
+    const userIdStr = searchParams.get('state') || searchParams.get('userId') || '1';
     const userId = parseInt(userIdStr, 10);
 
     const db = await getDb();
@@ -42,16 +42,19 @@ export async function GET(req: Request) {
           expiresAt = tokenData.expires_at;
           console.log('Token do Strava trocado com sucesso para o usuário:', userId);
         } else {
-          console.error('Erro na resposta de troca de token do Strava');
+          const errBody = await tokenResponse.text();
+          console.error('Erro na resposta de troca de token do Strava:', errBody);
+          return NextResponse.redirect(`${origin}/?error=strava_token_exchange_failed&userId=${userId}`);
         }
       } catch (err) {
         console.error('Erro ao chamar token do Strava:', err);
+        return NextResponse.redirect(`${origin}/?error=strava_connection_error&userId=${userId}`);
       }
     } else {
       console.log('Executando simulação de tokens Strava OAuth para o usuário:', userId);
     }
 
-    // Gravar tokens e marcar conexão no SQLite
+    // Gravar tokens e marcar conexão no SQLite/PostgreSQL
     await db.run(`
       UPDATE users 
       SET strava_connected = 1,
@@ -69,11 +72,11 @@ export async function GET(req: Request) {
     `, userId, todayStr);
 
     // Redirecionar de volta para a página principal (onde a SPA recarregará o estado)
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    return NextResponse.redirect(`${appUrl}?strava_sync=success&userId=${userId}`);
+    return NextResponse.redirect(`${origin}/?strava_sync=success&userId=${userId}`);
 
   } catch (error) {
     console.error('Erro no Callback do Strava:', error);
-    return NextResponse.redirect(new URL('/?error=internal_callback_error', req.url));
+    const { origin } = new URL(req.url);
+    return NextResponse.redirect(`${origin}/?error=internal_callback_error`);
   }
 }

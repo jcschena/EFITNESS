@@ -7,6 +7,7 @@ import {
   MessageSquare, 
   Sliders, 
   User, 
+  Users,
   Calendar, 
   TrendingUp, 
   Heart, 
@@ -127,10 +128,72 @@ export default function Home() {
     }
   };
 
+  // Lista de atletas para seleção na tela de login
+  const [athletesList, setAthletesList] = useState<Array<{ id: number; name: string; level: string }>>([]);
+  const [selectedAthleteId, setSelectedAthleteId] = useState<string>('');
+
+  // Carregar lista de atletas cadastrados
+  useEffect(() => {
+    const loadAthletes = async () => {
+      try {
+        const res = await fetch('/api/onboarding');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.athletes) {
+            setAthletesList(data.athletes);
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao carregar atletas:', err);
+      }
+    };
+    loadAthletes();
+  }, [activeUser]);
+
+  // Inicialização da sessão e leitura de URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlUserId = params.get('userId');
+    const syncStatus = params.get('strava_sync');
+    const errorStatus = params.get('error');
+
+    if (syncStatus === 'success') {
+      alert('Conexão com o Strava realizada com sucesso!');
+    } else if (errorStatus === 'strava_token_exchange_failed') {
+      alert('Erro ao trocar tokens com o Strava. Verifique suas credenciais de API no painel do Strava.');
+    } else if (errorStatus === 'strava_connection_error') {
+      alert('Erro de conexão ao tentar falar com a API do Strava.');
+    } else if (errorStatus === 'internal_callback_error') {
+      alert('Erro interno no servidor ao processar o callback do Strava.');
+    }
+
+    if (urlUserId) {
+      const parsedId = parseInt(urlUserId, 10);
+      if (!isNaN(parsedId)) {
+        setActiveUser(parsedId);
+        localStorage.setItem('active_user_id', String(parsedId));
+        // Limpar query string para manter a URL limpa
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+        return;
+      }
+    }
+
+    const savedUserId = localStorage.getItem('active_user_id');
+    if (savedUserId) {
+      const parsedId = parseInt(savedUserId, 10);
+      if (!isNaN(parsedId)) {
+        setActiveUser(parsedId);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if (activeUser) {
+      localStorage.setItem('active_user_id', String(activeUser));
       fetchDashboard(activeUser);
     } else {
+      localStorage.removeItem('active_user_id');
       setLoading(false);
     }
   }, [activeUser]);
@@ -204,7 +267,11 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
         setChatMessages([]); // Limpar chat antigo
-        setActiveUser(data.userId);
+        if (onboardForm.stravaConnected) {
+          window.location.href = `/api/strava/auth?userId=${data.userId}`;
+        } else {
+          setActiveUser(data.userId);
+        }
       } else {
         const errData = await res.json();
         alert(`Erro no banco de dados de onboarding: ${errData.error || 'Erro no servidor'}`);
@@ -349,6 +416,50 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+        {/* Seletor de Atletas Cadastrados */}
+        {athletesList.length > 0 && (
+          <div className="premium-card" style={{ marginBottom: '24px', textAlign: 'center' }}>
+            <h3 style={{ marginBottom: '12px', fontSize: '1.1rem', color: 'var(--neon-cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <Users size={18} style={{ color: 'var(--neon-cyan)' }} />
+              Atletas Cadastrados
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px' }}>
+              Selecione um perfil de atleta existente na base de dados para acessar:
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', alignItems: 'center' }}>
+              <select 
+                className="glass-input" 
+                style={{ flex: 1, background: '#0d1527', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
+                value={selectedAthleteId}
+                onChange={e => setSelectedAthleteId(e.target.value)}
+              >
+                <option value="">-- Selecione seu Perfil --</option>
+                {athletesList.map(ath => (
+                  <option key={ath.id} value={ath.id} style={{ background: '#0d1527', color: '#fff' }}>
+                    {ath.name} ({ath.level === 'elite' ? 'Elite' : ath.level === 'sedentario' ? 'Iniciante' : 'Intermediário'})
+                  </option>
+                ))}
+              </select>
+              <button 
+                className="glow-btn"
+                disabled={!selectedAthleteId}
+                onClick={() => {
+                  if (selectedAthleteId) {
+                    setActiveUser(parseInt(selectedAthleteId, 10));
+                  }
+                }}
+                style={{ 
+                  padding: '12px 24px', 
+                  opacity: selectedAthleteId ? 1 : 0.5,
+                  cursor: selectedAthleteId ? 'pointer' : 'not-allowed'
+                }}
+              >
+                Entrar
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Formulário de Onboarding passo a passo */}
         <div className="premium-card">
@@ -642,14 +753,44 @@ export default function Home() {
           {/* Active User Info & Switch */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: user?.strava_connected ? 'var(--neon-cyan)' : 'var(--text-muted)', animation: user?.strava_connected ? 'pulseGlow 2s infinite' : 'none' }}></div>
+              {(() => {
+                const isRealConnected = user?.strava_connected && user?.strava_access_token && !user?.strava_access_token.startsWith('mock_');
+                const isMockConnected = user?.strava_connected && user?.strava_access_token && user?.strava_access_token.startsWith('mock_');
+                
+                let dotColor = 'var(--text-muted)';
+                let glow = 'none';
+                let label = 'Desconectado';
+                
+                if (isRealConnected) {
+                  dotColor = '#fc4c02'; // Strava Orange
+                  glow = 'pulseGlow 2s infinite';
+                  label = 'Strava Real Conectado';
+                } else if (isMockConnected) {
+                  dotColor = 'var(--neon-cyan)';
+                  glow = 'pulseGlow 2s infinite';
+                  label = 'Strava Sandbox Ativo';
+                }
+                
+                return (
+                  <div 
+                    title={`Status Strava: ${label}`}
+                    style={{ 
+                      width: '8px', 
+                      height: '8px', 
+                      borderRadius: '50%', 
+                      background: dotColor, 
+                      animation: glow 
+                    }}
+                  ></div>
+                );
+              })()}
               <span style={{ color: 'var(--text-secondary)' }}>Atleta:</span>
               <strong style={{ color: '#fff' }}>{user?.name}</strong>
               <span style={{ fontSize: '0.75rem', padding: '1px 6px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: user?.level === 'elite' ? 'var(--neon-green)' : 'var(--neon-cyan)' }}>
                 {user?.level?.toUpperCase() || ''}
               </span>
             </div>
-            {!user?.strava_connected && (
+            {(!user?.strava_connected || !user?.strava_access_token || user?.strava_access_token.startsWith('mock_')) && (
               <a 
                 href={`/api/strava/auth?userId=${user?.id}`}
                 style={{ 
