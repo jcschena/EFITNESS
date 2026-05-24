@@ -25,7 +25,8 @@ import {
   Check,
   X,
   Plus,
-  Target
+  Target,
+  Copy
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { SPORTS_CONFIG, getSportConfig } from '@/lib/sports';
@@ -343,6 +344,62 @@ export default function Home() {
     return estimatedTss;
   };
 
+  const handleAddToGoogleCalendar = (workout: any) => {
+    if (!workout) return;
+    
+    const summaryPrefix = workout.type === 'Corrida' ? '🏃' :
+                          workout.type === 'Ciclismo' ? '🚴' :
+                          workout.type === 'Natacao' ? '🏊' :
+                          workout.type === 'Forca' ? '💪' :
+                          workout.type === 'Descanso' ? '😴' : '⚡';
+
+    const typeName = workout.type === 'Corrida' ? 'Corrida' :
+                     workout.type === 'Ciclismo' ? 'Ciclismo' :
+                     workout.type === 'Natacao' ? 'Natação' :
+                     workout.type === 'Forca' ? 'Fortalecimento' :
+                     workout.type === 'Descanso' ? 'Descanso' : workout.type;
+
+    const title = encodeURIComponent(`${summaryPrefix} [${typeName}] ${workout.title}`);
+    const startStr = workout.date.replace(/-/g, '');
+    
+    const startDateObj = new Date(workout.date + 'T12:00:00');
+    startDateObj.setDate(startDateObj.getDate() + 1);
+    const endStr = startDateObj.getFullYear() + 
+                   String(startDateObj.getMonth() + 1).padStart(2, '0') + 
+                   String(startDateObj.getDate()).padStart(2, '0');
+
+    const descParts = [];
+    if (workout.description) {
+      descParts.push(workout.description);
+    }
+    
+    if (workout.type !== 'Descanso') {
+      descParts.push('');
+      if (workout.distance_target > 0) {
+        descParts.push(`Distância Prescrita: ${formatDistance(workout.distance_target)} km`);
+      }
+      if (workout.duration_target > 0) {
+        descParts.push(`Duração Prescrita: ${secondsToTime(workout.duration_target)}`);
+      }
+      if (workout.pace_target && workout.pace_target !== 'N/A') {
+        descParts.push(`Ritmo Alvo (Pace): ${workout.pace_target} /km`);
+      }
+      if (workout.power_target > 0) {
+        descParts.push(`Potência Alvo: ${workout.power_target} W`);
+      }
+      if (workout.tss_target > 0) {
+        descParts.push(`Carga Estimada: ${workout.tss_target} TSS`);
+      }
+    }
+    
+    descParts.push(`Status do Treino: ${workout.status === 'completed' ? 'Concluído' : 'Pendente'}`);
+    
+    const details = encodeURIComponent(descParts.join('\n'));
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&sf=true&output=xml`;
+    
+    window.open(url, '_blank');
+  };
+
   const openManualLog = (workout: any = null) => {
     const todayYmd = new Date().toLocaleDateString('en-CA');
     if (workout) {
@@ -472,8 +529,9 @@ export default function Home() {
   const [loginLoading, setLoginLoading] = useState<boolean>(false);
 
   // Estados de Edição do Perfil
-  const [profileSaving, setProfileSaving] = useState<boolean>(false);
+  const [profileSaving, setProfileSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [copiedCalendarUrl, setCopiedCalendarUrl] = useState(false);
   const [showProfileCelebration, setShowProfileCelebration] = useState<boolean>(false);
   const [profileForm, setProfileForm] = useState({
     name: '',
@@ -830,6 +888,11 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
         setChatMessages(prev => [...prev, { sender: 'coach', text: data.reply }]);
+        
+        // Se o coach alterou o banco de dados de treinos, atualiza os dados na tela
+        if (data.dbUpdated && activeUser) {
+          await fetchDashboard(activeUser);
+        }
       } else {
         const errData = await res.json().catch(() => ({}));
         setChatMessages(prev => [...prev, { 
@@ -1025,7 +1088,7 @@ export default function Home() {
   }
 
   // SE JÁ EXISTE UM USUÁRIO ATIVO CARREGADO E COM DADOS DO DASHBOARD
-  const { user, goal, plan, workouts, activityLogs, notifications, metrics, lastSyncedActivity, celebration } = dashboardData || {};
+  const { user, goal, plan, workouts, activityLogs, notifications, metrics, lastSyncedActivity, celebration, calendarUrl } = dashboardData || {};
 
   const todayDateStr = currentTime ? currentTime.toLocaleDateString('en-CA') : new Date().toLocaleDateString('en-CA');
   const todayWorkout = workouts?.find((w: any) => w.date === todayDateStr);
@@ -1167,40 +1230,42 @@ export default function Home() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
       {/* NAVBAR HEADER */}
       <header style={{ background: 'rgba(6, 9, 19, 0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, zIndex: 10, padding: '12px 20px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="navbar-container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
           
           {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transition: 'transform 0.3s ease', filter: 'drop-shadow(0 0 8px rgba(0, 240, 255, 0.4))' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1) rotate(0deg)'}>
-              <defs>
-                <linearGradient id="ultra-grad-nav" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#00f0ff" />
-                  <stop offset="50%" stopColor="#b4f8c8" />
-                  <stop offset="100%" stopColor="#39ff14" />
-                </linearGradient>
-              </defs>
-              <path d="M6 18L16 6L26 18" stroke="url(#ultra-grad-nav)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M10 24L16 16L22 24" stroke="url(#ultra-grad-nav)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
-              <path d="M6 18C6 24 10 28 16 28C22 28 26 24 26 18" stroke="url(#ultra-grad-nav)" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
-            </svg>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.05em', background: 'linear-gradient(90deg, #fff 0%, #00f0ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0, lineHeight: 1 }}>
-                  ULTRA
-                </h2>
-                <span style={{ fontSize: '0.6rem', padding: '1px 4px', background: 'rgba(0, 240, 255, 0.1)', border: '1px solid rgba(0, 240, 255, 0.2)', borderRadius: '4px', color: 'var(--neon-cyan)', fontWeight: 700, letterSpacing: '0.05em', lineHeight: 1 }}>
-                  COACH
+          <div className="navbar-logo-container">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transition: 'transform 0.3s ease', filter: 'drop-shadow(0 0 8px rgba(0, 240, 255, 0.4))' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1) rotate(0deg)'}>
+                <defs>
+                  <linearGradient id="ultra-grad-nav" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#00f0ff" />
+                    <stop offset="50%" stopColor="#b4f8c8" />
+                    <stop offset="100%" stopColor="#39ff14" />
+                  </linearGradient>
+                </defs>
+                <path d="M6 18L16 6L26 18" stroke="url(#ultra-grad-nav)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M10 24L16 16L22 24" stroke="url(#ultra-grad-nav)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+                <path d="M6 18C6 24 10 28 16 28C22 28 26 24 26 18" stroke="url(#ultra-grad-nav)" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+              </svg>
+              <div className="navbar-logo-text">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.05em', background: 'linear-gradient(90deg, #fff 0%, #00f0ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0, lineHeight: 1 }}>
+                    ULTRA
+                  </h2>
+                  <span style={{ fontSize: '0.6rem', padding: '1px 4px', background: 'rgba(0, 240, 255, 0.1)', border: '1px solid rgba(0, 240, 255, 0.2)', borderRadius: '4px', color: 'var(--neon-cyan)', fontWeight: 700, letterSpacing: '0.05em', lineHeight: 1 }}>
+                    COACH
+                  </span>
+                </div>
+                <span className="navbar-slogan">
+                  Esforço conjunto, conquista compartilhada!
                 </span>
               </div>
-              <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', fontWeight: 500, marginTop: '2px', whiteSpace: 'nowrap' }}>
-                Esforço conjunto, conquista compartilhada!
-              </span>
             </div>
           </div>
 
           {/* Active User Info & Switch */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+          <div className="navbar-athlete-info">
+            <div className="navbar-athlete-badge-row">
               {(() => {
                 const isRealConnected = user?.strava_connected && user?.strava_access_token && !user?.strava_access_token.startsWith('mock_');
                 const isMockConnected = user?.strava_connected && user?.strava_access_token && user?.strava_access_token.startsWith('mock_');
@@ -1238,41 +1303,44 @@ export default function Home() {
                 {user?.level?.toUpperCase() || ''}
               </span>
             </div>
-            {(!user?.strava_connected || !user?.strava_access_token || user?.strava_access_token.startsWith('mock_')) && (
-              <a 
-                href={`/api/strava/auth?userId=${user?.id}`}
-                style={{ 
-                  background: 'linear-gradient(135deg, #fc4c02 0%, #d83c01 100%)', 
-                  color: '#fff', 
-                  borderRadius: '8px', 
-                  padding: '6px 12px', 
-                  fontSize: '0.75rem', 
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  boxShadow: '0 4px 12px rgba(252, 76, 2, 0.25)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  transition: 'var(--transition-smooth)' 
+            
+            <div className="navbar-actions">
+              {(!user?.strava_connected || !user?.strava_access_token || user?.strava_access_token.startsWith('mock_')) && (
+                <a 
+                  href={`/api/strava/auth?userId=${user?.id}`}
+                  style={{ 
+                    background: 'linear-gradient(135deg, #fc4c02 0%, #d83c01 100%)', 
+                    color: '#fff', 
+                    borderRadius: '8px', 
+                    padding: '6px 12px', 
+                    fontSize: '0.75rem', 
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    boxShadow: '0 4px 12px rgba(252, 76, 2, 0.25)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    transition: 'var(--transition-smooth)' 
+                  }}
+                >
+                  Conectar Strava Real
+                </a>
+              )}
+              <button 
+                onClick={() => {
+                  setActiveUser(null);
+                  setDashboardData(null);
+                  setChatMessages([]);
+                  setUsernameInput('');
+                  setPasswordInput('');
                 }}
+                style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', color: 'var(--text-secondary)', cursor: 'pointer', transition: 'var(--transition-smooth)' }}
+                onMouseOver={e => e.currentTarget.style.borderColor = 'var(--neon-red)'}
+                onMouseOut={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
               >
-                Conectar Strava Real
-              </a>
-            )}
-            <button 
-              onClick={() => {
-                setActiveUser(null);
-                setDashboardData(null);
-                setChatMessages([]);
-                setUsernameInput('');
-                setPasswordInput('');
-              }}
-              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', color: 'var(--text-secondary)', cursor: 'pointer', transition: 'var(--transition-smooth)' }}
-              onMouseOver={e => e.currentTarget.style.borderColor = 'var(--neon-red)'}
-              onMouseOut={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
-            >
-              Sair
-            </button>
+                Sair
+              </button>
+            </div>
           </div>
 
         </div>
@@ -1627,7 +1695,7 @@ export default function Home() {
             </div>
 
             {/* STATUS BRIEF */}
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', borderLeft: '1px solid var(--border-color)', paddingLeft: '20px' }}>
+            <div className="status-brief-container">
               <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Status do Organismo</span>
               <strong style={{ fontSize: '0.95rem', color: '#fff', margin: '4px 0' }}>{tsbStatus}</strong>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1656,7 +1724,7 @@ export default function Home() {
         )}
 
         {/* TAB NAVIGATION */}
-        <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', gap: '8px', paddingBottom: '2px' }}>
+        <div className="hide-scrollbar" style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', gap: '8px', paddingBottom: '2px' }}>
           <button 
             className="tab-btn" 
             onClick={() => setActiveTab('planilha')}
@@ -1910,8 +1978,8 @@ export default function Home() {
 
             {/* Lista da Planilha Semanal */}
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+              <div className="section-header-responsive" style={{ marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', margin: 0, flexWrap: 'wrap' }}>
                   Planilha Semanal
                   <span style={{ fontSize: '0.8rem', fontWeight: 400, color: 'var(--text-secondary)' }}>({plan?.name})</span>
                 </h3>
@@ -1998,14 +2066,9 @@ export default function Home() {
                   return (
                     <div 
                       key={w.id} 
-                      className="premium-card" 
+                      className="premium-card workout-card" 
                       onClick={() => setSelectedWorkout(w)}
                       style={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: '80px 1.5fr 2fr 1.2fr', 
-                        alignItems: 'center', 
-                        gap: '16px',
-                        padding: '16px 20px',
                         cursor: 'pointer',
                         borderColor: isToday
                           ? 'var(--neon-cyan)'
@@ -2052,7 +2115,7 @@ export default function Home() {
                       }}
                     >
                       {/* Dia e Tipo */}
-                      <div>
+                      <div className="workout-card-header">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span style={{ 
                             fontSize: '0.75rem', 
@@ -2086,7 +2149,7 @@ export default function Home() {
                       </div>
 
                       {/* Nome do Treino e Descrição */}
-                      <div>
+                      <div className="workout-card-info">
                         <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
                           {w.title}
                           {isAdjusted && (
@@ -2101,7 +2164,7 @@ export default function Home() {
                       </div>
 
                       {/* Carga Alvo & Pace Prescrito */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.85rem' }}>
+                      <div className="workout-card-metrics" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.85rem' }}>
                         <div>
                           <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.7rem' }}>Prescrito</span>
                           <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
@@ -2149,7 +2212,7 @@ export default function Home() {
                       </div>
 
                       {/* TSS Badge */}
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
+                      <div className="workout-card-tss" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                         <div style={{ fontSize: '0.95rem', fontWeight: 700, color: isCompleted ? 'var(--neon-green)' : 'var(--text-primary)' }}>
                           {isCompleted && hasLog ? hasLog.tss_real : w.tss_target} <span style={{ fontSize: '0.7rem', fontWeight: 400, color: 'var(--text-secondary)' }}>TSS</span>
                         </div>
@@ -2899,7 +2962,7 @@ export default function Home() {
                       />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="form-grid-2">
                       <div>
                         <label htmlFor="profile-birth" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Data de Nascimento</label>
                         <input 
@@ -2979,7 +3042,7 @@ export default function Home() {
                     {/* Seleção de Nível Esportivo */}
                     <div>
                       <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '10px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Nível de Condicionamento</label>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                      <div className="level-grid">
                         {[
                           { value: 'sedentario', label: 'Iniciante', desc: 'Saindo do sedentarismo' },
                           { value: 'intermediario', label: 'Intermediário', desc: 'Treinos estruturados' },
@@ -3016,7 +3079,7 @@ export default function Home() {
                     </div>
 
                     {/* Inputs de Limiares */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="form-grid-2">
                       <div>
                         <label htmlFor="profile-thr" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Frequência Limiar (bpm)</label>
                         <input 
@@ -3077,7 +3140,7 @@ export default function Home() {
 
                   <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="form-grid-2">
                       <div>
                         <label htmlFor="goal-type" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Tipo de Prova</label>
                         <select 
@@ -3115,7 +3178,7 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="form-grid-2">
                       <div>
                         <label htmlFor="goal-date" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Data da Prova</label>
                         <input 
@@ -3181,6 +3244,118 @@ export default function Home() {
                 )}
               </button>
             </form>
+
+            {/* CARD 3: INTEGRAÇÃO DE AGENDA (iCal/ICS) */}
+            <div className="premium-card" style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '20px', 
+              marginTop: '24px',
+              border: '1px solid rgba(0, 240, 255, 0.2)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 240, 255, 0.05)'
+            }}>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', color: '#fff' }}>
+                  <Calendar size={20} style={{ color: 'var(--neon-cyan)' }} />
+                  Sincronização com Calendário (Google Agenda / Apple / Outlook)
+                </h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '4px' }}>
+                  Sincronize toda a sua planilha de treinos dinâmicos automaticamente com o seu aplicativo de calendário pessoal.
+                </p>
+              </div>
+
+              <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                  Copie o link seguro abaixo e assine-o em seu aplicativo de agenda. Os treinos do ULTRA COACH serão atualizados e exibidos automaticamente.
+                </p>
+
+                {/* Input de Copiar Link */}
+                <div className="copy-link-container">
+                  <input 
+                    type="text" 
+                    readOnly 
+                    className="glass-input" 
+                    value={calendarUrl || 'Carregando URL do feed...'} 
+                    style={{ 
+                      fontFamily: 'monospace', 
+                      fontSize: '0.8rem', 
+                      color: 'var(--neon-cyan)',
+                      background: 'rgba(3, 7, 18, 0.6)',
+                      flex: 1
+                    }}
+                    onClick={(e) => (e.target as HTMLInputElement).select()}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (calendarUrl) {
+                        navigator.clipboard.writeText(calendarUrl);
+                        setCopiedCalendarUrl(true);
+                        setTimeout(() => setCopiedCalendarUrl(false), 2000);
+                      }
+                    }}
+                    className="glow-btn"
+                    style={{ 
+                      padding: '12px 20px', 
+                      borderRadius: '8px', 
+                      fontSize: '0.85rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      whiteSpace: 'nowrap',
+                      background: copiedCalendarUrl ? 'linear-gradient(90deg, var(--neon-green) 0%, #10b981 100%)' : undefined,
+                      color: copiedCalendarUrl ? '#030712' : undefined
+                    }}
+                  >
+                    {copiedCalendarUrl ? (
+                      <>
+                        <CheckCircle size={16} />
+                        Copiado!
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={16} />
+                        Copiar Link
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Guia de Configuração Rápida */}
+                <div style={{ 
+                  background: 'rgba(255, 255, 255, 0.02)', 
+                  border: '1px solid rgba(255, 255, 255, 0.04)', 
+                  borderRadius: '10px', 
+                  padding: '16px',
+                  marginTop: '8px'
+                }}>
+                  <h4 style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', marginBottom: '10px' }}>
+                    Como configurar em seu calendário:
+                  </h4>
+                  <ul style={{ 
+                    fontSize: '0.8rem', 
+                    color: 'var(--text-secondary)', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '8px', 
+                    paddingLeft: '16px',
+                    margin: 0,
+                    lineHeight: '1.4'
+                  }}>
+                    <li>
+                      <strong>Google Agenda (Web):</strong> No menu esquerdo, ao lado de <em>"Outras agendas"</em>, clique no botão <strong>+</strong> &gt; <strong>"Do URL"</strong>, cole o link acima e clique em <em>"Adicionar agenda"</em>.
+                    </li>
+                    <li>
+                      <strong>Apple Calendar (Mac/iPhone):</strong> Abra o aplicativo Calendário, vá em <strong>Arquivo</strong> &gt; <strong>Nova Assinatura de Calendário...</strong>, cole o link e clique em OK. No iPhone, vá em Ajustes &gt; Calendário &gt; Contas &gt; Adicionar Conta &gt; Outra &gt; Adicionar Assinatura de Calendário.
+                    </li>
+                    <li>
+                      <strong>Outlook (Web/Desktop):</strong> Clique em <strong>Adicionar Calendário</strong> &gt; <strong>Inscrever-se da Web</strong>, insira o link, dê um nome ao calendário (ex: "Treinos ULTRA") e clique em Salvar.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -3188,7 +3363,7 @@ export default function Home() {
 
       {/* FOOTER PWA MOBILE NAV */}
       <footer style={{ background: 'rgba(6, 9, 19, 0.9)', borderTop: '1px solid var(--border-color)', padding: '16px 20px', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="footer-container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <span>© 2026 ULTRA COACH. Todos os direitos reservados.</span>
           <div style={{ display: 'flex', gap: '16px' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -3386,7 +3561,7 @@ export default function Home() {
             </div>
 
             {/* Metricas Alvo vs Realizado */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+            <div className="modal-metrics-grid">
               {/* Alvo */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <h4 style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '6px' }}>
@@ -3428,6 +3603,40 @@ export default function Home() {
                   <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
                     Off Fisiológico (Descanso)
                   </span>
+                )}
+                
+                {selectedWorkout.type !== 'Descanso' && (
+                  <button
+                    type="button"
+                    onClick={() => handleAddToGoogleCalendar(selectedWorkout)}
+                    className="glow-btn"
+                    style={{
+                      marginTop: '8px',
+                      padding: '10px 14px',
+                      fontSize: '0.8rem',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      border: '1px solid rgba(0, 240, 255, 0.3)',
+                      background: 'rgba(0, 240, 255, 0.05)',
+                      color: 'var(--neon-cyan)',
+                      cursor: 'pointer',
+                      transition: 'var(--transition-smooth)'
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.background = 'var(--neon-cyan)';
+                      e.currentTarget.style.color = '#030712';
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.background = 'rgba(0, 240, 255, 0.05)';
+                      e.currentTarget.style.color = 'var(--neon-cyan)';
+                    }}
+                  >
+                    <Calendar size={14} />
+                    Google Agenda
+                  </button>
                 )}
               </div>
 
@@ -3661,7 +3870,7 @@ export default function Home() {
               
               {!manualLogForm.workoutId && (
                 <>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="form-grid-2">
                     <div>
                       <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
                         Data do Treino
@@ -3724,7 +3933,7 @@ export default function Home() {
 
               {manualLogForm.type !== 'Descanso' && (
                 <>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="form-grid-2">
                     <div>
                       <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
                         Distância Realizada (km)
@@ -3777,7 +3986,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="form-grid-2">
                     <div>
                       <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
                         Ritmo Médio (Pace)
@@ -3805,7 +4014,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="form-grid-2" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px' }}>
                     <div>
                       <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
                         Frequência Cardíaca Média (bpm)

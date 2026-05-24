@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb, autoCompleteExpiredRests } from '@/lib/db';
 import { calculatePhysioMetrics } from '@/lib/coach-engine';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { getCelebration } from '@/lib/celebrations';
 
 // Instanciar o SDK do Gemini se a chave estiver configurada
@@ -104,12 +104,12 @@ export async function POST(req: Request) {
     // Se a API do Gemini não estiver configurada, disparar o fallback
     if (!ai) {
       const fallbackReply = getFallbackCoachResponse(message, user, goal, metrics, workouts, clientDate);
-      return NextResponse.json({ reply: fallbackReply });
+      return NextResponse.json({ reply: fallbackReply, dbUpdated: false });
     }
 
     // 5. Configurar o Contexto Fisiológico Científico no Prompt do Gemini
     const workoutsSummary = workouts.map(w => {
-      return `- Dia ${w.day_of_week} (${w.date}): ${w.title} [Status: ${w.status}, Prescrito: ${w.distance_target}km, Carga: ${w.tss_target} TSS]`;
+      return `- ID: ${w.id}, Dia ${w.day_of_week} (${w.date}): ${w.title} [Tipo: ${w.type || 'N/A'}, Status: ${w.status}, Prescrito: ${w.distance_target || 0}km, Carga: ${w.tss_target || 0} TSS, Ritmo: ${w.pace_target || 'N/A'}, Potência: ${w.power_target || 0}W, Duração: ${w.duration_target || 0}s]`;
     }).join('\n');
 
     const celebration = getCelebration(user.birth_date, clientDate);
@@ -154,12 +154,40 @@ Diretrizes de Comportamento (Persona do Coach):
 3. **Análise Baseada nos Dados:** Utilize os dados reais do atleta (CTL, ATL, TSB, desvios de TSS) nas suas respostas. Se o usuário estiver sentindo cansaço, use as métricas para corroborar e se solidarizar ("Cara, com essa ATL lá em cima e Forma em ${metrics.tsb}, é super normal se sentir quebrado. Vamos cuidar desse corpo!").
 4. **Preocupação e Apoio:** Incentive-o em caso de falhas de treino ("Relaxa, acontece! A vida corrida às vezes atrapalha. Não vamos nos desesperar, já dei um tapa na planilha...") e celebre as vitórias.
 5. Fale sempre em Português Brasileiro (pt-BR), de forma concisa e estruturada.
+6. **Ajuste de Treinos/Planilha:** Se o usuário solicitar explicitamente alterações, ajustes ou redimensionamento do planejamento (ex: reduzir distância de terça, remover o longo, mudar dia de descanso, alterar ritmo/pace, etc.), você DEVE chamar a função (tool) 'adjustWorkout' para registrar essa alteração no banco de dados. Nunca afirme que alterou a planilha sem de fato invocar a função correspondente.
 `;
 
-    // 6. Chamar a API do Gemini
+    // 6. Chamar a API do Gemini com suporte a Tools
+    let dbUpdated = false;
     const model = ai.getGenerativeModel({ 
       model: 'gemini-2.5-flash',
-      systemInstruction: systemInstruction
+      systemInstruction: systemInstruction,
+      tools: [
+        {
+          functionDeclarations: [
+            {
+              name: 'adjustWorkout',
+              description: 'Ajusta ou altera os detalhes de um treino específico na planilha do atleta no banco de dados. Chame essa função quando o atleta pedir explicitamente para alterar a planilha ou treinos específicos (ex: diminuir volume, mudar distância, trocar descanso de dia, alterar ritmo/pace).',
+              parameters: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  workoutId: { type: SchemaType.INTEGER, description: 'O ID único do treino a ser modificado.' },
+                  type: { type: SchemaType.STRING, description: 'O tipo do treino: Corrida, Ciclismo, Natacao, Descanso, Forca, CorridaTrilha, Duathlon, Aquathlon.' },
+                  title: { type: SchemaType.STRING, description: 'O título descritivo do treino.' },
+                  description: { type: SchemaType.STRING, description: 'Nova instrução, descrição ou notas para o treino.' },
+                  distance_target: { type: SchemaType.NUMBER, description: 'A distância alvo em KM (use 0 para treinos sem distância como descanso ou força).' },
+                  duration_target: { type: SchemaType.INTEGER, description: 'A duração alvo em segundos (ex: 3600 para 1 hora).' },
+                  pace_target: { type: SchemaType.STRING, description: 'O ritmo (pace) alvo em formato MM:SS/km ou MM:SS/100m (ex: "5:30/km", ou "N/A").' },
+                  power_target: { type: SchemaType.INTEGER, description: 'A potência alvo em Watts (W) se aplicável (caso contrário 0).' },
+                  tss_target: { type: SchemaType.INTEGER, description: 'A carga alvo estimada em TSS (Training Stress Score).' },
+                  status: { type: SchemaType.STRING, description: 'O status do treino, defina como "adjusted" se foi modificado pelo coach.' }
+                },
+                required: ['workoutId']
+              }
+            }
+          ]
+        }
+      ]
     });
     
     // Formatar histórico para o Gemini e garantir alternância estrita (regras da API)
@@ -188,10 +216,99 @@ Diretrizes de Comportamento (Persona do Coach):
       history: formattedHistory
     });
 
-    const result = await chat.sendMessage(message);
-    const replyText = result.response.text();
+    let result = await chat.sendMessage(message);
+    
+    // Verificar se o modelo decidiu chamar uma função
+    const functionCalls = result.response.functionCalls();
+    if (functionCalls && functionCalls.length > 0) {
+      const functionResponses = [];
+      for (const call of functionCalls) {
+        if (call.name === 'adjustWorkout') {
+          const args = call.args as any;
+          const workoutId = parseInt(args.workoutId, 10);
+          
+          if (!workoutId) {
+            functionResponses.push({
+              functionResponse: {
+                name: 'adjustWorkout',
+                response: { success: false, error: 'O parâmetro workoutId é obrigatório.' }
+              }
+            });
+            continue;
+          }
+          
+          try {
+            // Construir a query de atualização dinâmica
+            const updates: string[] = [];
+            const values: any[] = [];
+            
+            if (args.type !== undefined) { updates.push('type = ?'); values.push(args.type); }
+            if (args.title !== undefined) { updates.push('title = ?'); values.push(args.title); }
+            if (args.description !== undefined) { updates.push('description = ?'); values.push(args.description); }
+            if (args.distance_target !== undefined) { updates.push('distance_target = ?'); values.push(args.distance_target); }
+            if (args.duration_target !== undefined) { updates.push('duration_target = ?'); values.push(args.duration_target); }
+            if (args.pace_target !== undefined) { updates.push('pace_target = ?'); values.push(args.pace_target); }
+            if (args.power_target !== undefined) { updates.push('power_target = ?'); values.push(args.power_target); }
+            if (args.tss_target !== undefined) { updates.push('tss_target = ?'); values.push(args.tss_target); }
+            
+            // Sempre que ajustado pelo coach, muda o status para 'adjusted'
+            updates.push('status = ?');
+            values.push(args.status !== undefined ? args.status : 'adjusted');
+            
+            if (updates.length > 1) { // Pelo menos um campo editado + status
+              values.push(workoutId);
+              await db.run(
+                `UPDATE workouts SET ${updates.join(', ')} WHERE id = ?`,
+                ...values
+              );
+              dbUpdated = true;
+              
+              // Inserir notificação correspondente
+              const todayStr = clientDate || new Date().toISOString().split('T')[0];
+              const workoutInfo = await db.get('SELECT title FROM workouts WHERE id = ?', workoutId);
+              const workoutTitle = workoutInfo ? workoutInfo.title : 'Treino';
+              
+              await db.run(
+                `INSERT INTO coach_notifs (user_id, date, title, content, read)
+                 VALUES (?, ?, ?, ?, 0)`,
+                uId,
+                todayStr,
+                'Planilha Ajustada pelo Treinador',
+                `Ajustei as métricas do treino "${workoutTitle}" (ID: ${workoutId}) de acordo com a nossa conversa.`
+              );
+              
+              functionResponses.push({
+                functionResponse: {
+                  name: 'adjustWorkout',
+                  response: { success: true, message: `Treino ${workoutId} atualizado no banco de dados com sucesso.` }
+                }
+              });
+            } else {
+              functionResponses.push({
+                functionResponse: {
+                  name: 'adjustWorkout',
+                  response: { success: false, error: 'Nenhum campo de atualização foi fornecido.' }
+                }
+              });
+            }
+          } catch (err: any) {
+            console.error('Erro ao executar adjustWorkout no banco:', err);
+            functionResponses.push({
+              functionResponse: {
+                name: 'adjustWorkout',
+                response: { success: false, error: `Erro interno no banco de dados: ${err.message}` }
+              }
+            });
+          }
+        }
+      }
+      
+      // Enviar as respostas das funções de volta ao chat para receber a resposta final em texto
+      result = await chat.sendMessage(functionResponses);
+    }
 
-    return NextResponse.json({ reply: replyText });
+    const replyText = result.response.text();
+    return NextResponse.json({ reply: replyText, dbUpdated });
 
   } catch (error: any) {
     console.error('Erro na API do Coach Chat:', error);

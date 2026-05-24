@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDb, autoCompleteExpiredRests } from '@/lib/db';
+import { getDb, autoCompleteExpiredRests, getCalendarToken } from '@/lib/db';
 import { calculatePhysioMetrics } from '@/lib/coach-engine';
 import { getCelebration } from '@/lib/celebrations';
 
@@ -140,6 +140,12 @@ export async function GET(req: Request) {
     // 8. Verificar se hoje é alguma comemoração especial (Aniversário ou Feriado)
     const celebration = getCelebration(user.birth_date, clientDate);
 
+    // 9. Gerar URL dinâmica segura do feed de calendário (iCal)
+    const requestUrl = new URL(req.url);
+    const baseUrl = `${requestUrl.protocol}//${requestUrl.host}`;
+    const calendarToken = getCalendarToken(userId, user.password || '');
+    const calendarUrl = `${baseUrl}/api/calendar?userId=${userId}&token=${calendarToken}`;
+
     return NextResponse.json({
       user,
       goal,
@@ -149,7 +155,8 @@ export async function GET(req: Request) {
       notifications,
       metrics: physioMetrics,
       lastSyncedActivity: lastSyncedActivity || null,
-      celebration
+      celebration,
+      calendarUrl
     });
 
   } catch (error: any) {

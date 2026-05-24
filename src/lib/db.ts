@@ -1,6 +1,7 @@
 import { Pool } from 'pg';
 import path from 'path';
 import type { Database } from 'sqlite';
+import crypto from 'crypto';
 
 // Interface unificada para abstrair o banco de dados (SQLite ou PostgreSQL)
 export interface DatabaseClient {
@@ -730,4 +731,12 @@ export async function autoCompleteExpiredRests(db: DatabaseClient, planId: numbe
       );
     }
   }
+}
+
+export function getCalendarToken(userId: number, passwordHash: string): string {
+  return crypto
+    .createHash('sha256')
+    .update(`${userId}-${passwordHash || 'default_salt'}`)
+    .digest('hex')
+    .substring(0, 16);
 }

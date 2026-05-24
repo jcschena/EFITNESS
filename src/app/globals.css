@@ -237,3 +237,253 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
   cursor: pointer;
 }
+
+/* ==========================================
+   Classes de Responsividade - Tema ULTRA
+   ========================================== */
+
+/* Navbar Header */
+.navbar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.navbar-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.navbar-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar-slogan {
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-top: 2px;
+  white-space: normal; /* Permite quebrar linha em telas pequenas */
+}
+
+.navbar-athlete-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+}
+
+.navbar-athlete-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .navbar-container {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .navbar-logo-container {
+    width: auto;
+    justify-content: flex-start;
+  }
+  .navbar-athlete-info {
+    flex-direction: row;
+    width: auto;
+    border-top: none;
+    padding-top: 0;
+    gap: 16px;
+  }
+  .navbar-athlete-badge-row {
+    justify-content: flex-start;
+  }
+  .navbar-actions {
+    width: auto;
+    justify-content: flex-end;
+  }
+}
+
+/* Ocultar barra de rolagem horizontal mantendo a funcionalidade */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari e Opera */
+}
+
+/* Painel de Metas do Organismo */
+.status-brief-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: none;
+  padding-left: 0;
+  border-top: 1px solid var(--border-color);
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
+@media (min-width: 768px) {
+  .status-brief-container {
+    border-left: 1px solid var(--border-color);
+    padding-left: 20px;
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+  }
+}
+
+/* Grid de Formulários de 2 Colunas */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 480px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Grid de Nível Esportivo */
+.level-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+@media (min-width: 520px) {
+  .level-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Seção de Título + Botão de Ação */
+.section-header-responsive {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .section-header-responsive {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+/* Recipiente de Copiar Link */
+.copy-link-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .copy-link-container {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* Grid de Métricas no Modal */
+.modal-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 480px) {
+  .modal-metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Card de Treino Responsivo (Substituindo grid fixo de 4 colunas) */
+.workout-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 
+    "header tss"
+    "info info"
+    "metrics metrics";
+  gap: 12px;
+  align-items: start;
+}
+
+.workout-card-header {
+  grid-area: header;
+}
+
+.workout-card-info {
+  grid-area: info;
+}
+
+.workout-card-metrics {
+  grid-area: metrics;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 10px;
+}
+
+.workout-card-tss {
+  grid-area: tss;
+  align-items: flex-end;
+}
+
+@media (min-width: 768px) {
+  .workout-card {
+    grid-template-columns: 90px 1.5fr 2fr 1.2fr;
+    grid-template-areas: none;
+    align-items: center;
+    gap: 16px;
+  }
+  .workout-card-header {
+    grid-area: auto;
+  }
+  .workout-card-info {
+    grid-area: auto;
+  }
+  .workout-card-metrics {
+    grid-area: auto;
+    border-top: none;
+    padding-top: 0;
+  }
+  .workout-card-tss {
+    grid-area: auto;
+    align-items: flex-end;
+  }
+}
+
