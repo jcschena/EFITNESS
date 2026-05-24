@@ -133,7 +133,10 @@ Diretrizes de Comportamento (Persona do Coach):
 `;
 
     // 6. Chamar a API do Gemini
-    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = ai.getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      systemInstruction: systemInstruction
+    });
     
     // Formatar histórico para o Gemini
     const formattedHistory = (chatHistory || []).map((msg: any) => ({
@@ -142,8 +145,7 @@ Diretrizes de Comportamento (Persona do Coach):
     }));
 
     const chat = model.startChat({
-      history: formattedHistory,
-      systemInstruction: systemInstruction
+      history: formattedHistory
     });
 
     const result = await chat.sendMessage(message);

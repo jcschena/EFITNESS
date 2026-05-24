@@ -106,12 +106,19 @@ export default function Home() {
         setDashboardData(data);
         // Inicializar histórico de chat se vazio
         if (chatMessages.length === 0 && data.user) {
+          const firstName = data.user.name.split(' ')[0];
+          let welcomeText = `Olá, ${firstName}! Sou o seu treinador virtual APEX. Analisei seus dados de onboarding e estruturei sua planilha de treinos semanal. Sempre que você treinar e subir sua atividade no Strava, eu recebo os dados aqui e recalculo sua carga TSS instantaneamente. Como posso te orientar hoje?`;
+          
+          if (data.user.id === 1) {
+            welcomeText = `Saudações, Tiago! Analisei suas métricas recentes de periodização. Sua planilha de treinamento rumo ao seu objetivo de Ironman está montada. Vi que seu TSB está equilibrado, mas fique atento ao treino longo de sábado. Como posso te orientar hoje?`;
+          } else if (data.user.id === 2) {
+            welcomeText = `Olá, Ana! Estou muito empolgado em te guiar nessa jornada de saída do sedentarismo. Montei uma semana de transição muito segura, alternando caminhada e trote leve para preservar suas articulações. Qualquer dúvida sobre ritmos ou desconforto, é só perguntar!`;
+          }
+          
           setChatMessages([
             { 
               sender: 'coach', 
-              text: data.user.level === 'elite' 
-                ? `Saudações, Tiago! Analisei suas métricas recentes de periodização. Sua planilha de treinamento rumo ao seu objetivo de Ironman está montada. Vi que seu TSB está equilibrado, mas fique atento ao treino longo de sábado. Como posso te orientar hoje?`
-                : `Olá, Ana! Estou muito empolgado em te guiar nessa jornada de saída do sedentarismo. Montei uma semana de transição muito segura, alternando caminhada e trote leve para preservar suas articulações. Qualquer dúvida sobre ritmos ou desconforto, é só perguntar!`
+              text: welcomeText
             }
           ]);
         }
