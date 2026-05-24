@@ -314,9 +314,19 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
         setChatMessages(prev => [...prev, { sender: 'coach', text: data.reply }]);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setChatMessages(prev => [...prev, { 
+          sender: 'coach', 
+          text: `Desculpe, campeão! Tive um probleminha técnico para me conectar aos meus servidores de IA agora (Erro: ${errData.error || 'Erro ' + res.status}). Poderia tentar me enviar a mensagem novamente em alguns segundos?` 
+        }]);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erro ao conversar com o coach:', err);
+      setChatMessages(prev => [...prev, { 
+        sender: 'coach', 
+        text: `Opa, meu velho! Tive uma falha de conexão de rede ao tentar me comunicar com a IA (${err.message || 'Erro de rede'}). Dá uma olhada na sua internet e tenta de novo!` 
+      }]);
     } finally {
       setChatLoading(false);
     }

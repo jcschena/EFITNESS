@@ -138,11 +138,27 @@ Diretrizes de Comportamento (Persona do Coach):
       systemInstruction: systemInstruction
     });
     
-    // Formatar histórico para o Gemini
-    const formattedHistory = (chatHistory || []).map((msg: any) => ({
+    // Formatar histórico para o Gemini e garantir alternância estrita (regras da API)
+    const rawHistory = (chatHistory || []).map((msg: any) => ({
       role: msg.sender === 'user' ? 'user' : 'model',
       parts: [{ text: msg.text }]
     }));
+
+    const formattedHistory: any[] = [];
+    for (const msg of rawHistory) {
+      if (formattedHistory.length === 0) {
+        // O primeiro item do histórico precisa ser obrigatoriamente do 'user'
+        if (msg.role === 'user') {
+          formattedHistory.push(msg);
+        }
+      } else {
+        // Garantir que as roles alternem estritamente entre 'user' e 'model'
+        const lastMsg = formattedHistory[formattedHistory.length - 1];
+        if (lastMsg.role !== msg.role) {
+          formattedHistory.push(msg);
+        }
+      }
+    }
 
     const chat = model.startChat({
       history: formattedHistory
