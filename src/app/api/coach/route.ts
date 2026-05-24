@@ -95,7 +95,7 @@ export async function POST(req: Request) {
     if (activePlan) {
       const today = clientDate ? new Date(clientDate + 'T12:00:00') : new Date();
       await autoCompleteExpiredRests(db, activePlan.id, today);
-      workouts = await db.all('SELECT * FROM workouts WHERE plan_id = ? ORDER BY day_of_week ASC', activePlan.id);
+      workouts = await db.all('SELECT * FROM workouts WHERE plan_id = ? ORDER BY day_of_week ASC, id ASC', activePlan.id);
     }
 
     // 4. Calcular métricas fisiológicas acumuladas (CTL, ATL, TSB)

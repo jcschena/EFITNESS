@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { paceToSeconds, secondsToPace } from '@/lib/coach-engine';
 import { getStravaAccessToken } from '@/lib/strava';
+import { getLocalSportIdByStravaType } from '@/lib/sports';
 
 export async function POST(req: Request) {
   try {
@@ -93,10 +94,7 @@ export async function POST(req: Request) {
               totalDistance += distanceKm;
               totalDuration += durationSec;
 
-              let activityType = 'Outro';
-              if (act.type === 'Run') activityType = 'Corrida';
-              else if (act.type === 'Ride') activityType = 'Ciclismo';
-              else if (act.type === 'Swim') activityType = 'Natacao';
+              const activityType = getLocalSportIdByStravaType(act.type);
 
               activitiesList.push({
                 id: act.id,
@@ -119,7 +117,7 @@ export async function POST(req: Request) {
               estimatedLthr = Math.round(maxHrObserved * 0.90);
             }
 
-            const runs = activitiesList.filter(a => a.type === 'Corrida' && a.distance >= 3);
+            const runs = activitiesList.filter(a => ['Corrida', 'CorridaTrilha'].includes(a.type) && a.distance >= 3);
             if (runs.length > 0) {
               let bestPaceSecs = 9999;
               runs.forEach(run => {
@@ -139,10 +137,10 @@ export async function POST(req: Request) {
 
     // Se NÃO existirem dados para serem coletados no Strava (ou Strava não conectado/sem dados)
     if (!hasColectedData) {
-      // Buscar no banco local a última atividade de corrida com duração >= 30 minutos (1800 segundos)
+      // Buscar no banco local a última atividade de corrida/trilha com duração >= 30 minutos (1800 segundos)
       const lastRun = await db.get(
         `SELECT * FROM activity_logs 
-         WHERE user_id = ? AND type = 'Corrida' AND duration_real >= 1800 
+         WHERE user_id = ? AND type IN ('Corrida', 'CorridaTrilha') AND duration_real >= 1800 
          ORDER BY timestamp DESC LIMIT 1`,
         userId
       );
@@ -239,3 +237,4 @@ export async function POST(req: Request) {
     }, { status: 500 });
   }
 }
+

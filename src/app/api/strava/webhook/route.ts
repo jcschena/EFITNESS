@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { calculateHrTSS, calculatePaceTSS, autoRegulateTrainingPlan } from '@/lib/coach-engine';
 import { getStravaAccessToken } from '@/lib/strava';
+import { getLocalSportIdByStravaType, SPORTS_CONFIG } from '@/lib/sports';
 
 const VERIFY_TOKEN = 'APEX_STRAVA_TOKEN';
 
@@ -40,7 +41,14 @@ export async function POST(req: Request) {
     const isMock = payload.isMock === true;
 
     let userId = parseInt(payload.userId || '1', 10); // Default Tiago Aço
-    let activityType = payload.type || 'Corrida'; // 'Corrida', 'Ciclismo'
+    let activityType = payload.type || 'Corrida';
+    
+    // Normalizar se o tipo fornecido for um tipo Strava em inglês
+    const isLocalId = SPORTS_CONFIG.some(s => s.id === activityType);
+    if (!isLocalId) {
+      activityType = getLocalSportIdByStravaType(activityType);
+    }
+
     let distanceReal = parseFloat(payload.distance || '0'); // km
     let durationReal = parseInt(payload.duration || '0', 10); // segundos
     let avgHr = payload.avgHr ? parseInt(payload.avgHr, 10) : null;
@@ -103,10 +111,8 @@ export async function POST(req: Request) {
               paceReal = `${mins}:${String(secs).padStart(2, '0')}/km`;
             }
 
-            // Converter tipo do Strava ('Run', 'Ride', 'Swim') para os nossos padrões
-            if (stravaActivity.type === 'Run') activityType = 'Corrida';
-            else if (stravaActivity.type === 'Ride') activityType = 'Ciclismo';
-            else if (stravaActivity.type === 'Swim') activityType = 'Natacao';
+            // Converter tipo do Strava para os nossos padrões via sports config
+            activityType = getLocalSportIdByStravaType(stravaActivity.type);
 
           } else {
             console.warn('Falha ao obter atividade na API do Strava. Usando fallback de teste.');
@@ -129,7 +135,7 @@ export async function POST(req: Request) {
 
     // Calcular o TSS se não fornecido
     if (tssReal === 0 && durationReal > 0) {
-      if (activityType === 'Corrida' && paceReal !== '0:00/km') {
+      if (['Corrida', 'CorridaTrilha'].includes(activityType) && paceReal !== '0:00/km') {
         tssReal = calculatePaceTSS(durationReal, paceReal, user.threshold_pace);
       } else if (avgHr) {
         tssReal = calculateHrTSS(durationReal, avgHr, user.threshold_hr);
@@ -184,10 +190,10 @@ export async function POST(req: Request) {
     }
 
     // RECALIBRAÇÃO FISIOLÓGICA AUTOMÁTICA
-    // Se a atividade for de Corrida e durou pelo menos 30 minutos (1800 segundos)
+    // Se a atividade for de Corrida/Trilha e durou pelo menos 30 minutos (1800 segundos)
     let autoCalibrated = false;
     let autoCalibrateMsg = '';
-    if (activityType === 'Corrida' && durationReal >= 1800) {
+    if (['Corrida', 'CorridaTrilha'].includes(activityType) && durationReal >= 1800) {
       const currentUser = await db.get<{
         threshold_hr: number;
         threshold_pace: string;
@@ -250,3 +256,4 @@ export async function POST(req: Request) {
     }, { status: 500 });
   }
 }
+

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { getDb, getWeekDates, formatDate, generateWorkoutsForPlan } from '@/lib/db';
 
 export async function POST(req: Request) {
   try {
@@ -20,7 +20,13 @@ export async function POST(req: Request) {
       threshold_pace,
       weekly_target_hours,
       username,
-      password
+      password,
+      // Campos de meta
+      goal_type,
+      goal_distance,
+      goal_date_target,
+      goal_target_time,
+      goal_weekly_tss_target
     } = data;
 
     // 1. Validações Básicas
@@ -113,7 +119,79 @@ export async function POST(req: Request) {
       userId
     );
 
-    console.log(`Perfil do usuário id=${userId} atualizado com sucesso no banco de dados.`);
+    // 6. Atualizar Objetivo (Goal) do usuário
+    const existingGoal = await db.get(
+      'SELECT * FROM goals WHERE user_id = ? ORDER BY date_target ASC LIMIT 1',
+      userId
+    );
+
+    if (goal_type) {
+      const parsedGoalDistance = parseFloat(String(goal_distance || '0').replace(',', '.'));
+      const parsedGoalTss = parseInt(String(goal_weekly_tss_target || '0'), 10);
+      
+      if (existingGoal) {
+        await db.run(`
+          UPDATE goals
+          SET type = ?,
+              distance = ?,
+              date_target = ?,
+              target_time = ?,
+              weekly_tss_target = ?
+          WHERE id = ?
+        `,
+          goal_type,
+          isNaN(parsedGoalDistance) ? 0 : parsedGoalDistance,
+          goal_date_target || null,
+          goal_target_time || null,
+          isNaN(parsedGoalTss) ? 0 : parsedGoalTss,
+          existingGoal.id
+        );
+      } else {
+        await db.run(`
+          INSERT INTO goals (user_id, type, distance, date_target, target_time, weekly_tss_target)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `,
+          userId,
+          goal_type,
+          isNaN(parsedGoalDistance) ? 0 : parsedGoalDistance,
+          goal_date_target || null,
+          goal_target_time || null,
+          isNaN(parsedGoalTss) ? 0 : parsedGoalTss
+        );
+      }
+    }
+
+      // 7. Recalcular e regenerar planilha se o nível ou a modalidade (goal_type) mudarem
+      const levelChanged = user.level !== level;
+      const goalTypeChanged = existingGoal ? existingGoal.type !== goal_type : true;
+
+      if (levelChanged || goalTypeChanged) {
+        const activePlan = await db.get('SELECT * FROM training_plans WHERE user_id = ? AND active = 1', userId);
+        if (activePlan) {
+          // Deletar workouts da planilha ativa
+          await db.run('DELETE FROM workouts WHERE plan_id = ?', activePlan.id);
+
+          // Gerar novos workouts baseados no novo objetivo e nível
+          const newWorkouts = generateWorkoutsForPlan(goal_type, level);
+          const weekDates = getWeekDates();
+
+          for (const w of newWorkouts) {
+            await db.run(`
+              INSERT INTO workouts (plan_id, day_of_week, date, type, distance_target, duration_target, pace_target, power_target, tss_target, title, description, status)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+            `, activePlan.id, w.day, formatDate(weekDates[w.day - 1]), w.type, w.dist, w.dur, w.pace, w.power, w.tss, w.title, w.desc);
+          }
+
+          // Notificação de recalibração
+          const todayYmd = formatDate(new Date());
+          await db.run(`
+            INSERT INTO coach_notifs (user_id, date, title, content, read)
+            VALUES (?, ?, 'Planilha Recalibrada! 🔄', ?, 0)
+          `, userId, todayYmd, `Identifiquei a mudança de ${levelChanged ? 'Nível' : ''}${levelChanged && goalTypeChanged ? ' e ' : ''}${goalTypeChanged ? 'Objetivo Esportivo' : ''}. Recalibrei sua planilha para a modalidade de ${goal_type} (${level === 'elite' ? 'Elite' : level === 'intermediario' ? 'Intermediário' : 'Iniciante'}) para alinhar com suas novas metas.`);
+        }
+      }
+
+      console.log(`Perfil e objetivos do usuário id=${userId} atualizados com sucesso no banco de dados.`);
 
     return NextResponse.json({
       success: true,

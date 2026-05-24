@@ -1,4 +1,5 @@
 import { getDb, DatabaseClient } from './db';
+import { isEnduranceSport } from './sports';
 
 // Estruturas de Dados
 export interface UserMetrics {
@@ -6,6 +7,7 @@ export interface UserMetrics {
   threshold_pace: string; // no formato 'MM:SS'
   weight: number;
 }
+
 
 // Converte Pace string 'MM:SS' para segundos por km
 export function paceToSeconds(paceStr: string): number {
@@ -160,7 +162,7 @@ export async function autoRegulateTrainingPlan(db: DatabaseClient, userId: numbe
     for (const fw of futureWorkouts) {
       let reductionFactor = 0.15; // 15% de redução padrão
       if (fw.type === 'Forca') reductionFactor = 0; // Não reduz força
-      if (fw.type === 'Corrida' && fw.title.toLowerCase().includes('longo')) reductionFactor = 0.20; // Reduz mais o longo
+      if (['Corrida', 'CorridaTrilha'].includes(fw.type) && fw.title.toLowerCase().includes('longo')) reductionFactor = 0.20; // Reduz mais o longo
 
       if (reductionFactor > 0) {
         const newTss = Math.round(fw.tss_target * (1 - reductionFactor));
@@ -168,7 +170,7 @@ export async function autoRegulateTrainingPlan(db: DatabaseClient, userId: numbe
         const newDur = fw.duration_target > 0 ? Math.round(fw.duration_target * (1 - reductionFactor)) : 0;
         
         let newPaceStr = fw.pace_target;
-        if (fw.type === 'Corrida' && fw.pace_target !== 'N/A') {
+        if (['Corrida', 'CorridaTrilha'].includes(fw.type) && fw.pace_target !== 'N/A') {
           // Ajusta o ritmo planejado deixando-o ligeiramente mais lento (recuperação)
           const currentPaceSecs = paceToSeconds(fw.pace_target);
           const adjustedPaceSecs = Math.round(currentPaceSecs * 1.05); // 5% mais lento
@@ -195,7 +197,7 @@ export async function autoRegulateTrainingPlan(db: DatabaseClient, userId: numbe
     const tssMissing = tssTarget - lastTssReal;
     const tssToRedistribute = Math.round(tssMissing * 0.4); // Redistribui apenas 40% para evitar pico de carga
     
-    const enduranceWorkouts = futureWorkouts.filter(fw => fw.type === 'Corrida' || fw.type === 'Ciclismo');
+    const enduranceWorkouts = futureWorkouts.filter(fw => isEnduranceSport(fw.type));
     
     if (enduranceWorkouts.length > 0 && tssToRedistribute > 0) {
       const tssAddPerWorkout = Math.round(tssToRedistribute / enduranceWorkouts.length);

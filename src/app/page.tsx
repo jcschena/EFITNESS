@@ -24,9 +24,11 @@ import {
   ChevronRight,
   Check,
   X,
-  Plus
+  Plus,
+  Target
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { SPORTS_CONFIG, getSportConfig } from '@/lib/sports';
 
 const BarChart = dynamic(
   () => import('react-chartjs-2').then((mod) => mod.Bar),
@@ -137,6 +139,144 @@ export default function Home() {
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
+  const getMultiSportSplits = (goalType: string | undefined | null, totalDistance: number | undefined | null, totalTimeStr: string | undefined | null) => {
+    const type = goalType || 'Corrida';
+    const dist = totalDistance || 0;
+    const timeStr = totalTimeStr || '00:00:00';
+    const totalSeconds = timeToSeconds(timeStr);
+
+    let swimDist = 0;
+    let bikeDist = 0;
+    let runDist = 0;
+    let swimSecs = 0;
+    let bikeSecs = 0;
+    let runSecs = 0;
+    let typeLabel = `${type} Personalizado`;
+
+    if (type === 'Triathlon') {
+      // Tolerâncias para distâncias padrão de Triathlon
+      if (Math.abs(dist - 226.2) < 2) {
+        swimDist = 3.86;
+        bikeDist = 180.2;
+        runDist = 42.2;
+        typeLabel = "Ironman (Full)";
+      } else if (Math.abs(dist - 113.1) < 2 || Math.abs(dist - 113.0) < 2) {
+        swimDist = 1.9;
+        bikeDist = 90.1;
+        runDist = 21.1;
+        typeLabel = "Ironman 70.3 (Half)";
+      } else if (Math.abs(dist - 51.5) < 2) {
+        swimDist = 1.5;
+        bikeDist = 40.0;
+        runDist = 10.0;
+        typeLabel = "Olímpico (Standard)";
+      } else if (Math.abs(dist - 25.75) < 2 || Math.abs(dist - 25.8) < 2) {
+        swimDist = 0.75;
+        bikeDist = 20.0;
+        runDist = 5.0;
+        typeLabel = "Sprint / Short";
+      } else {
+        // Divisão proporcional personalizada
+        swimDist = Number((dist * 0.0168).toFixed(2));
+        bikeDist = Number((dist * 0.7966).toFixed(2));
+        runDist = Number((dist * 0.1866).toFixed(2));
+        const diff = dist - (swimDist + bikeDist + runDist);
+        if (Math.abs(diff) > 0.001) {
+          runDist = Number((runDist + diff).toFixed(2));
+        }
+      }
+      swimSecs = Math.round(totalSeconds * 0.10);
+      bikeSecs = Math.round(totalSeconds * 0.53);
+      runSecs = Math.round(totalSeconds * 0.37);
+
+      return {
+        label: typeLabel,
+        hasSwim: true,
+        hasBike: true,
+        hasRun: true,
+        swim: { distance: swimDist, time: secondsToTime(swimSecs) },
+        bike: { distance: bikeDist, time: secondsToTime(bikeSecs) },
+        run: { distance: runDist, time: secondsToTime(runSecs) }
+      };
+    } else if (type === 'Duathlon') {
+      if (Math.abs(dist - 55.0) < 2) {
+        bikeDist = 40.0;
+        runDist = 15.0;
+        typeLabel = "Duathlon Olímpico";
+      } else if (Math.abs(dist - 27.5) < 2) {
+        bikeDist = 20.0;
+        runDist = 7.5;
+        typeLabel = "Duathlon Sprint";
+      } else if (Math.abs(dist - 190.0) < 5) {
+        bikeDist = 150.0;
+        runDist = 40.0;
+        typeLabel = "Duathlon Longo";
+      } else {
+        bikeDist = Number((dist * 0.7273).toFixed(2));
+        runDist = Number((dist * 0.2727).toFixed(2));
+        const diff = dist - (bikeDist + runDist);
+        if (Math.abs(diff) > 0.001) {
+          runDist = Number((runDist + diff).toFixed(2));
+        }
+      }
+      bikeSecs = Math.round(totalSeconds * 0.60);
+      runSecs = Math.round(totalSeconds * 0.40);
+
+      return {
+        label: typeLabel,
+        hasSwim: false,
+        hasBike: true,
+        hasRun: true,
+        swim: { distance: 0, time: "00:00:00" },
+        bike: { distance: bikeDist, time: secondsToTime(bikeSecs) },
+        run: { distance: runDist, time: secondsToTime(runSecs) }
+      };
+    } else if (type === 'Aquathlon') {
+      if (Math.abs(dist - 6.0) < 0.5) {
+        swimDist = 1.0;
+        runDist = 5.0;
+        typeLabel = "Aquathlon Olímpico";
+      } else if (Math.abs(dist - 3.0) < 0.5) {
+        swimDist = 0.5;
+        runDist = 2.5;
+        typeLabel = "Aquathlon Sprint";
+      } else if (Math.abs(dist - 12.0) < 1.0) {
+        swimDist = 2.0;
+        runDist = 10.0;
+        typeLabel = "Aquathlon Longo";
+      } else {
+        swimDist = Number((dist * 0.1667).toFixed(2));
+        runDist = Number((dist * 0.8333).toFixed(2));
+        const diff = dist - (swimDist + runDist);
+        if (Math.abs(diff) > 0.001) {
+          runDist = Number((runDist + diff).toFixed(2));
+        }
+      }
+      swimSecs = Math.round(totalSeconds * 0.25);
+      runSecs = Math.round(totalSeconds * 0.75);
+
+      return {
+        label: typeLabel,
+        hasSwim: true,
+        hasBike: false,
+        hasRun: true,
+        swim: { distance: swimDist, time: secondsToTime(swimSecs) },
+        bike: { distance: 0, time: "00:00:00" },
+        run: { distance: runDist, time: secondsToTime(runSecs) }
+      };
+    }
+
+    return {
+      label: typeLabel,
+      hasSwim: false,
+      hasBike: false,
+      hasRun: false,
+      swim: { distance: 0, time: "00:00:00" },
+      bike: { distance: 0, time: "00:00:00" },
+      run: { distance: 0, time: "00:00:00" }
+    };
+  };
+
   const timeToSeconds = (timeStr: string | undefined | null): number => {
     if (!timeStr) return 0;
     const parts = timeStr.split(':');
@@ -182,7 +322,7 @@ export default function Home() {
     const userThresholdPace = dashboardData?.user?.threshold_pace || '5:00';
     const userThresholdHr = dashboardData?.user?.threshold_hr || 160;
     
-    if (type === 'Corrida') {
+    if (['Corrida', 'CorridaTrilha'].includes(type)) {
       const paceStr = calcPace(dist, durationStr);
       if (paceStr !== '0:00/km') {
         const paceSecs = paceToSeconds(paceStr);
@@ -344,7 +484,12 @@ export default function Home() {
     threshold_pace: '',
     weekly_target_hours: '',
     username: '',
-    password: ''
+    password: '',
+    goal_type: 'Corrida',
+    goal_distance: '',
+    goal_date_target: '',
+    goal_target_time: '',
+    goal_weekly_tss_target: ''
   });
 
   // Estados para Calibração Strava
@@ -461,7 +606,12 @@ export default function Home() {
         threshold_pace: dashboardData.user.threshold_pace || '',
         weekly_target_hours: String(dashboardData.user.weekly_target_hours || ''),
         username: dashboardData.user.username || '',
-        password: dashboardData.user.password || ''
+        password: dashboardData.user.password || '',
+        goal_type: dashboardData.goal?.type || 'Corrida',
+        goal_distance: String(dashboardData.goal?.distance || ''),
+        goal_date_target: dashboardData.goal?.date_target || '',
+        goal_target_time: dashboardData.goal?.target_time || '',
+        goal_weekly_tss_target: String(dashboardData.goal?.weekly_tss_target || '')
       });
     }
   }, [dashboardData]);
@@ -880,6 +1030,12 @@ export default function Home() {
   const todayDateStr = currentTime ? currentTime.toLocaleDateString('en-CA') : new Date().toLocaleDateString('en-CA');
   const todayWorkout = workouts?.find((w: any) => w.date === todayDateStr);
 
+  // Progresso de Conclusão da Planilha Semanal
+  const totalWorkouts = workouts ? workouts.length : 0;
+  const completedWorkouts = workouts ? workouts.filter((w: any) => w.status === 'completed').length : 0;
+  const percentComplete = totalWorkouts > 0 ? Math.round((completedWorkouts / totalWorkouts) * 100) : 0;
+  const isWeeklyPlanCompleted = workouts && workouts.length > 0 && completedWorkouts === totalWorkouts;
+
   // Formatar dados do gráfico comparativo planejado vs executado
   // Vamos plotar a carga TSS planejada para cada dia de Segunda (1) a Domingo (7) versus a carga executada
   const tssLabels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
@@ -890,13 +1046,13 @@ export default function Home() {
     workouts.forEach((w: any) => {
       const idx = w.day_of_week - 1;
       if (idx >= 0 && idx < 7) {
-        tssTargetData[idx] = w.tss_target;
+        tssTargetData[idx] += w.tss_target;
         // Se estiver completo, o TSS realizado é computado.
         // Tentamos achar se tem log na mesma data/treino.
         if (w.status === 'completed') {
           // Achar se tem log de atividade correspondente
           const log = activityLogs?.find((l: any) => l.workout_id === w.id);
-          tssRealData[idx] = log ? log.tss_real : w.tss_target; // Fallback para target se não tiver log
+          tssRealData[idx] += log ? log.tss_real : w.tss_target; // Fallback para target se não tiver log
         }
       }
     });
@@ -975,13 +1131,27 @@ export default function Home() {
 
   // Auxiliar para pegar cor por tipo de treino
   const getWorkoutColor = (type: string) => {
-    switch (type) {
-      case 'Corrida': return 'var(--neon-green)';
-      case 'Ciclismo': return 'var(--neon-cyan)';
-      case 'Natacao': return 'var(--neon-purple)';
-      case 'Forca': return 'var(--neon-orange)';
-      default: return 'var(--text-muted)';
-    }
+    const config = getSportConfig(type);
+    if (config) return config.color;
+    
+    // Fallbacks para compatibilidade com nomes antigos
+    if (type === 'Natacao') return 'var(--neon-purple)';
+    if (type === 'Forca') return 'var(--neon-orange)';
+    
+    return 'var(--text-muted)';
+  };
+
+  // Auxiliar para pegar emoji/ícone por tipo de treino
+  const getWorkoutIcon = (type: string) => {
+    const config = getSportConfig(type);
+    if (config) return config.emoji;
+    
+    // Fallbacks
+    if (type === 'Natacao') return '🏊‍♂️';
+    if (type === 'Forca') return '💪';
+    if (type === 'Descanso') return '💤';
+    
+    return '💪';
   };
 
   // Verifica se o treino já expirou o limite de 48 horas para realização
@@ -1110,7 +1280,7 @@ export default function Home() {
 
       {/* CORE CONTENT LAYOUT */}
       <main style={{ flex: 1, width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {(celebration || showProfileCelebration) && <ConfettiShower />}
+        {(celebration || showProfileCelebration || isWeeklyPlanCompleted) && <ConfettiShower />}
 
         {/* COCKPIT CHRONOMETER & CALENDAR WIDGET */}
         <section className="animate-slide-up" style={{ 
@@ -1275,7 +1445,7 @@ export default function Home() {
                 ) : (
                   <div>
                     <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: getWorkoutColor(todayWorkout.type), display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      {todayWorkout.type === 'Corrida' ? '🏃‍♂️' : todayWorkout.type === 'Ciclismo' ? '🚴‍♂️' : todayWorkout.type === 'Natacao' ? '🏊‍♂️' : '💪'} {todayWorkout.title}
+                      {getWorkoutIcon(todayWorkout.type)} {todayWorkout.title}
                     </h4>
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', lineHeight: '1.3', lineClamp: 2, WebkitLineClamp: 2, display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {todayWorkout.description}
@@ -1300,6 +1470,76 @@ export default function Home() {
 
           </div>
         </section>
+
+        {/* BANNER PLANILHA 100% CONCLUÍDA */}
+        {isWeeklyPlanCompleted && (
+          <section className="premium-card animate-slide-up" style={{ 
+            background: 'linear-gradient(135deg, rgba(57, 255, 20, 0.12) 0%, rgba(0, 240, 255, 0.1) 100%)',
+            borderColor: 'var(--neon-green)',
+            borderWidth: '2px',
+            borderStyle: 'solid',
+            padding: '24px', 
+            borderRadius: '16px',
+            boxShadow: '0 0 30px rgba(57, 255, 20, 0.3), inset 0 0 20px rgba(57, 255, 20, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            {/* Efeitos de brilho no background */}
+            <div style={{
+              position: 'absolute',
+              top: '-50%',
+              left: '-20%',
+              width: '60%',
+              height: '200%',
+              background: 'radial-gradient(circle, rgba(57, 255, 20, 0.15) 0%, transparent 70%)',
+              transform: 'rotate(-30deg)',
+              pointerEvents: 'none'
+            }} />
+            <div style={{
+              position: 'absolute',
+              bottom: '-50%',
+              right: '-20%',
+              width: '60%',
+              height: '200%',
+              background: 'radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%)',
+              transform: 'rotate(-30deg)',
+              pointerEvents: 'none'
+            }} />
+            
+            <div style={{ fontSize: '3rem', animation: 'pulseScore 2s infinite', display: 'inline-block', zIndex: 1 }}>
+              🏆
+            </div>
+            <div style={{ flex: 1, zIndex: 1 }}>
+              <h3 style={{ 
+                fontSize: '1.5rem', 
+                fontWeight: 800,
+                color: 'var(--neon-green)', 
+                marginBottom: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                textShadow: '0 0 10px rgba(57, 255, 20, 0.5)'
+              }}>
+                Planilha Semanal 100% Cumprida! 🎉
+              </h3>
+              <p style={{ fontSize: '1.05rem', color: '#fff', lineHeight: '1.5', fontWeight: 600 }}>
+                Sensacional, {user?.name}! Você completou com absoluto sucesso 100% dos treinos prescritos para esta semana!
+              </p>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '4px', lineHeight: '1.4' }}>
+                Você acumulou toda a carga fisiológica planejada e deu um passo gigantesco rumo ao seu objetivo de {goal?.type ? `conquistar a prova de ${goal.type}` : 'evolução constante'}. A sua dedicação é inspiração pura. Aproveite a merecida supercompensação!
+              </p>
+            </div>
+            <style jsx global>{`
+              @keyframes pulseScore {
+                0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.4)); }
+                50% { transform: scale(1.1); filter: drop-shadow(0 0 15px rgba(57, 255, 20, 0.8)); }
+              }
+            `}</style>
+          </section>
+        )}
 
         {/* BANNER TEMÁTICO COMEMORATIVO */}
         {celebration && (
@@ -1543,24 +1783,121 @@ export default function Home() {
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', margin: '20px 0' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Grande Objetivo</span>
-                      <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.type} ({formatDistance(goal?.distance)} km)</strong>
+                  {['Triathlon', 'Duathlon', 'Aquathlon'].includes(goal?.type) ? (() => {
+                    const splits = getMultiSportSplits(goal?.type, goal?.distance, goal?.target_time);
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', margin: '20px 0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Grande Objetivo</span>
+                          <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{splits.label} ({formatDistance(goal?.distance)} km)</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Data Alvo da Prova</span>
+                          <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.date_target ? new Date(goal.date_target).toLocaleDateString('pt-BR') : 'N/A'}</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Carga Alvo Semanal</span>
+                          <strong style={{ fontSize: '0.9rem', color: '#fc4c02' }}>{goal?.weekly_tss_target} TSS</strong>
+                        </div>
+
+                        {/* Detalhes por Modalidade */}
+                        <div style={{ 
+                          background: 'rgba(255, 255, 255, 0.02)', 
+                          border: '1px solid rgba(255, 255, 255, 0.05)', 
+                          borderRadius: '10px', 
+                          padding: '12px 14px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '10px',
+                          marginTop: '6px'
+                        }}>
+                          <span style={{ 
+                            fontSize: '0.75rem', 
+                            fontWeight: 700, 
+                            color: 'var(--neon-cyan)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            display: 'block',
+                            marginBottom: '4px'
+                          }}>
+                            Metas por Modalidade
+                          </span>
+                          
+                          {/* Swim */}
+                          {splits.hasSwim && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: '0.8rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '1rem' }}>🏊‍♂️</span> Natação
+                              </span>
+                              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                <strong>{formatDistance(splits.swim.distance)} km</strong> (@ {splits.swim.time})
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Bike */}
+                          {splits.hasBike && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: splits.hasSwim ? '1px solid rgba(255,255,255,0.03)' : 'none', paddingTop: splits.hasSwim ? '6px' : '0' }}>
+                              <span style={{ fontSize: '0.8rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '1rem' }}>🚴‍♂️</span> Ciclismo
+                              </span>
+                              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                <strong>{formatDistance(splits.bike.distance)} km</strong> (@ {splits.bike.time})
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Run */}
+                          {splits.hasRun && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: (splits.hasSwim || splits.hasBike) ? '1px solid rgba(255,255,255,0.03)' : 'none', paddingTop: (splits.hasSwim || splits.hasBike) ? '6px' : '0' }}>
+                              <span style={{ fontSize: '0.8rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '1rem' }}>🏃‍♂️</span> Corrida
+                              </span>
+                              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                <strong>{formatDistance(splits.run.distance)} km</strong> (@ {splits.run.time})
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Tempo Total Esperado */}
+                        <div style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center',
+                          background: 'linear-gradient(90deg, rgba(252, 76, 2, 0.12) 0%, rgba(252, 76, 2, 0.03) 100%)', 
+                          border: '1px solid rgba(252, 76, 2, 0.3)', 
+                          borderRadius: '8px', 
+                          padding: '10px 12px',
+                          marginTop: '6px',
+                          boxShadow: '0 0 10px rgba(252, 76, 2, 0.05)'
+                        }}>
+                          <span style={{ fontSize: '0.8rem', color: '#fc4c02', fontWeight: 700 }}>Tempo Total Esperado</span>
+                          <strong style={{ fontSize: '1.05rem', color: '#fff', fontFamily: 'var(--font-title)' }}>{goal?.target_time || 'N/A'}</strong>
+                        </div>
+
+                      </div>
+                    );
+                  })() : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', margin: '20px 0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Grande Objetivo</span>
+                        <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.type} ({formatDistance(goal?.distance)} km)</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Data Alvo da Prova</span>
+                        <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.date_target ? new Date(goal.date_target).toLocaleDateString('pt-BR') : 'N/A'}</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Tempo Alvo Prescrito</span>
+                        <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.target_time || 'N/A'}</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Carga Alvo Semanal</span>
+                        <strong style={{ fontSize: '0.9rem', color: '#fc4c02' }}>{goal?.weekly_tss_target} TSS</strong>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Data Alvo da Prova</span>
-                      <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.date_target ? new Date(goal.date_target).toLocaleDateString('pt-BR') : 'N/A'}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Tempo Alvo Prescrito</span>
-                      <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.target_time || 'N/A'}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Carga Alvo Semanal</span>
-                      <strong style={{ fontSize: '0.9rem', color: '#fc4c02' }}>{goal?.weekly_tss_target} TSS</strong>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
@@ -1599,6 +1936,55 @@ export default function Home() {
                   <Plus size={14} /> Lançar Treino Manual
                 </button>
               </div>
+
+              {/* Barra de Progresso Semanal */}
+              {workouts && workouts.length > 0 && (
+                <div className="premium-card" style={{ 
+                  padding: '16px 20px', 
+                  marginBottom: '16px',
+                  background: 'rgba(13, 21, 39, 0.4)',
+                  borderColor: isWeeklyPlanCompleted ? 'rgba(57, 255, 20, 0.3)' : 'var(--glass-border)',
+                  boxShadow: isWeeklyPlanCompleted ? '0 0 15px rgba(57, 255, 20, 0.1)' : 'none',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                      Progresso da Semana: <strong style={{ color: isWeeklyPlanCompleted ? 'var(--neon-green)' : '#fff' }}>{percentComplete}%</strong>
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      {completedWorkouts} de {totalWorkouts} treinos concluídos
+                    </span>
+                  </div>
+                  
+                  {/* Track da Barra de Progresso */}
+                  <div style={{ 
+                    width: '100%', 
+                    height: '8px', 
+                    background: 'rgba(255, 255, 255, 0.05)', 
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    position: 'relative'
+                  }}>
+                    <div style={{ 
+                      width: `${percentComplete}%`, 
+                      height: '100%', 
+                      background: isWeeklyPlanCompleted 
+                        ? 'linear-gradient(90deg, #39ff14 0%, #00f0ff 100%)' 
+                        : 'linear-gradient(90deg, var(--neon-cyan) 0%, #0088ff 100%)',
+                      borderRadius: '4px',
+                      transition: 'width 0.5s ease-in-out',
+                      boxShadow: isWeeklyPlanCompleted 
+                        ? '0 0 10px #39ff14' 
+                        : '0 0 8px var(--neon-cyan)'
+                    }} />
+                  </div>
+
+                  {isWeeklyPlanCompleted && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '10px', fontSize: '0.8rem', color: 'var(--neon-green)', fontWeight: 600 }}>
+                      🏆 Planilha 100% concluída! Orgulho do seu esforço!
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {workouts && workouts.map((w: any) => {
@@ -1694,8 +2080,8 @@ export default function Home() {
                             </span>
                           )}
                         </div>
-                        <strong style={{ fontSize: '1rem', color: getWorkoutColor(w.type) }}>
-                          {w.type}
+                        <strong style={{ fontSize: '0.9rem', color: getWorkoutColor(w.type), display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          {getWorkoutIcon(w.type)} {getSportConfig(w.type)?.name || w.type}
                         </strong>
                       </div>
 
@@ -2676,6 +3062,103 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+
+                {/* CARD 3: OBJETIVO E METAS ESPORTIVAS */}
+                <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', color: '#fff' }}>
+                      <Target size={20} style={{ color: 'var(--neon-cyan)' }} />
+                      Objetivo Esportivo & Meta
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '4px' }}>
+                      Defina sua meta esportiva principal para que a planilha seja alinhada.
+                    </p>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <div>
+                        <label htmlFor="goal-type" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Tipo de Prova</label>
+                        <select 
+                          id="goal-type"
+                          className="glass-input" 
+                          value={profileForm.goal_type} 
+                          onChange={e => setProfileForm({ ...profileForm, goal_type: e.target.value })} 
+                          disabled={profileSaving}
+                          style={{
+                            background: 'rgba(3, 7, 18, 0.6)',
+                            color: '#fff',
+                            border: '1px solid var(--border-color)'
+                          }}
+                        >
+                          {SPORTS_CONFIG.filter(sport => sport.id !== 'Descanso').map(sport => (
+                            <option key={sport.id} value={sport.id} style={{ background: '#0d1527', color: '#fff' }}>
+                              {sport.emoji} {sport.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label htmlFor="goal-distance" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Distância Alvo (km)</label>
+                        <input 
+                          id="goal-distance"
+                          type="number" 
+                          step="0.01"
+                          className="glass-input" 
+                          placeholder="Ex: 42.2 ou 226.2"
+                          value={profileForm.goal_distance} 
+                          onChange={e => setProfileForm({ ...profileForm, goal_distance: e.target.value })} 
+                          required 
+                          disabled={profileSaving}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <div>
+                        <label htmlFor="goal-date" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Data da Prova</label>
+                        <input 
+                          id="goal-date"
+                          type="date" 
+                          className="glass-input" 
+                          value={profileForm.goal_date_target} 
+                          onChange={e => setProfileForm({ ...profileForm, goal_date_target: e.target.value })} 
+                          disabled={profileSaving}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="goal-time" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Tempo Alvo Esperado</label>
+                        <input 
+                          id="goal-time"
+                          type="text" 
+                          className="glass-input" 
+                          placeholder="Ex: 09:45:00"
+                          value={profileForm.goal_target_time} 
+                          onChange={e => setProfileForm({ ...profileForm, goal_target_time: maskTimeInput(e.target.value) })} 
+                          required 
+                          disabled={profileSaving}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label htmlFor="goal-tss" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Carga Alvo Semanal (TSS)</label>
+                      <input 
+                        id="goal-tss"
+                        type="number" 
+                        className="glass-input" 
+                        placeholder="Ex: 650"
+                        value={profileForm.goal_weekly_tss_target} 
+                        onChange={e => setProfileForm({ ...profileForm, goal_weekly_tss_target: e.target.value })} 
+                        required 
+                        disabled={profileSaving}
+                      />
+                    </div>
+
+                  </div>
+                </div>
+
               </div>
 
               {/* Botão de Submissão */}
@@ -2831,7 +3314,7 @@ export default function Home() {
                   alignItems: 'center',
                   gap: '4px'
                 }}>
-                  {selectedWorkout.type === 'Corrida' ? '🏃‍♂️' : selectedWorkout.type === 'Ciclismo' ? '🚴‍♂️' : selectedWorkout.type === 'Natacao' ? '🏊‍♂️' : selectedWorkout.type === 'Forca' ? '💪' : '💤'} {selectedWorkout.type}
+                  {getWorkoutIcon(selectedWorkout.type)} {getSportConfig(selectedWorkout.type)?.name || selectedWorkout.type}
                 </span>
                 
                 {(() => {
@@ -3201,11 +3684,11 @@ export default function Home() {
                         value={manualLogForm.type}
                         onChange={e => setManualLogForm({ ...manualLogForm, type: e.target.value })}
                       >
-                        <option value="Corrida">🏃‍♂️ Corrida</option>
-                        <option value="Ciclismo">🚴‍♂️ Ciclismo</option>
-                        <option value="Natacao">🏊‍♂️ Natação</option>
-                        <option value="Forca">💪 Fortalecimento</option>
-                        <option value="Descanso">💤 Descanso</option>
+                        {SPORTS_CONFIG.map(sport => (
+                          <option key={sport.id} value={sport.id} style={{ background: '#0d1527', color: '#fff' }}>
+                            {sport.emoji} {sport.name}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>

@@ -68,7 +68,7 @@ export async function GET(req: Request) {
       await autoCompleteExpiredRests(db, activePlan.id, today);
 
       // Obter treinos da planilha ativa
-      workouts = await db.all('SELECT * FROM workouts WHERE plan_id = ? ORDER BY day_of_week ASC', activePlan.id);
+      workouts = await db.all('SELECT * FROM workouts WHERE plan_id = ? ORDER BY day_of_week ASC, id ASC', activePlan.id);
     }
 
     // 4. Obter Logs de Atividades realizados na semana
@@ -83,10 +83,40 @@ export async function GET(req: Request) {
     }
 
     // 5. Obter Notificações Recentes do Coach
-    const notifications = await db.all(
+    let notifications = await db.all(
       'SELECT * FROM coach_notifs WHERE user_id = ? ORDER BY id DESC LIMIT 5', 
       userId
     );
+
+    // 5b. Verificar se todos os treinos da planilha ativa estão completos e criar notificação do Coach
+    const isAllWorkoutsCompleted = workouts.length > 0 && workouts.every((w: any) => w.status === 'completed');
+    if (isAllWorkoutsCompleted) {
+      const existingNotif = await db.get(
+        "SELECT * FROM coach_notifs WHERE user_id = ? AND title = 'Planilha Semanal 100% Cumprida!'",
+        userId
+      );
+      if (!existingNotif) {
+        const today = clientDate ? new Date(clientDate + 'T12:00:00') : new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
+        
+        await db.run(
+          `INSERT INTO coach_notifs (user_id, date, title, content, read)
+           VALUES (?, ?, 'Planilha Semanal 100% Cumprida!', ?, 0)`,
+          userId,
+          todayStr,
+          `Parabéns, campeão! Você completou 100% dos treinos da sua planilha esta semana. Essa constância é o combustível para alcançarmos os seus objetivos fisiológicos. Continue assim!`
+        );
+        
+        // Recarregar notificações para incluir a nova
+        notifications = await db.all(
+          'SELECT * FROM coach_notifs WHERE user_id = ? ORDER BY id DESC LIMIT 5', 
+          userId
+        );
+      }
+    }
 
     // 6. Calcular Métricas de Fadiga (CTL, ATL, TSB)
     const physioMetrics = await calculatePhysioMetrics(db, userId);
