@@ -161,7 +161,7 @@ export async function syncUserStravaActivities(
         const avgPower = act.device_watts ? Math.round(act.average_watts) : null;
         const cadency = act.average_cadence ? Math.round(act.average_cadence) : null;
         const elevationGain = act.total_elevation_gain || null;
-        const timestamp = act.start_date || new Date().toISOString();
+        const timestamp = act.start_date_local || act.start_date || new Date().toISOString();
         
         let paceReal = '0:00/km';
         const speedMps = act.average_speed;
@@ -183,24 +183,7 @@ export async function syncUserStravaActivities(
           tssReal = Math.round((durationReal / 3600) * 60);
         }
 
-        const dateStr = timestamp.split('T')[0];
-        let workout = await db.get<{ id: number; plan_id: number }>(
-          "SELECT id, plan_id FROM workouts WHERE date = ? AND type = ? AND status IN ('pending', 'adjusted')",
-          dateStr,
-          activityType
-        );
-
-        if (!workout) {
-          workout = await db.get<{ id: number; plan_id: number }>(
-            `SELECT w.id, w.plan_id FROM workouts w
-             JOIN training_plans tp ON w.plan_id = tp.id
-             WHERE tp.user_id = ? AND tp.active = 1 AND w.type = ? AND w.status IN ('pending', 'adjusted')
-             ORDER BY w.date ASC LIMIT 1`,
-            userId,
-            activityType
-          );
-        }
-
+        const workout = await findBestMatchingWorkout(db, userId, timestamp, activityType);
         const workoutId = workout ? workout.id : null;
         const rawPayloadString = JSON.stringify(act);
         
@@ -267,4 +250,90 @@ export async function syncUserStravaActivities(
     console.error('Erro na sincronização de atividades do Strava:', err);
     return { success: false, syncedCount: 0, errors: [err.message || err] };
   }
+}
+
+/**
+ * Agrupa esportes compatíveis para fins de sincronização de treinos.
+ */
+export function getCompatibleSportTypes(type: string): string[] {
+  if (['Corrida', 'CorridaTrilha'].includes(type)) {
+    return ['Corrida', 'CorridaTrilha'];
+  }
+  if (['Ciclismo', 'MountainBike', 'Gravel', 'EBike', 'EMountainBike', 'BicicletaMao', 'Velomovel'].includes(type)) {
+    return ['Ciclismo', 'MountainBike', 'Gravel', 'EBike', 'EMountainBike', 'BicicletaMao', 'Velomovel'];
+  }
+  if (['Natacao', 'NatacaoAguasAbertas'].includes(type)) {
+    return ['Natacao', 'NatacaoAguasAbertas'];
+  }
+  return [type];
+}
+
+/**
+ * Procura pelo melhor treino planejado pendente ou ajustado para associar com uma atividade do Strava.
+ * A busca segue os critérios:
+ * 1. Mesma data local e tipo compatível (ex: Corrida e CorridaTrilha são compatíveis).
+ * 2. Qualquer dia na mesma semana da planilha ativa com tipo compatível (ordenado por proximidade de data).
+ * 3. Primeira atividade pendente de tipo compatível em toda a planilha ativa.
+ */
+export async function findBestMatchingWorkout(
+  db: DatabaseClient,
+  userId: number,
+  localTimestamp: string,
+  activityType: string
+): Promise<{ id: number; plan_id: number } | null> {
+  const dateStr = localTimestamp.split('T')[0];
+  const compatibleTypes = getCompatibleSportTypes(activityType);
+  const typesPlaceholder = compatibleTypes.map(() => '?').join(',');
+
+  // 1. Tentar achar na mesma data com tipo compatível
+  let workout = await db.get<{ id: number; plan_id: number }>(
+    `SELECT id, plan_id FROM workouts 
+     WHERE date = ? AND type IN (${typesPlaceholder}) AND status IN ('pending', 'adjusted')`,
+    dateStr,
+    ...compatibleTypes
+  );
+
+  if (workout) {
+    return workout;
+  }
+
+  // 2. Se não achar na mesma data, tentar na mesma semana da planilha ativa
+  const activePlan = await db.get<{ id: number; start_date: string; end_date: string }>(
+    'SELECT id, start_date, end_date FROM training_plans WHERE user_id = ? AND active = 1',
+    userId
+  );
+
+  if (activePlan) {
+    const weeklyWorkouts = await db.all<{ id: number; plan_id: number; date: string }>(
+      `SELECT id, plan_id, date FROM workouts 
+       WHERE plan_id = ? AND date >= ? AND date <= ? AND type IN (${typesPlaceholder}) AND status IN ('pending', 'adjusted')`,
+      activePlan.id,
+      activePlan.start_date,
+      activePlan.end_date,
+      ...compatibleTypes
+    );
+
+    if (weeklyWorkouts.length > 0) {
+      // Ordenar por proximidade de data em JavaScript (compatível com SQLite e PostgreSQL)
+      const activityTime = new Date(dateStr + 'T12:00:00').getTime();
+      weeklyWorkouts.sort((a, b) => {
+        const diffA = Math.abs(new Date(a.date + 'T12:00:00').getTime() - activityTime);
+        const diffB = Math.abs(new Date(b.date + 'T12:00:00').getTime() - activityTime);
+        return diffA - diffB;
+      });
+      return weeklyWorkouts[0];
+    }
+  }
+
+  // 3. Fallback: buscar o primeiro pendente geral de tipo compatível na planilha ativa
+  workout = await db.get<{ id: number; plan_id: number }>(
+    `SELECT w.id, w.plan_id FROM workouts w
+     JOIN training_plans tp ON w.plan_id = tp.id
+     WHERE tp.user_id = ? AND tp.active = 1 AND w.type IN (${typesPlaceholder}) AND w.status IN ('pending', 'adjusted')
+     ORDER BY w.date ASC LIMIT 1`,
+    userId,
+    ...compatibleTypes
+  );
+
+  return workout || null;
 }

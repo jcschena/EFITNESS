@@ -33,13 +33,13 @@ export async function GET() {
     const db = await getDb();
     diagnostics.database.status = 'connected';
     
-    // Test a simple query
-    const userCount = await db.get('SELECT COUNT(*) as count FROM users');
-    diagnostics.database.userCount = userCount ? userCount.count : 0;
-    
-    // Retrieve users list to inspect their Strava states
-    const users = await db.all('SELECT id, name, level, strava_connected, strava_access_token IS NOT NULL as has_access_token, strava_refresh_token IS NOT NULL as has_refresh_token, strava_token_expires FROM users');
-    diagnostics.database.users = users;
+    // Limpar logs do Strava importados com erro para o usuário 3
+    const deleteRes = await db.run("DELETE FROM activity_logs WHERE sync_source = 'Strava' AND user_id = 3");
+    diagnostics.database.deleteResult = deleteRes;
+
+    // Resetar treinos do plano 3 para pendente (exceto o manual de id 64)
+    const updateRes = await db.run("UPDATE workouts SET status = 'pending' WHERE plan_id = 3 AND status = 'completed' AND id != 64");
+    diagnostics.database.updateResult = updateRes;
 
   } catch (err: any) {
     diagnostics.database.status = 'failed';

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { calculateHrTSS, calculatePaceTSS, autoRegulateTrainingPlan } from '@/lib/coach-engine';
-import { getStravaAccessToken } from '@/lib/strava';
+import { getStravaAccessToken, findBestMatchingWorkout } from '@/lib/strava';
 import { getLocalSportIdByStravaType, SPORTS_CONFIG } from '@/lib/sports';
 
 const VERIFY_TOKEN = 'APEX_STRAVA_TOKEN';
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     let avgPower = payload.avgPower ? parseInt(payload.avgPower, 10) : null;
     let cadency = payload.cadence ? parseInt(payload.cadence, 10) : null;
     let elevationGain = payload.elevationGain ? parseFloat(payload.elevationGain) : null;
-    let timestamp = payload.timestamp || new Date().toISOString();
+    let timestamp = payload.start_date_local || payload.timestamp || new Date().toISOString();
     let paceReal = payload.pace || '0:00/km';
     let tssReal = parseInt(payload.tss || '0', 10);
 
@@ -100,7 +100,7 @@ export async function POST(req: Request) {
             avgPower = stravaActivity.device_watts ? Math.round(stravaActivity.average_watts) : null;
             cadency = stravaActivity.average_cadence ? Math.round(stravaActivity.average_cadence) : null;
             elevationGain = stravaActivity.total_elevation_gain || null;
-            timestamp = stravaActivity.start_date || new Date().toISOString();
+            timestamp = stravaActivity.start_date_local || stravaActivity.start_date || new Date().toISOString();
             
             // Tratar Pace
             const speedMps = stravaActivity.average_speed; // m/s
@@ -145,25 +145,7 @@ export async function POST(req: Request) {
     }
 
     // Tentar localizar o treino planejado correspondente no banco
-    const dateStr = timestamp.split('T')[0];
-    let workout = await db.get<{ id: number; plan_id: number }>(
-      "SELECT id, plan_id FROM workouts WHERE date = ? AND type = ? AND status IN ('pending', 'adjusted')",
-      dateStr,
-      activityType
-    );
-
-    // Se não achar por data, buscar o primeiro pendente geral da planilha ativa
-    if (!workout) {
-      workout = await db.get<{ id: number; plan_id: number }>(
-        `SELECT w.id, w.plan_id FROM workouts w
-         JOIN training_plans tp ON w.plan_id = tp.id
-         WHERE tp.user_id = ? AND tp.active = 1 AND w.type = ? AND w.status IN ('pending', 'adjusted')
-         ORDER BY w.date ASC LIMIT 1`,
-        userId,
-        activityType
-      );
-    }
-
+    const workout = await findBestMatchingWorkout(db, userId, timestamp, activityType);
     const workoutId = workout ? workout.id : null;
 
     // Inserir registro no log de atividades (sync_source: 'Strava')
