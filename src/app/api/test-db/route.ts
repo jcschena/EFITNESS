@@ -15,6 +15,12 @@ export async function GET() {
       STRAVA_CLIENT_ID_VALUE: process.env.STRAVA_CLIENT_ID ? `${process.env.STRAVA_CLIENT_ID.substring(0, 3)}...` : 'not set',
       STRAVA_CLIENT_SECRET_EXISTS: !!process.env.STRAVA_CLIENT_SECRET,
       GEMINI_API_KEY_EXISTS: !!process.env.GEMINI_API_KEY,
+      GEMINI_RELATED_KEYS: Object.keys(process.env).filter(k => 
+        k.toUpperCase().includes('GEMINI') || 
+        k.toUpperCase().includes('GOOGLE') || 
+        k.toUpperCase().includes('AI') || 
+        k.toUpperCase().includes('KEY')
+      ),
     },
     database: {
       status: 'unknown',
