@@ -134,6 +134,13 @@ class PostgreSQLAdapter implements DatabaseClient {
               LIMIT 1
             );
         `);
+        // Definir aniversário padrão para o João caso esteja nulo
+        await this.exec(`
+          UPDATE users 
+          SET birth_date = '1985-05-23' 
+          WHERE TRIM(UPPER(name)) = 'JOAO CLAUDIO SCHENA' 
+            AND (birth_date IS NULL OR birth_date = '');
+        `);
         // Atualizar user_id nos logs antigos que possam ter ficado orfãos
         await this.exec(`
           UPDATE activity_logs 
@@ -206,6 +213,13 @@ class SQLiteAdapter implements DatabaseClient {
             ORDER BY CASE WHEN strava_access_token IS NOT NULL THEN 0 ELSE 1 END, id ASC 
             LIMIT 1
           );
+      `);
+      // Definir aniversário padrão para o João caso esteja nulo no SQLite
+      await this.db.exec(`
+        UPDATE users 
+        SET birth_date = '1985-05-23' 
+        WHERE TRIM(UPPER(name)) = 'JOAO CLAUDIO SCHENA' 
+          AND (birth_date IS NULL OR birth_date = '');
       `);
       // Atualizar user_id nos logs antigos que possam ter ficado orfãos no SQLite
       await this.db.exec(`
