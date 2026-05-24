@@ -181,7 +181,7 @@ export async function POST(req: Request) {
     // Se o treino foi identificado, atualizá-lo como completo
     if (workoutId) {
       await db.run(
-        'UPDATE workouts SET status = "completed" WHERE id = ?',
+        "UPDATE workouts SET status = 'completed' WHERE id = ?",
         workoutId
       );
 

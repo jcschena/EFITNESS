@@ -216,7 +216,7 @@ export async function syncUserStravaActivities(
 
         if (workoutId) {
           await db.run(
-            'UPDATE workouts SET status = "completed" WHERE id = ?',
+            "UPDATE workouts SET status = 'completed' WHERE id = ?",
             workoutId
           );
           await autoRegulateTrainingPlan(db, userId, workoutId, tssReal);
