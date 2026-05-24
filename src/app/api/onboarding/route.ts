@@ -30,7 +30,21 @@ export async function POST(req: Request) {
 
     const name = data.name || 'Novo Atleta';
     const level = data.level || 'intermediario'; // 'elite', 'intermediario', 'sedentario'
-    const age = parseInt(data.age || '30', 10);
+    const birthDate = data.birthDate || null;
+    let age = 30;
+
+    if (birthDate) {
+      const birth = new Date(birthDate);
+      const today = new Date();
+      age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+    } else if (data.age) {
+      age = parseInt(data.age, 10);
+    }
+
     const weight = parseFloat(data.weight || '75');
     const goalType = data.goalType || 'Corrida';
     const goalDistance = parseFloat(data.goalDistance || '10');
@@ -63,9 +77,9 @@ export async function POST(req: Request) {
 
     // 2. Inserir Usuário
     const userInsert = await db.run(`
-      INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, name, level, age, weight, thresholdHr, thresholdPace, weeklyHours, 0); // Always start as 0 (authorization is done via OAuth redirect after onboarding)
+      INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, name, level, age, weight, thresholdHr, thresholdPace, weeklyHours, 0, birthDate); // Always start as 0 (authorization is done via OAuth redirect after onboarding)
     
     const userId = userInsert.lastID;
 

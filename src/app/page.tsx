@@ -60,6 +60,7 @@ export default function Home() {
   const [activeUser, setActiveUser] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<string>('planilha'); // 'planilha', 'coach', 'simulador'
+  const [showSimulator, setShowSimulator] = useState<boolean>(false);
   
   // Dados do Dashboard carregados do Backend
   const [dashboardData, setDashboardData] = useState<any>(null);
@@ -70,6 +71,7 @@ export default function Home() {
   const [onboardForm, setOnboardForm] = useState({
     name: '',
     level: 'intermediario',
+    birthDate: '',
     age: '',
     weight: '',
     goalType: 'Corrida',
@@ -379,6 +381,61 @@ export default function Home() {
     setChatInput(question);
   };
 
+  // Componente de Confete para Comemorações
+  const ConfettiShower = () => {
+    const [pieces, setPieces] = useState<Array<{ id: number; left: number; delay: number; color: string; duration: number; size: number }>>([]);
+    
+    useEffect(() => {
+      const colors = ['#fc4c02', '#00f0ff', '#39ff14', '#a855f7', '#ff6b35', '#ffeb3b', '#e91e63'];
+      const newPieces = Array.from({ length: 60 }).map((_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        delay: Math.random() * 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        duration: 3 + Math.random() * 4,
+        size: 6 + Math.random() * 8,
+      }));
+      setPieces(newPieces);
+    }, []);
+
+    return (
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 9999, overflow: 'hidden' }}>
+        {pieces.map(p => (
+          <div 
+            key={p.id} 
+            style={{
+              position: 'absolute',
+              top: '-20px',
+              left: `${p.left}%`,
+              width: `${p.size}px`,
+              height: `${p.size * 1.5}px`,
+              background: p.color,
+              borderRadius: '2px',
+              opacity: 0.8,
+              transform: 'rotate(0deg)',
+              animation: `fall ${p.duration}s linear ${p.delay}s infinite`,
+            }}
+          />
+        ))}
+        <style jsx global>{`
+          @keyframes fall {
+            0% {
+              top: -20px;
+              transform: translateX(0) rotate(0deg);
+            }
+            50% {
+              transform: translateX(20px) rotate(180deg);
+            }
+            100% {
+              top: 105vh;
+              transform: translateX(-20px) rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', gap: '16px' }}>
@@ -437,43 +494,84 @@ export default function Home() {
         {/* Seletor de Atletas Cadastrados */}
         {athletesList.length > 0 && (
           <div className="premium-card" style={{ marginBottom: '24px', textAlign: 'center' }}>
-            <h3 style={{ marginBottom: '12px', fontSize: '1.1rem', color: 'var(--neon-cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--neon-cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Users size={18} style={{ color: 'var(--neon-cyan)' }} />
-              Atletas Cadastrados
+              Acessar Perfil de Atleta
             </h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px' }}>
-              Selecione um perfil de atleta existente na base de dados para acessar:
+              Clique no botão com seu nome para entrar diretamente no painel:
             </p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', alignItems: 'center' }}>
-              <select 
-                className="glass-input" 
-                style={{ flex: 1, background: '#0d1527', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
-                value={selectedAthleteId}
-                onChange={e => setSelectedAthleteId(e.target.value)}
-              >
-                <option value="">-- Selecione seu Perfil --</option>
-                {athletesList.map(ath => (
-                  <option key={ath.id} value={ath.id} style={{ background: '#0d1527', color: '#fff' }}>
-                    {ath.name} ({ath.level === 'elite' ? 'Elite' : ath.level === 'sedentario' ? 'Iniciante' : 'Intermediário'})
-                  </option>
-                ))}
-              </select>
-              <button 
-                className="glow-btn"
-                disabled={!selectedAthleteId}
-                onClick={() => {
-                  if (selectedAthleteId) {
-                    setActiveUser(parseInt(selectedAthleteId, 10));
-                  }
-                }}
-                style={{ 
-                  padding: '12px 24px', 
-                  opacity: selectedAthleteId ? 1 : 0.5,
-                  cursor: selectedAthleteId ? 'pointer' : 'not-allowed'
-                }}
-              >
-                Entrar
-              </button>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
+              {athletesList.map(ath => {
+                const isJoao = ath.name.toUpperCase().includes('SCHENA') || ath.name.toUpperCase().includes('JOAO');
+                return (
+                  <button
+                    key={ath.id}
+                    onClick={() => setActiveUser(ath.id)}
+                    style={{
+                      width: '100%',
+                      padding: '16px 20px',
+                      background: isJoao 
+                        ? 'linear-gradient(135deg, #fc4c02 0%, #d83c01 100%)' 
+                        : 'rgba(255, 255, 255, 0.03)',
+                      border: isJoao 
+                        ? '1px solid #fc4c02' 
+                        : '1px solid rgba(255, 255, 255, 0.08)',
+                      color: '#fff',
+                      boxShadow: isJoao 
+                        ? '0 6px 20px rgba(252, 76, 2, 0.3)' 
+                        : 'none',
+                      borderRadius: '12px',
+                      fontSize: '1rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: 'pointer',
+                      transition: 'var(--transition-smooth)'
+                    }}
+                    onMouseOver={e => {
+                      if (!isJoao) {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                        e.currentTarget.style.borderColor = 'var(--neon-cyan)';
+                      } else {
+                        e.currentTarget.style.filter = 'brightness(1.1)';
+                      }
+                    }}
+                    onMouseOut={e => {
+                      if (!isJoao) {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                      } else {
+                        e.currentTarget.style.filter = 'none';
+                      }
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', textAlign: 'left' }}>
+                      <div style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '50%',
+                        background: isJoao ? '#fff' : 'rgba(255, 255, 255, 0.1)',
+                        color: isJoao ? '#fc4c02' : 'var(--text-secondary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 800,
+                        fontSize: '0.95rem'
+                      }}>
+                        {ath.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <strong style={{ display: 'block', fontWeight: 600 }}>{ath.name}</strong>
+                        <span style={{ fontSize: '0.75rem', color: isJoao ? '#ffe2d1' : 'var(--text-secondary)' }}>
+                          Nível: {ath.level === 'elite' ? 'Elite' : ath.level === 'sedentario' ? 'Iniciante' : 'Intermediário'}
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} style={{ opacity: 0.8 }} />
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -503,13 +601,30 @@ export default function Home() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Idade</label>
+                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Data de Nascimento</label>
                     <input 
-                      type="number" 
+                      type="date" 
                       className="glass-input" 
-                      placeholder="Ex: 35"
-                      value={onboardForm.age} 
-                      onChange={e => setOnboardForm({...onboardForm, age: e.target.value})} 
+                      value={onboardForm.birthDate || ''} 
+                      onChange={e => {
+                        const bDate = e.target.value;
+                        let calculatedAge = '';
+                        if (bDate) {
+                          const birth = new Date(bDate + 'T12:00:00');
+                          const today = new Date();
+                          let ageVal = today.getFullYear() - birth.getFullYear();
+                          const m = today.getMonth() - birth.getMonth();
+                          if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+                            ageVal--;
+                          }
+                          calculatedAge = String(ageVal);
+                        }
+                        setOnboardForm({
+                          ...onboardForm, 
+                          birthDate: bDate,
+                          age: calculatedAge
+                        });
+                      }} 
                       required 
                     />
                   </div>
@@ -526,6 +641,11 @@ export default function Home() {
                     />
                   </div>
                 </div>
+                {onboardForm.age && (
+                  <div style={{ fontSize: '0.85rem', color: 'var(--neon-cyan)', marginTop: '-8px', fontWeight: 600 }}>
+                    Idade calculada automaticamente: {onboardForm.age} anos
+                  </div>
+                )}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Nível de Condicionamento</label>
                   <select 
@@ -543,7 +663,7 @@ export default function Home() {
                   type="button" 
                   className="glow-btn" 
                   style={{ marginTop: '12px' }} 
-                  onClick={() => { if (onboardForm.name && onboardForm.age && onboardForm.weight) setOnboardStep(2); }}
+                  onClick={() => { if (onboardForm.name && onboardForm.birthDate && onboardForm.weight) setOnboardStep(2); }}
                 >
                   Continuar <ArrowRight size={16} />
                 </button>
@@ -644,7 +764,7 @@ export default function Home() {
   }
 
   // SE JÁ EXISTE UM USUÁRIO ATIVO CARREGADO E COM DADOS DO DASHBOARD
-  const { user, goal, plan, workouts, activityLogs, notifications, metrics } = dashboardData || {};
+  const { user, goal, plan, workouts, activityLogs, notifications, metrics, lastSyncedActivity, celebration } = dashboardData || {};
 
   // Formatar dados do gráfico comparativo planejado vs executado
   // Vamos plotar a carga TSS planejada para cada dia de Segunda (1) a Domingo (7) versus a carga executada
@@ -848,6 +968,52 @@ export default function Home() {
 
       {/* CORE CONTENT LAYOUT */}
       <main style={{ flex: 1, width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {celebration && <ConfettiShower />}
+
+        {/* BANNER TEMÁTICO COMEMORATIVO */}
+        {celebration && (
+          <section className="premium-card animate-slide-up" style={{ 
+            background: celebration.type === 'birthday' 
+              ? 'linear-gradient(135deg, rgba(252, 76, 2, 0.18) 0%, rgba(168, 85, 247, 0.18) 100%)'
+              : 'linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(57, 255, 20, 0.12) 100%)',
+            borderColor: celebration.type === 'birthday' ? 'rgba(252, 76, 2, 0.4)' : 'rgba(0, 240, 255, 0.4)',
+            padding: '24px', 
+            borderRadius: '16px',
+            boxShadow: celebration.type === 'birthday' 
+              ? '0 0 25px rgba(252, 76, 2, 0.25), inset 0 0 15px rgba(252, 76, 2, 0.1)' 
+              : '0 0 25px rgba(0, 240, 255, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ fontSize: '2.5rem', animation: 'bounce 2s infinite', display: 'inline-block' }}>
+              {celebration.type === 'birthday' ? '🎂' : '🎉'}
+            </div>
+            <div style={{ flex: 1, zIndex: 1 }}>
+              <h3 style={{ 
+                fontSize: '1.4rem', 
+                color: celebration.type === 'birthday' ? '#fc4c02' : 'var(--neon-cyan)', 
+                marginBottom: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                {celebration.type === 'birthday' ? 'Feliz Aniversário! 🎉' : `${celebration.name}! 🌟`}
+              </h3>
+              <p style={{ fontSize: '0.95rem', color: '#fff', lineHeight: '1.5', fontWeight: 500 }}>
+                {celebration.message}
+              </p>
+            </div>
+            <style jsx global>{`
+              @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+              }
+            `}</style>
+          </section>
+        )}
         
         {/* TOP PHYSIOLOGICAL INSIGHT PANEL */}
         {metrics && (
@@ -984,8 +1150,8 @@ export default function Home() {
             }}
           >
             <Database size={18} style={{ color: activeTab === 'simulador' ? 'var(--neon-cyan)' : 'inherit' }} />
-            Sandbox Strava (Simulador)
-            <span style={{ fontSize: '0.65rem', background: '#e11d48', padding: '1px 5px', color: '#fff', borderRadius: '4px', fontWeight: 700 }}>ADMIN</span>
+            Último Treino Strava
+            <span style={{ fontSize: '0.65rem', background: '#fc4c02', padding: '1px 5px', color: '#fff', borderRadius: '4px', fontWeight: 700 }}>CONECTADO</span>
           </button>
         </div>
 
@@ -1317,165 +1483,319 @@ export default function Home() {
           </div>
         )}
 
-        {/* 3. SIMULADOR GARMIN SANDBOX (ADMIN TOOL) */}
+        {/* 3. ÚLTIMO TREINO SINCRONIZADO DO STRAVA */}
         {activeTab === 'simulador' && (
-          <div className="premium-card animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                Strava API Webhook Sandbox
-                <span style={{ fontSize: '0.8rem', padding: '2px 8px', background: 'rgba(0, 240, 255, 0.1)', color: '#fc4c02', borderRadius: '4px' }}>Simulação em Tempo Real</span>
-              </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '4px', lineHeight: '1.4' }}>
-                Como o OAuth de produção do Strava API exige chaves e homologação de empresa parceira, esta tela simula a recepção de dados push do relógio. Escolha um cenário esportivo, edite as métricas como se o relógio as enviasse e aperte o botão para disparar o webhook do app. O dashboard e o calendário recalcularão a carga na hora!
-              </p>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-              
-              {/* Form de Variáveis */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                
-                {/* Tipo de atividade */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Modalidade</label>
-                    <select 
-                      className="glass-input" 
-                      style={{ background: '#0d1527', color: '#fff' }}
-                      value={simType} 
-                      onChange={e => setSimType(e.target.value)}
-                    >
-                      <option value="Corrida">Corrida de Rua</option>
-                      <option value="Ciclismo">Ciclismo</option>
-                    </select>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
+            
+            {/* Seção principal: Dados do Último Treino */}
+            <div className="premium-card" style={{ background: 'linear-gradient(135deg, rgba(13, 21, 39, 0.9) 0%, rgba(6, 9, 19, 0.9) 100%)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '40px', height: '40px', background: 'rgba(252, 76, 2, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Activity style={{ color: '#fc4c02' }} size={24} />
                   </div>
-
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Cenário Fisiológico</label>
-                    <select 
-                      className="glass-input" 
-                      style={{ background: '#0d1527', color: '#fff' }}
-                      value={simScenario} 
-                      onChange={e => setSimScenario(e.target.value)}
-                    >
-                      <option value="normal">Normal (Dentro da Prescrição)</option>
-                      <option value="overtraining">Sobrecarga (Overtraining Risco)</option>
-                      <option value="missed">Sessão Pulada / Zero Carga</option>
-                    </select>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Último Treino Importado</h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Dados mais recentes recebidos via integração Strava</p>
                   </div>
                 </div>
-
-                {/* Métricas específicas */}
-                {simScenario !== 'missed' && (
-                  <>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Distância Realizada (km)</label>
-                        <input 
-                          type="number" 
-                          step="0.01" 
-                          className="glass-input" 
-                          value={simDistance}
-                          onChange={e => setSimDistance(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Duração Real (segundos)</label>
-                        <input 
-                          type="number" 
-                          className="glass-input" 
-                          value={simDuration}
-                          onChange={e => setSimDuration(e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Frequência Cardíaca Média (bpm)</label>
-                        <input 
-                          type="number" 
-                          className="glass-input" 
-                          value={simHr}
-                          onChange={e => setSimHr(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                          {simType === 'Corrida' ? 'Ritmo Médio (Pace MM:SS)' : 'Potência Média (Watts)'}
-                        </label>
-                        {simType === 'Corrida' ? (
-                          <input 
-                            type="text" 
-                            className="glass-input" 
-                            value={simPace}
-                            onChange={e => setSimPace(e.target.value)}
-                          />
-                        ) : (
-                          <input 
-                            type="number" 
-                            className="glass-input" 
-                            value={simPower}
-                            onChange={e => setSimPower(e.target.value)}
-                          />
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                        TSS Estimado da Atividade (Se 0, a IA calculará com base nos Limiares)
-                      </label>
-                      <input 
-                        type="number" 
-                        className="glass-input" 
-                        value={simTss}
-                        onChange={e => setSimTss(e.target.value)}
-                      />
-                    </div>
-                  </>
-                )}
-
-                <button 
-                  type="button" 
-                  className="glow-btn" 
-                  style={{ marginTop: '10px' }}
-                  onClick={handleSimulateWebhook}
-                >
-                  Disparar Webhook Strava push
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: '#fc4c02', background: 'rgba(252, 76, 2, 0.08)', padding: '6px 12px', borderRadius: '20px', border: '1px solid rgba(252, 76, 2, 0.2)', fontWeight: 600 }}>
+                  <Wifi size={14} />
+                  Sincronização Ativa
+                </div>
               </div>
 
-              {/* Explicação da Auto-Regulação Fisiológica */}
-              <div style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--neon-lime)' }}>Como avaliar este teste:</h4>
-                <ol style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', paddingLeft: '16px', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <li>
-                    Selecione <strong>Corrida</strong> e mude o cenário para <strong>Sobrecarga (Overtraining Risco)</strong>.
-                  </li>
-                  <li>
-                    Clique em <strong>Disparar Webhook Strava push</strong>.
-                  </li>
-                  <li>
-                    Observe a mensagem de sucesso que informa o TSS gerado (ex: 145 TSS, bem acima dos 85 TSS prescritos na planilha).
-                  </li>
-                  <li>
-                    Retorne à aba <strong>Planilha Semanal</strong> ou <strong>Treinador IA</strong> e você verá:
-                    <ul style={{ paddingLeft: '12px', marginTop: '4px', listStyleType: 'circle', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <li style={{ color: 'var(--neon-orange)' }}>Um banner de notificação laranja da IA explicando que a carga estourou.</li>
-                      <li>Os treinos seguintes com badge <strong>AJUSTADO</strong>, com intensidades, distâncias e TSS diminuídos de forma adaptativa.</li>
-                      <li>Gráficos atualizados com a barra do Realizado superando o Planejado.</li>
-                    </ul>
-                  </li>
-                </ol>
+              {lastSyncedActivity ? (
+                <div>
+                  {/* Grid de Métricas Principais */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+                    
+                    {/* Modalidade */}
+                    <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>Modalidade</span>
+                      <strong style={{ fontSize: '1.25rem', color: getWorkoutColor(lastSyncedActivity.type), display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                        {lastSyncedActivity.type}
+                      </strong>
+                    </div>
 
-                {simStatusMsg && (
-                  <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', fontSize: '0.85rem', color: '#fc4c02', fontFamily: 'monospace', textAlign: 'center' }}>
-                    {simStatusMsg}
+                    {/* Distância */}
+                    <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>Distância</span>
+                      <strong style={{ fontSize: '1.25rem', color: '#fff', display: 'block', marginTop: '4px' }}>
+                        {lastSyncedActivity.distance_real} km
+                      </strong>
+                    </div>
+
+                    {/* Duração */}
+                    <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>Tempo Decorrido</span>
+                      <strong style={{ fontSize: '1.25rem', color: '#fff', display: 'block', marginTop: '4px' }}>
+                        {(() => {
+                          const secs = lastSyncedActivity.duration_real;
+                          const hrs = Math.floor(secs / 3600);
+                          const mins = Math.floor((secs % 3600) / 60);
+                          const remainingSecs = secs % 60;
+                          return hrs > 0 
+                            ? `${hrs}h ${mins}m ${remainingSecs}s` 
+                            : `${mins}m ${remainingSecs}s`;
+                        })()}
+                      </strong>
+                    </div>
+
+                    {/* Pace */}
+                    <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>Ritmo Médio</span>
+                      <strong style={{ fontSize: '1.25rem', color: '#fff', display: 'block', marginTop: '4px' }}>
+                        {lastSyncedActivity.pace_real}
+                      </strong>
+                    </div>
+
+                    {/* Carga TSS */}
+                    <div style={{ padding: '16px', background: 'rgba(57, 255, 20, 0.04)', borderRadius: '12px', border: '1px solid rgba(57, 255, 20, 0.1)' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>Carga de Estresse (TSS)</span>
+                      <strong style={{ fontSize: '1.25rem', color: 'var(--neon-green)', display: 'block', marginTop: '4px' }}>
+                        {lastSyncedActivity.tss_real} TSS
+                      </strong>
+                    </div>
+
                   </div>
-                )}
-              </div>
 
+                  {/* Detalhes Fisiológicos Avançados */}
+                  <div style={{ padding: '20px', background: 'rgba(255,255,255,0.01)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.04)', marginBottom: '24px' }}>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--neon-cyan)', marginBottom: '12px' }}>Dinâmica e Biometria</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Frequência Cardíaca Média</span>
+                        <strong style={{ display: 'block', fontSize: '1rem', color: '#fff', marginTop: '2px' }}>
+                          {lastSyncedActivity.avg_hr ? `${lastSyncedActivity.avg_hr} bpm` : '--'}
+                        </strong>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Frequência Cardíaca Máxima</span>
+                        <strong style={{ display: 'block', fontSize: '1rem', color: '#fff', marginTop: '2px' }}>
+                          {lastSyncedActivity.max_hr ? `${lastSyncedActivity.max_hr} bpm` : '--'}
+                        </strong>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Cadência Média</span>
+                        <strong style={{ display: 'block', fontSize: '1rem', color: '#fff', marginTop: '2px' }}>
+                          {lastSyncedActivity.cadency ? `${lastSyncedActivity.cadency} rpm` : '--'}
+                        </strong>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Ganho de Elevação</span>
+                        <strong style={{ display: 'block', fontSize: '1rem', color: '#fff', marginTop: '2px' }}>
+                          {lastSyncedActivity.elevation_gain ? `${lastSyncedActivity.elevation_gain} m` : '--'}
+                        </strong>
+                      </div>
+                      {lastSyncedActivity.avg_power > 0 && (
+                        <div>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Potência Média</span>
+                          <strong style={{ display: 'block', fontSize: '1rem', color: '#fff', marginTop: '2px' }}>
+                            {lastSyncedActivity.avg_power} W
+                          </strong>
+                        </div>
+                      )}
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Sincronizado Em</span>
+                        <strong style={{ display: 'block', fontSize: '0.9rem', color: '#fff', marginTop: '2px' }}>
+                          {new Date(lastSyncedActivity.timestamp).toLocaleString('pt-BR')}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Informação sobre associação */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '0.85rem' }}>
+                    <CheckCircle style={{ color: 'var(--neon-green)' }} size={16} />
+                    <span>
+                      Este treino foi associado automaticamente {lastSyncedActivity.workout_id ? 'a um treino planejado na sua planilha.' : 'como treino extra não planejado.'}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '40px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(255,255,255,0.02)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                    <Clock style={{ color: 'var(--text-muted)' }} size={28} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#fff' }}>Nenhum treino sincronizado ainda</h4>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '4px', maxWidth: '400px', margin: '8px auto 0' }}>
+                      Assim que você subir seu primeiro treino real no Strava (ou disparar um treino simulado abaixo), os detalhes consolidados dele aparecerão aqui.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Simulador colapsável */}
+            <div className="premium-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <button 
+                onClick={() => setShowSimulator(!showSimulator)}
+                style={{ 
+                  width: '100%', 
+                  background: 'rgba(255,255,255,0.02)', 
+                  border: 'none', 
+                  padding: '16px 20px', 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  color: 'var(--text-secondary)',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                  textAlign: 'left'
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Database size={16} style={{ color: 'var(--neon-orange)' }} />
+                  Ferramentas do Desenvolvedor (Simulador Webhook Strava)
+                </span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  {showSimulator ? 'Recolher [-]' : 'Expandir [+]'}
+                </span>
+              </button>
+
+              {showSimulator && (
+                <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                    Esta ferramenta simula a chamada da API Webhook do Strava enviando os dados em push. Altere as variáveis fisiológicas abaixo para testar a auto-regulação adaptativa do coach.
+                  </p>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+                    
+                    {/* Form de Variáveis */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      
+                      {/* Tipo de atividade */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Modalidade</label>
+                          <select 
+                            className="glass-input" 
+                            style={{ background: '#0d1527', color: '#fff' }}
+                            value={simType} 
+                            onChange={e => setSimType(e.target.value)}
+                          >
+                            <option value="Corrida">Corrida de Rua</option>
+                            <option value="Ciclismo">Ciclismo</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Cenário Fisiológico</label>
+                          <select 
+                            className="glass-input" 
+                            style={{ background: '#0d1527', color: '#fff' }}
+                            value={simScenario} 
+                            onChange={e => setSimScenario(e.target.value)}
+                          >
+                            <option value="normal">Normal (Dentro da Prescrição)</option>
+                            <option value="overtraining">Sobrecarga (Overtraining Risco)</option>
+                            <option value="missed">Sessão Pulada / Zero Carga</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Métricas específicas */}
+                      {simScenario !== 'missed' && (
+                        <>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Distância Realizada (km)</label>
+                              <input 
+                                type="number" 
+                                step="0.01" 
+                                className="glass-input" 
+                                value={simDistance}
+                                onChange={e => setSimDistance(e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Duração Real (segundos)</label>
+                              <input 
+                                type="number" 
+                                className="glass-input" 
+                                value={simDuration}
+                                onChange={e => setSimDuration(e.target.value)}
+                              />
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Frequência Cardíaca Média (bpm)</label>
+                              <input 
+                                type="number" 
+                                className="glass-input" 
+                                value={simHr}
+                                onChange={e => setSimHr(e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                {simType === 'Corrida' ? 'Ritmo Médio (Pace MM:SS)' : 'Potência Média (Watts)'}
+                              </label>
+                              {simType === 'Corrida' ? (
+                                <input 
+                                  type="text" 
+                                  className="glass-input" 
+                                  value={simPace}
+                                  onChange={e => setSimPace(e.target.value)}
+                                />
+                              ) : (
+                                <input 
+                                  type="number" 
+                                  className="glass-input" 
+                                  value={simPower}
+                                  onChange={e => setSimPower(e.target.value)}
+                                />
+                              )}
+                            </div>
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                              TSS Estimado da Atividade (Se 0, a IA calculará com base nos Limiares)
+                            </label>
+                            <input 
+                              type="number" 
+                              className="glass-input" 
+                              value={simTss}
+                              onChange={e => setSimTss(e.target.value)}
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      <button 
+                        type="button" 
+                        className="glow-btn-lime" 
+                        style={{ marginTop: '10px' }}
+                        onClick={handleSimulateWebhook}
+                      >
+                        Disparar Webhook Strava push
+                      </button>
+                    </div>
+
+                    {/* Explicação da Auto-Regulação Fisiológica */}
+                    <div style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--neon-lime)' }}>Como testar:</h4>
+                      <ol style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', paddingLeft: '16px', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <li>Escolha a modalidade e o cenário fisiológico (ex: Sobrecarga).</li>
+                        <li>Clique em <strong>Disparar Webhook Strava push</strong>.</li>
+                        <li>Verifique o sucesso e veja as métricas atualizarem na aba atual e na planilha semanal de treinos!</li>
+                      </ol>
+
+                      {simStatusMsg && (
+                        <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', fontSize: '0.85rem', color: '#fc4c02', fontFamily: 'monospace', textAlign: 'center' }}>
+                          {simStatusMsg}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>

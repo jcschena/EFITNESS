@@ -110,6 +110,45 @@ class PostgreSQLAdapter implements DatabaseClient {
       await this.exec(ddl);
       console.log('Schema do PostgreSQL verificado/criado com sucesso.');
 
+      // Migrations incrementais
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date TEXT;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration birth_date no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE activity_logs ADD COLUMN IF NOT EXISTS user_id INTEGER;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration user_id no Postgres:', e);
+      }
+
+      // Limpar atletas duplicados "JOAO CLAUDIO SCHENA"
+      try {
+        await this.exec(`
+          DELETE FROM users 
+          WHERE TRIM(UPPER(name)) = 'JOAO CLAUDIO SCHENA' 
+            AND id != (
+              SELECT id FROM users 
+              WHERE TRIM(UPPER(name)) = 'JOAO CLAUDIO SCHENA' 
+              ORDER BY CASE WHEN strava_access_token IS NOT NULL THEN 0 ELSE 1 END, id ASC 
+              LIMIT 1
+            );
+        `);
+        // Atualizar user_id nos logs antigos que possam ter ficado orfãos
+        await this.exec(`
+          UPDATE activity_logs 
+          SET user_id = (
+            SELECT tp.user_id 
+            FROM workouts w 
+            JOIN training_plans tp ON w.plan_id = tp.id 
+            WHERE w.id = activity_logs.workout_id
+          )
+          WHERE user_id IS NULL AND workout_id IS NOT NULL;
+        `);
+      } catch (e) {
+        console.warn('Erro ao limpar duplicados ou atualizar logs no Postgres:', e);
+      }
+
       // Verificar se há dados no banco
       const userCheck = await this.get('SELECT COUNT(*) as count FROM users');
       if (userCheck && parseInt(userCheck.count, 10) === 0) {
@@ -143,6 +182,45 @@ class SQLiteAdapter implements DatabaseClient {
     // Iniciar Schema no SQLite
     const ddl = getInitialSchemaDDL();
     await this.db.exec(ddl);
+
+    // Migrations incrementais no SQLite
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN birth_date TEXT;');
+    } catch (e) {
+      // Ignorar se já existe
+    }
+    try {
+      await this.db.exec('ALTER TABLE activity_logs ADD COLUMN user_id INTEGER;');
+    } catch (e) {
+      // Ignorar se já existe
+    }
+
+    // Limpar atletas duplicados "JOAO CLAUDIO SCHENA" no SQLite
+    try {
+      await this.db.exec(`
+        DELETE FROM users 
+        WHERE TRIM(UPPER(name)) = 'JOAO CLAUDIO SCHENA' 
+          AND id != (
+            SELECT id FROM users 
+            WHERE TRIM(UPPER(name)) = 'JOAO CLAUDIO SCHENA' 
+            ORDER BY CASE WHEN strava_access_token IS NOT NULL THEN 0 ELSE 1 END, id ASC 
+            LIMIT 1
+          );
+      `);
+      // Atualizar user_id nos logs antigos que possam ter ficado orfãos no SQLite
+      await this.db.exec(`
+        UPDATE activity_logs 
+        SET user_id = (
+          SELECT tp.user_id 
+          FROM workouts w 
+          JOIN training_plans tp ON w.plan_id = tp.id 
+          WHERE w.id = activity_logs.workout_id
+        )
+        WHERE user_id IS NULL AND workout_id IS NOT NULL;
+      `);
+    } catch (e) {
+      console.warn('Erro ao limpar duplicados ou atualizar logs no SQLite:', e);
+    }
 
     const userCheck = await this.db.get<{ count: number }>('SELECT COUNT(*) as count FROM users');
     if (userCheck && userCheck.count === 0) {
@@ -186,7 +264,8 @@ function getInitialSchemaDDL(): string {
       strava_connected INTEGER DEFAULT 0,
       strava_access_token TEXT,
       strava_refresh_token TEXT,
-      strava_token_expires INTEGER
+      strava_token_expires INTEGER,
+      birth_date TEXT
     );
 
     CREATE TABLE IF NOT EXISTS goals (
@@ -230,6 +309,7 @@ function getInitialSchemaDDL(): string {
     CREATE TABLE IF NOT EXISTS activity_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       workout_id INTEGER,
+      user_id INTEGER,
       sync_source TEXT DEFAULT 'Strava',
       timestamp TEXT NOT NULL,
       type TEXT NOT NULL,
@@ -243,7 +323,8 @@ function getInitialSchemaDDL(): string {
       elevation_gain REAL,
       tss_real INTEGER NOT NULL,
       raw_payload TEXT,
-      FOREIGN KEY(workout_id) REFERENCES workouts(id) ON DELETE SET NULL
+      FOREIGN KEY(workout_id) REFERENCES workouts(id) ON DELETE SET NULL,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS coach_notifs (
@@ -282,13 +363,13 @@ function formatDate(date: Date): string {
 async function seedDatabase(db: DatabaseClient) {
   // 1. Inserir usuários
   const eliteUserId = (await db.run(`
-    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, strava_access_token)
-    VALUES ('Tiago "Aço" Silva', 'elite', 32, 68.5, 172, '3:45', 18, 1, 'mock_strava_token_elite')
+    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, strava_access_token, birth_date)
+    VALUES ('Tiago "Aço" Silva', 'elite', 32, 68.5, 172, '3:45', 18, 1, 'mock_strava_token_elite', '1994-05-24')
   `)).lastID;
 
   const sedentarioUserId = (await db.run(`
-    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected)
-    VALUES ('Ana Santos', 'sedentario', 45, 82.0, 145, '8:30', 4, 0)
+    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date)
+    VALUES ('Ana Santos', 'sedentario', 45, 82.0, 145, '8:30', 4, 0, '1981-05-24')
   `)).lastID;
 
   if (!eliteUserId || !sedentarioUserId) return;

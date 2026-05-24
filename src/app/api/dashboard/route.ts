@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { calculatePhysioMetrics } from '@/lib/coach-engine';
+import { getCelebration } from '@/lib/celebrations';
 
 export async function GET(req: Request) {
   try {
@@ -48,6 +49,25 @@ export async function GET(req: Request) {
     // 6. Calcular Métricas de Fadiga (CTL, ATL, TSB)
     const physioMetrics = await calculatePhysioMetrics(db, userId);
 
+    // 7. Obter o último treino absoluto sincronizado do Strava para o usuário
+    let lastSyncedActivity = await db.get(
+      'SELECT * FROM activity_logs WHERE user_id = ? ORDER BY timestamp DESC LIMIT 1',
+      userId
+    );
+    if (!lastSyncedActivity) {
+      // Fallback para treinos antigos
+      lastSyncedActivity = await db.get(`
+        SELECT al.* FROM activity_logs al
+        JOIN workouts w ON al.workout_id = w.id
+        JOIN training_plans tp ON w.plan_id = tp.id
+        WHERE tp.user_id = ?
+        ORDER BY al.timestamp DESC LIMIT 1
+      `, userId);
+    }
+
+    // 8. Verificar se hoje é alguma comemoração especial (Aniversário ou Feriado)
+    const celebration = getCelebration(user.birth_date);
+
     return NextResponse.json({
       user,
       goal,
@@ -55,7 +75,9 @@ export async function GET(req: Request) {
       workouts,
       activityLogs,
       notifications,
-      metrics: physioMetrics
+      metrics: physioMetrics,
+      lastSyncedActivity: lastSyncedActivity || null,
+      celebration
     });
 
   } catch (error: any) {

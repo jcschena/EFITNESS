@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { calculatePhysioMetrics } from '@/lib/coach-engine';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { getCelebration } from '@/lib/celebrations';
 
 // Instanciar o SDK do Gemini se a chave estiver configurada
 const apiKey = process.env.GEMINI_API_KEY;
@@ -21,9 +22,18 @@ function getFallbackCoachResponse(
   const totalTssTarget = weeklyWorkouts.reduce((acc, w) => acc + w.tss_target, 0);
   const totalTssReal = weeklyWorkouts.reduce((acc, w) => acc + (w.status === 'completed' ? w.tss_target : 0), 0); // simplificado
   const completedCount = weeklyWorkouts.filter(w => w.status === 'completed').length;
-   let response = `[Fisiologista de Fallback Ativado - Chave Gemini API não detectada]\n\n`;
+  let response = `[Fisiologista de Fallback Ativado - Chave Gemini API não detectada]\n\n`;
 
   const firstName = user.name.split(' ')[0];
+
+  const celebration = getCelebration(user.birth_date);
+  if (celebration) {
+    if (celebration.type === 'birthday') {
+      response += `🎉 🎂 FELIZ ANIVERSÁRIO, ${firstName.toUpperCase()}!!! 🥳 🎈\nQue este novo ciclo traga muita saúde, paz, conquistas e, claro, muitos quilômetros de evolução na pista e na vida! Aproveite muito o seu dia, comemore bastante e conte comigo para seguir evoluindo de forma segura! 🥂\n\n`;
+    } else {
+      response += `🎉 ${celebration.name.toUpperCase()}!!! 🌟\n${celebration.message}\n\n`;
+    }
+  }
 
   if (msg.includes('cansad') || msg.includes('fadiga') || msg.includes('dor') || msg.includes('exausto')) {
     response += `Fala, ${firstName}! Cara, tô de olho nas suas métricas e te entendo perfeitamente. Sua Fadiga Aguda (ATL) tá batendo em **${metrics.atl}** e seu status de Forma (TSB) tá em **${metrics.tsb}** hoje.\n\n`;
@@ -99,9 +109,20 @@ export async function POST(req: Request) {
       return `- Dia ${w.day_of_week} (${w.date}): ${w.title} [Status: ${w.status}, Prescrito: ${w.distance_target}km, Carga: ${w.tss_target} TSS]`;
     }).join('\n');
 
+    const celebration = getCelebration(user.birth_date);
+    let celebrationPrompt = '';
+    if (celebration) {
+      if (celebration.type === 'birthday') {
+        celebrationPrompt = `\n[HOJE É O ANIVERSÁRIO DO ATLETA! Você DEVE começar sua resposta parabenizando o usuário calorosamente pelo seu aniversário. Use confetes virtuais em texto, deseje saúde, conquistas, prosperidade nos treinos e comemore essa data festiva antes de entrar nas análises técnicas.]\n`;
+      } else {
+        celebrationPrompt = `\n[HOJE É UMA DATA COMEMORATIVA: ${celebration.name}! Você DEVE começar sua resposta felicitando o atleta por esta data comemorativa (${celebration.message}) e fazendo uma analogia motivacional positiva com os treinos dele.]\n`;
+      }
+    }
+
     const systemInstruction = `
 Você é o Coach APEX, um lendário treinador de endurance e ex-atleta de elite com Doutorado em Fisiologia do Exercício.
 Você é conselheiro científico do usuário e gerencia sua carga de treino utilizando a metodologia Training Stress Score (TSS).
+${celebrationPrompt}
 
 Seu perfil de atleta atual:
 - Nome: ${user.name}

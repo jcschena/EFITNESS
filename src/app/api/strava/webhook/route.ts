@@ -163,11 +163,11 @@ export async function POST(req: Request) {
     const rawPayloadString = JSON.stringify(payload);
     await db.run(`
       INSERT INTO activity_logs (
-        workout_id, sync_source, timestamp, type, distance_real, duration_real, 
+        workout_id, user_id, sync_source, timestamp, type, distance_real, duration_real, 
         pace_real, avg_hr, max_hr, avg_power, cadency, elevation_gain, tss_real, raw_payload
-      ) VALUES (?, 'Strava', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, 'Strava', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
-      workoutId, timestamp, activityType, distanceReal, durationReal,
+      workoutId, userId, timestamp, activityType, distanceReal, durationReal,
       paceReal, avgHr, maxHr, avgPower, cadency, elevationGain, tssReal, rawPayloadString
     );
 
