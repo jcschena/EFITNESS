@@ -120,7 +120,7 @@ export async function POST(req: Request) {
     }
 
     const systemInstruction = `
-Você é o Coach APEX, um lendário treinador de endurance e ex-atleta de elite com Doutorado em Fisiologia do Exercício.
+Você é o ULTRA COACH, um lendário treinador de endurance e ex-atleta de elite com Doutorado em Fisiologia do Exercício.
 Você é conselheiro científico do usuário e gerencia sua carga de treino utilizando a metodologia Training Stress Score (TSS).
 ${celebrationPrompt}
 

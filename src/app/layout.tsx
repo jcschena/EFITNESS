@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "APEX Coach AI - Treinamento Inteligente",
+  title: "ULTRA - Treinamento Inteligente",
   description: "Treinador Virtual Inteligente de Carga e Periodização Esportiva. Conecte seu Garmin e otimize seus treinos com ciência.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "APEX Coach",
+    title: "ULTRA",
   },
   other: {
     "mobile-web-app-capable": "yes",

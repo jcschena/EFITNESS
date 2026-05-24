@@ -386,7 +386,12 @@ async function seedDatabase(db: DatabaseClient) {
     VALUES ('Ana Santos', 'sedentario', 45, 82.0, 145, '8:30', 4, 0, '1981-05-24')
   `)).lastID;
 
-  if (!eliteUserId || !sedentarioUserId) return;
+  const joaoUserId = (await db.run(`
+    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date)
+    VALUES ('JOAO CLAUDIO SCHENA', 'intermediario', 40, 75.0, 162, '5:15', 6, 0, '1985-05-23')
+  `)).lastID;
+
+  if (!eliteUserId || !sedentarioUserId || !joaoUserId) return;
 
   // 2. Inserir objetivos
   await db.run(`
@@ -398,6 +403,11 @@ async function seedDatabase(db: DatabaseClient) {
     INSERT INTO goals (user_id, type, distance, date_target, target_time, weekly_tss_target)
     VALUES (?, 'Corrida', 5.0, ?, '00:35:00', 120)
   `, sedentarioUserId, formatDate(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)));
+
+  await db.run(`
+    INSERT INTO goals (user_id, type, distance, date_target, target_time, weekly_tss_target)
+    VALUES (?, 'Corrida', 10.0, ?, '00:55:00', 240)
+  `, joaoUserId, formatDate(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)));
 
   // 3. Inserir planos
   const weekDates = getWeekDates();
@@ -414,7 +424,12 @@ async function seedDatabase(db: DatabaseClient) {
     VALUES (?, 'Transição Sedentarismo Ativo - Semana 3', ?, ?, 1)
   `, sedentarioUserId, startDateStr, endDateStr)).lastID;
 
-  if (!elitePlanId || !sedentarioPlanId) return;
+  const joaoPlanId = (await db.run(`
+    INSERT INTO training_plans (user_id, name, start_date, end_date, active)
+    VALUES (?, 'Planilha Inicial Personalizada - João Claudio', ?, ?, 1)
+  `, joaoUserId, startDateStr, endDateStr)).lastID;
+
+  if (!elitePlanId || !sedentarioPlanId || !joaoPlanId) return;
 
   // 4. Inserir treinos
   // Elite
@@ -453,14 +468,37 @@ async function seedDatabase(db: DatabaseClient) {
     `, sedentarioPlanId, w.day, formatDate(weekDates[w.day - 1]), w.type, w.dist, w.dur, w.pace, w.power, w.tss, w.title, w.desc);
   }
 
+  // João Claudio (Intermediário)
+  const joaoWorkouts = [
+    { day: 1, type: 'Corrida', dist: 6.0, dur: 2160, pace: '6:00/km', power: 0, tss: 35, title: 'Corrida Leve Aeróbia Z2', desc: 'Corrida confortável em ritmo conversacional para ganho de base aeróbia.' },
+    { day: 2, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso', desc: 'Permita que seus músculos se recuperem do estresse acumulado.' },
+    { day: 3, type: 'Corrida', dist: 8.0, dur: 2880, pace: '5:45/km', power: 0, tss: 60, title: 'Treino de Ritmo / Tempo Run', desc: 'Principal: 20 min contínuos em ritmo moderado/forte (Pace ~5:10/km). Excelente estímulo de limiar.' },
+    { day: 4, type: 'Forca', dist: 0.0, dur: 2400, pace: 'N/A', power: 0, tss: 15, title: 'Fortalecimento Geral de Pernas & Core', desc: 'Agachamentos, passadas e pranchas para estabilização articular.' },
+    { day: 5, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso', desc: 'Dia livre para relaxamento e regeneração.' },
+    { day: 6, type: 'Corrida', dist: 12.0, dur: 4680, pace: '6:30/km', power: 0, tss: 110, title: 'Treino Longo de Fim de Semana', desc: 'O treino mais longo da semana. Foco em ritmo estável de Zona 2. Hidrate-se bem antes e depois.' },
+    { day: 7, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso', desc: 'Dia de repouso total.' }
+  ];
+
+  for (const w of joaoWorkouts) {
+    await db.run(`
+      INSERT INTO workouts (plan_id, day_of_week, date, type, distance_target, duration_target, pace_target, power_target, tss_target, title, description, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+    `, joaoPlanId, w.day, formatDate(weekDates[w.day - 1]), w.type, w.dist, w.dur, w.pace, w.power, w.tss, w.title, w.desc);
+  }
+
   // Notificações
   await db.run(`
     INSERT INTO coach_notifs (user_id, date, title, content)
-    VALUES (?, ?, 'Bem-vindo ao APEX Coach AI!', 'Eu sou o seu Treinador Virtual. Analisei suas metas e montei sua planilha semanal de treinos dinâmicos. Sempre que você treinar e subir sua atividade no Strava, os dados serão sincronizados aqui e eu ajustarei seus treinos automaticamente para evitar overtraining ou compensar a falta. Vamos com tudo!')
+    VALUES (?, ?, 'Bem-vindo ao ULTRA!', 'Eu sou o seu Treinador Virtual (ULTRA COACH). Analisei suas metas e montei sua planilha semanal de treinos dinâmicos. Sempre que você treinar e subir sua atividade no Strava, os dados serão sincronizados aqui e eu ajustarei seus treinos automaticamente para evitar overtraining ou compensar a falta. Vamos com tudo!')
   `, eliteUserId, formatDate(new Date()));
 
   await db.run(`
     INSERT INTO coach_notifs (user_id, date, title, content)
     VALUES (?, ?, 'Sua Jornada Começa Aqui!', 'Parabéns por dar o primeiro passo para sair do sedentarismo! Montei uma planilha segura de caminhada e corrida intervalada para você. Sem cobrança de ritmo, foque no conforto. Vamos usar o Strava para acompanhar sua evolução e comemorar cada vitória. Estou aqui para te guiar.')
   `, sedentarioUserId, formatDate(new Date()));
+
+  await db.run(`
+    INSERT INTO coach_notifs (user_id, date, title, content)
+    VALUES (?, ?, 'Bem-vindo ao ULTRA!', 'Olá, João Claudio! Analisei seus dados e configurei sua planilha semanal de treinos dinâmicos. Use o Strava para que eu acompanhe sua evolução e faça ajustes automáticos!')
+  `, joaoUserId, formatDate(new Date()));
 }

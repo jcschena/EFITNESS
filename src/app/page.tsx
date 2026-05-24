@@ -109,7 +109,7 @@ export default function Home() {
         // Inicializar histórico de chat se vazio
         if (chatMessages.length === 0 && data.user) {
           const firstName = data.user.name.split(' ')[0];
-          let welcomeText = `Olá, ${firstName}! Sou o seu treinador virtual APEX. Analisei seus dados de onboarding e estruturei sua planilha de treinos semanal. Sempre que você treinar e subir sua atividade no Strava, eu recebo os dados aqui e recalculo sua carga TSS instantaneamente. Como posso te orientar hoje?`;
+          let welcomeText = `Olá, ${firstName}! Sou o seu treinador virtual ULTRA COACH. Analisei seus dados de onboarding e estruturei sua planilha de treinos semanal. Sempre que você treinar e subir sua atividade no Strava, eu recebo os dados aqui e recalculo sua carga TSS instantaneamente. Como posso te orientar hoje?`;
           
           if (data.user.id === 1) {
             welcomeText = `Saudações, Tiago! Analisei suas métricas recentes de periodização. Sua planilha de treinamento rumo ao seu objetivo de Ironman está montada. Vi que seu TSB está equilibrado, mas fique atento ao treino longo de sábado. Como posso te orientar hoje?`;
@@ -137,27 +137,39 @@ export default function Home() {
     }
   };
 
-  // Lista de atletas para seleção na tela de login
-  const [athletesList, setAthletesList] = useState<Array<{ id: number; name: string; level: string }>>([]);
-  const [selectedAthleteId, setSelectedAthleteId] = useState<string>('');
+  // Estados do Novo Sistema de Login e Senha
+  const [usernameInput, setUsernameInput] = useState<string>('');
+  const [passwordInput, setPasswordInput] = useState<string>('');
+  const [loginError, setLoginError] = useState<string>('');
+  const [loginLoading, setLoginLoading] = useState<boolean>(false);
 
-  // Carregar lista de atletas cadastrados
-  useEffect(() => {
-    const loadAthletes = async () => {
-      try {
-        const res = await fetch('/api/onboarding');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.athletes) {
-            setAthletesList(data.athletes);
-          }
-        }
-      } catch (err) {
-        console.error('Erro ao carregar atletas:', err);
+  // Enviar Login
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    setLoginLoading(true);
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: usernameInput, password: passwordInput })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('is_authenticated', 'true');
+        localStorage.setItem('active_user_id', String(data.userId));
+        setActiveUser(data.userId);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setLoginError(errData.error || 'Credenciais inválidas. Tente novamente.');
       }
-    };
-    loadAthletes();
-  }, [activeUser]);
+    } catch (err: any) {
+      console.error('Erro ao realizar login:', err);
+      setLoginError('Falha ao conectar com o servidor.');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
 
   // Inicialização da sessão e leitura de URL
   useEffect(() => {
@@ -179,8 +191,9 @@ export default function Home() {
     if (urlUserId) {
       const parsedId = parseInt(urlUserId, 10);
       if (!isNaN(parsedId)) {
-        setActiveUser(parsedId);
         localStorage.setItem('active_user_id', String(parsedId));
+        localStorage.setItem('is_authenticated', 'true');
+        setActiveUser(parsedId);
         // Limpar query string para manter a URL limpa
         const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
         window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
@@ -189,20 +202,26 @@ export default function Home() {
     }
 
     const savedUserId = localStorage.getItem('active_user_id');
-    if (savedUserId) {
+    const savedAuthenticated = localStorage.getItem('is_authenticated');
+    if (savedUserId && savedAuthenticated === 'true') {
       const parsedId = parseInt(savedUserId, 10);
       if (!isNaN(parsedId)) {
         setActiveUser(parsedId);
+        return;
       }
     }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     if (activeUser) {
       localStorage.setItem('active_user_id', String(activeUser));
+      localStorage.setItem('is_authenticated', 'true');
       fetchDashboard(activeUser);
     } else {
       localStorage.removeItem('active_user_id');
+      localStorage.removeItem('is_authenticated');
+      setDashboardData(null);
       setLoading(false);
     }
   }, [activeUser]);
@@ -441,7 +460,7 @@ export default function Home() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', gap: '16px' }}>
         <RefreshCw style={{ animation: 'spin 1.5s linear infinite', color: '#00f0ff' }} size={40} />
         <p style={{ fontFamily: 'var(--font-title)', fontWeight: 600, color: 'var(--text-secondary)' }}>
-          Carregando cockpit fisiológico APEX...
+          Carregando cockpit fisiológico ULTRA...
         </p>
         <style jsx global>{`
           @keyframes spin {
@@ -457,13 +476,29 @@ export default function Home() {
     return (
       <div style={{ maxWidth: '600px', margin: '40px auto', padding: '20px', width: '100%' }} className="animate-slide-up">
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ display: 'inline-flex', padding: '12px', background: 'rgba(0, 240, 255, 0.1)', borderRadius: '20px', marginBottom: '16px', border: '1px solid rgba(0, 240, 255, 0.2)' }}>
-            <Activity style={{ color: '#fc4c02' }} size={32} />
+        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+          <div style={{ display: 'inline-flex', padding: '20px', background: 'rgba(0, 240, 255, 0.04)', borderRadius: '50%', marginBottom: '20px', border: '1px solid rgba(0, 240, 255, 0.15)', boxShadow: '0 0 30px rgba(0, 240, 255, 0.1)' }}>
+            <svg width="64" height="64" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 12px rgba(0, 240, 255, 0.5))' }}>
+              <defs>
+                <linearGradient id="ultra-grad-large" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#00f0ff" />
+                  <stop offset="50%" stopColor="#b4f8c8" />
+                  <stop offset="100%" stopColor="#39ff14" />
+                </linearGradient>
+              </defs>
+              <path d="M6 18L16 6L26 18" stroke="url(#ultra-grad-large)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M10 24L16 16L22 24" stroke="url(#ultra-grad-large)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+              <path d="M6 18C6 24 10 28 16 28C22 28 26 24 26 18" stroke="url(#ultra-grad-large)" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+            </svg>
           </div>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '8px' }}>APEX COACH AI</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
-            Periodização Fisiológica Científica e Coaching Virtual Autônomo
+          <h1 style={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '0.05em', marginBottom: '4px', background: 'linear-gradient(90deg, #fff 0%, #00f0ff 50%, #39ff14 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            ULTRA
+          </h1>
+          <p style={{ color: 'var(--neon-cyan)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '16px' }}>
+            Esforço conjunto, conquista compartilhada!
+          </p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '460px', margin: '0 auto' }}>
+            Periodização Fisiológica Científica e Coaching Virtual Autônomo com o seu ULTRA COACH
           </p>
         </div>
 
@@ -734,7 +769,7 @@ export default function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="animate-fade-in">
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Wearables & Strava</h3>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.4' }}>
-                  O APEX Coach AI atinge seu máximo potencial quando sincroniza automaticamente com seu Strava. Lemos seu pace real, dinâmica de corrida, watts de ciclismo e zonas cardíacas para recalcular sua planilha instantaneamente sempre que você salvar um treino.
+                  O ULTRA COACH atinge seu máximo potencial quando sincroniza automaticamente com seu Strava. Lemos seu pace real, dinâmica de corrida, watts de ciclismo e zonas cardíacas para recalcular sua planilha instantaneamente sempre que você salvar um treino.
                 </p>
                 <div style={{ padding: '16px', background: onboardForm.stravaConnected ? 'rgba(57, 255, 20, 0.08)' : 'rgba(255, 255, 255, 0.02)', border: onboardForm.stravaConnected ? '1px dashed var(--neon-green)' : '1px dashed rgba(255, 255, 255, 0.1)', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifySelf: 'center', textAlign: 'center', gap: '12px', transition: 'var(--transition-smooth)' }}>
                   <Wifi style={{ color: onboardForm.stravaConnected ? 'var(--neon-green)' : 'var(--text-muted)' }} size={36} />
@@ -877,14 +912,32 @@ export default function Home() {
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           
           {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Activity style={{ color: user?.level === 'elite' ? 'var(--neon-green)' : 'var(--neon-cyan)' }} size={24} />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #fff 0%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              APEX COACH
-            </h2>
-            <span style={{ fontSize: '0.7rem', padding: '2px 6px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-              AI ENGINE
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transition: 'transform 0.3s ease', filter: 'drop-shadow(0 0 8px rgba(0, 240, 255, 0.4))' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1) rotate(0deg)'}>
+              <defs>
+                <linearGradient id="ultra-grad-nav" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#00f0ff" />
+                  <stop offset="50%" stopColor="#b4f8c8" />
+                  <stop offset="100%" stopColor="#39ff14" />
+                </linearGradient>
+              </defs>
+              <path d="M6 18L16 6L26 18" stroke="url(#ultra-grad-nav)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M10 24L16 16L22 24" stroke="url(#ultra-grad-nav)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+              <path d="M6 18C6 24 10 28 16 28C22 28 26 24 26 18" stroke="url(#ultra-grad-nav)" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+            </svg>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.05em', background: 'linear-gradient(90deg, #fff 0%, #00f0ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0, lineHeight: 1 }}>
+                  ULTRA
+                </h2>
+                <span style={{ fontSize: '0.6rem', padding: '1px 4px', background: 'rgba(0, 240, 255, 0.1)', border: '1px solid rgba(0, 240, 255, 0.2)', borderRadius: '4px', color: 'var(--neon-cyan)', fontWeight: 700, letterSpacing: '0.05em', lineHeight: 1 }}>
+                  COACH
+                </span>
+              </div>
+              <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', fontWeight: 500, marginTop: '2px', whiteSpace: 'nowrap' }}>
+                Esforço conjunto, conquista compartilhada!
+              </span>
+            </div>
           </div>
 
           {/* Active User Info & Switch */}
@@ -1363,7 +1416,7 @@ export default function Home() {
                   <Sparkles style={{ color: '#fc4c02' }} size={20} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Coach APEX</h3>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>ULTRA COACH</h3>
                   <span style={{ fontSize: '0.75rem', color: 'var(--neon-lime)', display: 'block' }}>PhD em Fisiologia do Exercício | On-line</span>
                 </div>
               </div>
@@ -1806,7 +1859,7 @@ export default function Home() {
       {/* FOOTER PWA MOBILE NAV */}
       <footer style={{ background: 'rgba(6, 9, 19, 0.9)', borderTop: '1px solid var(--border-color)', padding: '16px 20px', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>© 2026 APEX Coach AI. Todos os direitos reservados.</span>
+          <span>© 2026 ULTRA COACH. Todos os direitos reservados.</span>
           <div style={{ display: 'flex', gap: '16px' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Wifi size={12} style={{ color: 'var(--neon-green)' }} /> Strava API Integrada
