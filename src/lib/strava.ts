@@ -185,7 +185,7 @@ export async function syncUserStravaActivities(
 
         const dateStr = timestamp.split('T')[0];
         let workout = await db.get<{ id: number; plan_id: number }>(
-          'SELECT id, plan_id FROM workouts WHERE date = ? AND type = ? AND status IN ("pending", "adjusted")',
+          "SELECT id, plan_id FROM workouts WHERE date = ? AND type = ? AND status IN ('pending', 'adjusted')",
           dateStr,
           activityType
         );
@@ -194,7 +194,7 @@ export async function syncUserStravaActivities(
           workout = await db.get<{ id: number; plan_id: number }>(
             `SELECT w.id, w.plan_id FROM workouts w
              JOIN training_plans tp ON w.plan_id = tp.id
-             WHERE tp.user_id = ? AND tp.active = 1 AND w.type = ? AND w.status IN ("pending", "adjusted")
+             WHERE tp.user_id = ? AND tp.active = 1 AND w.type = ? AND w.status IN ('pending', 'adjusted')
              ORDER BY w.date ASC LIMIT 1`,
             userId,
             activityType
