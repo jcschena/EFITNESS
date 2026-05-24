@@ -8,6 +8,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const userIdStr = searchParams.get('userId') || '1';
     const userId = parseInt(userIdStr, 10);
+    const clientDate = searchParams.get('clientDate') || undefined;
 
     const db = await getDb();
 
@@ -66,7 +67,7 @@ export async function GET(req: Request) {
     }
 
     // 8. Verificar se hoje é alguma comemoração especial (Aniversário ou Feriado)
-    const celebration = getCelebration(user.birth_date);
+    const celebration = getCelebration(user.birth_date, clientDate);
 
     return NextResponse.json({
       user,

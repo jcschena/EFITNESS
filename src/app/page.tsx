@@ -102,7 +102,8 @@ export default function Home() {
   const fetchDashboard = async (userId: number) => {
     try {
       setRefreshing(true);
-      const res = await fetch(`/api/dashboard?userId=${userId}`);
+      const clientDate = new Date().toLocaleDateString('en-CA');
+      const res = await fetch(`/api/dashboard?userId=${userId}&clientDate=${clientDate}`);
       if (res.ok) {
         const data = await res.json();
         setDashboardData(data);
@@ -125,8 +126,13 @@ export default function Home() {
           ]);
         }
       } else {
-        const errData = await res.json();
+        const errData = await res.json().catch(() => ({}));
         alert(`Erro ao buscar dados do dashboard: ${errData.error || 'Erro interno no servidor'}`);
+        if (res.status === 404) {
+          setActiveUser(null);
+          localStorage.removeItem('active_user_id');
+          localStorage.removeItem('is_authenticated');
+        }
       }
     } catch (err: any) {
       console.error('Erro ao buscar dados do dashboard:', err);
@@ -323,13 +329,15 @@ export default function Home() {
     setChatLoading(true);
 
     try {
+      const clientDate = new Date().toLocaleDateString('en-CA');
       const res = await fetch('/api/coach', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: activeUser,
           message: userMsg,
-          chatHistory: chatMessages.slice(-6) // enviar últimas mensagens para manter contexto
+          chatHistory: chatMessages.slice(-6), // enviar últimas mensagens para manter contexto
+          clientDate
         })
       });
       if (res.ok) {
@@ -471,328 +479,100 @@ export default function Home() {
     );
   }
 
-  // TELA DE SELEÇÃO INICIAL / ONBOARDING
+  // TELA DE LOGIN E SENHA
   if (!activeUser) {
     return (
-      <div style={{ maxWidth: '600px', margin: '40px auto', padding: '20px', width: '100%' }} className="animate-slide-up">
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-          <div style={{ display: 'inline-flex', padding: '20px', background: 'rgba(0, 240, 255, 0.04)', borderRadius: '50%', marginBottom: '20px', border: '1px solid rgba(0, 240, 255, 0.15)', boxShadow: '0 0 30px rgba(0, 240, 255, 0.1)' }}>
-            <svg width="64" height="64" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 12px rgba(0, 240, 255, 0.5))' }}>
-              <defs>
-                <linearGradient id="ultra-grad-large" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#00f0ff" />
-                  <stop offset="50%" stopColor="#b4f8c8" />
-                  <stop offset="100%" stopColor="#39ff14" />
-                </linearGradient>
-              </defs>
-              <path d="M6 18L16 6L26 18" stroke="url(#ultra-grad-large)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M10 24L16 16L22 24" stroke="url(#ultra-grad-large)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
-              <path d="M6 18C6 24 10 28 16 28C22 28 26 24 26 18" stroke="url(#ultra-grad-large)" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
-            </svg>
-          </div>
-          <h1 style={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '0.05em', marginBottom: '4px', background: 'linear-gradient(90deg, #fff 0%, #00f0ff 50%, #39ff14 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            ULTRA
-          </h1>
-          <p style={{ color: 'var(--neon-cyan)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '16px' }}>
-            Esforço conjunto, conquista compartilhada!
-          </p>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '460px', margin: '0 auto' }}>
-            Periodização Fisiológica Científica e Coaching Virtual Autônomo com o seu ULTRA COACH
-          </p>
-        </div>
-
-        {/* Escolha rápida de perfis mockados para agilizar testes */}
-        <div className="premium-card" style={{ marginBottom: '24px', textAlign: 'center' }}>
-          <h3 style={{ marginBottom: '12px', fontSize: '1.1rem', color: 'var(--neon-lime)' }}>Acesso Rápido para Avaliação</h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px' }}>
-            Escolha um dos perfis pré-configurados para pular o onboarding e ver o painel imediatamente:
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <button 
-              className="glow-btn-lime" 
-              onClick={() => setActiveUser(1)}
-              style={{ fontSize: '0.9rem', padding: '10px' }}
-            >
-              Tiago (Atleta Elite)
-            </button>
-            <button 
-              className="glow-btn" 
-              onClick={() => setActiveUser(2)}
-              style={{ fontSize: '0.9rem', padding: '10px', background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)', boxShadow: '0 4px 14px rgba(168, 85, 247, 0.3)' }}
-            >
-              Ana (Sedentária)
-            </button>
-          </div>
-        </div>
-
-        {/* Seletor de Atletas Cadastrados */}
-        {athletesList.length > 0 && (
-          <div className="premium-card" style={{ marginBottom: '24px', textAlign: 'center' }}>
-            <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--neon-cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <Users size={18} style={{ color: 'var(--neon-cyan)' }} />
-              Acessar Perfil de Atleta
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px' }}>
-              Clique no botão com seu nome para entrar diretamente no painel:
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
-              {athletesList.map(ath => {
-                const isJoao = ath.name.toUpperCase().includes('SCHENA') || ath.name.toUpperCase().includes('JOAO');
-                return (
-                  <button
-                    key={ath.id}
-                    onClick={() => setActiveUser(ath.id)}
-                    style={{
-                      width: '100%',
-                      padding: '16px 20px',
-                      background: isJoao 
-                        ? 'linear-gradient(135deg, #fc4c02 0%, #d83c01 100%)' 
-                        : 'rgba(255, 255, 255, 0.03)',
-                      border: isJoao 
-                        ? '1px solid #fc4c02' 
-                        : '1px solid rgba(255, 255, 255, 0.08)',
-                      color: '#fff',
-                      boxShadow: isJoao 
-                        ? '0 6px 20px rgba(252, 76, 2, 0.3)' 
-                        : 'none',
-                      borderRadius: '12px',
-                      fontSize: '1rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      cursor: 'pointer',
-                      transition: 'var(--transition-smooth)'
-                    }}
-                    onMouseOver={e => {
-                      if (!isJoao) {
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-                        e.currentTarget.style.borderColor = 'var(--neon-cyan)';
-                      } else {
-                        e.currentTarget.style.filter = 'brightness(1.1)';
-                      }
-                    }}
-                    onMouseOut={e => {
-                      if (!isJoao) {
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                      } else {
-                        e.currentTarget.style.filter = 'none';
-                      }
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', textAlign: 'left' }}>
-                      <div style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        background: isJoao ? '#fff' : 'rgba(255, 255, 255, 0.1)',
-                        color: isJoao ? '#fc4c02' : 'var(--text-secondary)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 800,
-                        fontSize: '0.95rem'
-                      }}>
-                        {ath.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <strong style={{ display: 'block', fontWeight: 600 }}>{ath.name}</strong>
-                        <span style={{ fontSize: '0.75rem', color: isJoao ? '#ffe2d1' : 'var(--text-secondary)' }}>
-                          Nível: {ath.level === 'elite' ? 'Elite' : ath.level === 'sedentario' ? 'Iniciante' : 'Intermediário'}
-                        </span>
-                      </div>
-                    </div>
-                    <ChevronRight size={18} style={{ opacity: 0.8 }} />
-                  </button>
-                );
-              })}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', width: '100%' }} className="animate-slide-up">
+        <div style={{ maxWidth: '420px', width: '100%' }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <div style={{ display: 'inline-flex', padding: '20px', background: 'rgba(0, 240, 255, 0.04)', borderRadius: '50%', marginBottom: '20px', border: '1px solid rgba(0, 240, 255, 0.15)', boxShadow: '0 0 30px rgba(0, 240, 255, 0.1)' }}>
+              <svg width="64" height="64" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 12px rgba(0, 240, 255, 0.5))' }}>
+                <defs>
+                  <linearGradient id="ultra-grad-large" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#00f0ff" />
+                    <stop offset="50%" stopColor="#b4f8c8" />
+                    <stop offset="100%" stopColor="#39ff14" />
+                  </linearGradient>
+                </defs>
+                <path d="M6 18L16 6L26 18" stroke="url(#ultra-grad-large)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M10 24L16 16L22 24" stroke="url(#ultra-grad-large)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+                <path d="M6 18C6 24 10 28 16 28C22 28 26 24 26 18" stroke="url(#ultra-grad-large)" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+              </svg>
             </div>
+            <h1 style={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '0.05em', marginBottom: '4px', background: 'linear-gradient(90deg, #fff 0%, #00f0ff 50%, #39ff14 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              ULTRA
+            </h1>
+            <p style={{ color: 'var(--neon-cyan)', fontSize: '0.9rem', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '16px' }}>
+              Esforço conjunto, conquista compartilhada!
+            </p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', maxWidth: '340px', margin: '0 auto', lineHeight: '1.4' }}>
+              Periodização Fisiológica Científica e Coaching Virtual Autônomo
+            </p>
           </div>
-        )}
 
-        {/* Formulário de Onboarding passo a passo */}
-        <div className="premium-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            <span style={{ color: onboardStep >= 1 ? 'var(--neon-cyan)' : 'inherit', fontWeight: onboardStep >= 1 ? 700 : 400 }}>1. Perfil</span>
-            <span style={{ color: onboardStep >= 2 ? 'var(--neon-cyan)' : 'inherit', fontWeight: onboardStep >= 2 ? 700 : 400 }}>2. Meta</span>
-            <span style={{ color: onboardStep >= 3 ? 'var(--neon-cyan)' : 'inherit', fontWeight: onboardStep >= 3 ? 700 : 400 }}>3. Garmin</span>
-          </div>
+          {/* Login Card */}
+          <div className="premium-card" style={{ padding: '32px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '16px' }}>
+            <h3 style={{ marginBottom: '24px', fontSize: '1.4rem', fontWeight: 700, color: '#fff', textAlign: 'center' }}>Acesso ao Cockpit</h3>
+            
+            <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div>
+                <label htmlFor="username" style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Usuário</label>
+                <input 
+                  id="username"
+                  type="text" 
+                  className="glass-input" 
+                  placeholder="Seu usuário"
+                  value={usernameInput} 
+                  onChange={e => setUsernameInput(e.target.value)} 
+                  required 
+                  disabled={loginLoading}
+                  style={{ fontSize: '1rem' }}
+                />
+              </div>
 
-          <form onSubmit={handleOnboardSubmit}>
-            {onboardStep === 1 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="animate-fade-in">
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Fale sobre você</h3>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Nome Completo</label>
-                  <input 
-                    type="text" 
-                    className="glass-input" 
-                    placeholder="Ex: Roberto Silva"
-                    value={onboardForm.name} 
-                    onChange={e => setOnboardForm({...onboardForm, name: e.target.value})} 
-                    required 
-                  />
+              <div>
+                <label htmlFor="password" style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Senha</label>
+                <input 
+                  id="password"
+                  type="password" 
+                  className="glass-input" 
+                  placeholder="Sua senha"
+                  value={passwordInput} 
+                  onChange={e => setPasswordInput(e.target.value)} 
+                  required 
+                  disabled={loginLoading}
+                  style={{ fontSize: '1rem' }}
+                />
+              </div>
+
+              {loginError && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: 'rgba(255, 59, 48, 0.08)', border: '1px solid rgba(255, 59, 48, 0.25)', borderRadius: '8px', color: 'var(--neon-red)', fontSize: '0.85rem', fontWeight: 500 }} className="animate-fade-in">
+                  <AlertTriangle size={16} style={{ flexShrink: 0 }} />
+                  <span>{loginError}</span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Data de Nascimento</label>
-                    <input 
-                      type="date" 
-                      className="glass-input" 
-                      value={onboardForm.birthDate || ''} 
-                      onChange={e => {
-                        const bDate = e.target.value;
-                        let calculatedAge = '';
-                        if (bDate) {
-                          const birth = new Date(bDate + 'T12:00:00');
-                          const today = new Date();
-                          let ageVal = today.getFullYear() - birth.getFullYear();
-                          const m = today.getMonth() - birth.getMonth();
-                          if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-                            ageVal--;
-                          }
-                          calculatedAge = String(ageVal);
-                        }
-                        setOnboardForm({
-                          ...onboardForm, 
-                          birthDate: bDate,
-                          age: calculatedAge
-                        });
-                      }} 
-                      required 
-                    />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Peso (kg)</label>
-                    <input 
-                      type="number" 
-                      step="0.1" 
-                      className="glass-input" 
-                      placeholder="Ex: 78.5"
-                      value={onboardForm.weight} 
-                      onChange={e => setOnboardForm({...onboardForm, weight: e.target.value})} 
-                      required 
-                    />
-                  </div>
-                </div>
-                {onboardForm.age && (
-                  <div style={{ fontSize: '0.85rem', color: 'var(--neon-cyan)', marginTop: '-8px', fontWeight: 600 }}>
-                    Idade calculada automaticamente: {onboardForm.age} anos
-                  </div>
+              )}
+
+              <button 
+                type="submit" 
+                className="glow-btn" 
+                style={{ width: '100%', marginTop: '8px', padding: '14px', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                disabled={loginLoading}
+              >
+                {loginLoading ? (
+                  <>
+                    <RefreshCw style={{ animation: 'spin 1s linear infinite' }} size={18} />
+                    Autenticando...
+                  </>
+                ) : (
+                  <>
+                    Entrar no Painel
+                    <ArrowRight size={18} />
+                  </>
                 )}
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Nível de Condicionamento</label>
-                  <select 
-                    className="glass-input" 
-                    style={{ background: '#0d1527', color: '#fff' }}
-                    value={onboardForm.level} 
-                    onChange={e => setOnboardForm({...onboardForm, level: e.target.value})}
-                  >
-                    <option value="sedentario">Sedentário (Qualidade de Vida)</option>
-                    <option value="intermediario">Intermediário (Performance Amadora)</option>
-                    <option value="elite">Elite (Competitivo / Alta Performance)</option>
-                  </select>
-                </div>
-                <button 
-                  type="button" 
-                  className="glow-btn" 
-                  style={{ marginTop: '12px' }} 
-                  onClick={() => { if (onboardForm.name && onboardForm.birthDate && onboardForm.weight) setOnboardStep(2); }}
-                >
-                  Continuar <ArrowRight size={16} />
-                </button>
-              </div>
-            )}
-
-            {onboardStep === 2 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="animate-fade-in">
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Seu Grande Objetivo</h3>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Modalidade</label>
-                  <select 
-                    className="glass-input" 
-                    style={{ background: '#0d1527', color: '#fff' }}
-                    value={onboardForm.goalType} 
-                    onChange={e => setOnboardForm({...onboardForm, goalType: e.target.value})}
-                  >
-                    <option value="Corrida">Corrida de Rua / Ultramaratona</option>
-                    <option value="Triathlon">Triathlon (Short a Ironman)</option>
-                    <option value="Ciclismo">Ciclismo (Estrada / MTB)</option>
-                    <option value="Natacao">Natação</option>
-                  </select>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Distância do Alvo (km)</label>
-                    <input 
-                      type="number" 
-                      step="0.1" 
-                      className="glass-input" 
-                      placeholder="Ex: 21.1 ou 226" 
-                      value={onboardForm.goalDistance} 
-                      onChange={e => setOnboardForm({...onboardForm, goalDistance: e.target.value})} 
-                      required 
-                    />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Tempo Alvo (Estimado)</label>
-                    <input 
-                      type="text" 
-                      className="glass-input" 
-                      placeholder="Ex: 01:45:00 ou 10:30:00"
-                      value={onboardForm.goalTime} 
-                      onChange={e => setOnboardForm({...onboardForm, goalTime: e.target.value})} 
-                      required 
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>Horas Disponíveis para Treino (Semana)</label>
-                  <input 
-                    type="number" 
-                    className="glass-input" 
-                    placeholder="Ex: 6" 
-                    value={onboardForm.weeklyHours} 
-                    onChange={e => setOnboardForm({...onboardForm, weeklyHours: e.target.value})} 
-                    required 
-                  />
-                </div>
-                <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                  <button type="button" className="glow-btn" style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} onClick={() => setOnboardStep(1)}>Voltar</button>
-                  <button type="button" className="glow-btn" style={{ flex: 1 }} onClick={() => { if (onboardForm.goalDistance && onboardForm.goalTime && onboardForm.weeklyHours) setOnboardStep(3); }}>Próximo</button>
-                </div>
-              </div>
-            )}
-
-            {onboardStep === 3 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="animate-fade-in">
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Wearables & Strava</h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.4' }}>
-                  O ULTRA COACH atinge seu máximo potencial quando sincroniza automaticamente com seu Strava. Lemos seu pace real, dinâmica de corrida, watts de ciclismo e zonas cardíacas para recalcular sua planilha instantaneamente sempre que você salvar um treino.
-                </p>
-                <div style={{ padding: '16px', background: onboardForm.stravaConnected ? 'rgba(57, 255, 20, 0.08)' : 'rgba(255, 255, 255, 0.02)', border: onboardForm.stravaConnected ? '1px dashed var(--neon-green)' : '1px dashed rgba(255, 255, 255, 0.1)', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifySelf: 'center', textAlign: 'center', gap: '12px', transition: 'var(--transition-smooth)' }}>
-                  <Wifi style={{ color: onboardForm.stravaConnected ? 'var(--neon-green)' : 'var(--text-muted)' }} size={36} />
-                  <div>
-                    <h4 style={{ fontSize: '1rem', fontWeight: 600 }}>Integrar Strava</h4>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Fluxo de Consentimento Strava API (OAuth)</p>
-                  </div>
-                  <button 
-                    type="button" 
-                    className="glow-btn" 
-                    style={{ background: onboardForm.stravaConnected ? 'var(--neon-green)' : 'linear-gradient(135deg, #fc4c02 0%, #d83c01 100%)', boxShadow: 'none', padding: '8px 16px', fontSize: '0.85rem' }}
-                    onClick={() => setOnboardForm({...onboardForm, stravaConnected: !onboardForm.stravaConnected})}
-                  >
-                    {onboardForm.stravaConnected ? 'Strava Conectado ✔' : 'Conectar Conta Strava'}
-                  </button>
-                </div>
-                <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                  <button type="button" className="glow-btn" style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} onClick={() => setOnboardStep(2)}>Voltar</button>
-                  <button type="submit" className="glow-btn-lime" style={{ flex: 1 }}>Finalizar Setup</button>
-                </div>
-              </div>
-            )}
-          </form>
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     );
@@ -1006,13 +786,14 @@ export default function Home() {
                 setActiveUser(null);
                 setDashboardData(null);
                 setChatMessages([]);
-                setOnboardStep(1);
+                setUsernameInput('');
+                setPasswordInput('');
               }}
               style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', color: 'var(--text-secondary)', cursor: 'pointer', transition: 'var(--transition-smooth)' }}
-              onMouseOver={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'}
+              onMouseOver={e => e.currentTarget.style.borderColor = 'var(--neon-red)'}
               onMouseOut={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
             >
-              Trocar Atleta
+              Sair
             </button>
           </div>
 

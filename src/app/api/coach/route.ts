@@ -14,7 +14,8 @@ function getFallbackCoachResponse(
   user: any, 
   goal: any, 
   metrics: any, 
-  weeklyWorkouts: any[]
+  weeklyWorkouts: any[],
+  clientDate?: string
 ): string {
   const msg = message.toLowerCase();
   
@@ -26,7 +27,7 @@ function getFallbackCoachResponse(
 
   const firstName = user.name.split(' ')[0];
 
-  const celebration = getCelebration(user.birth_date);
+  const celebration = getCelebration(user.birth_date, clientDate);
   if (celebration) {
     if (celebration.type === 'birthday') {
       response += `🎉 🎂 FELIZ ANIVERSÁRIO, ${firstName.toUpperCase()}!!! 🥳 🎈\nQue este novo ciclo traga muita saúde, paz, conquistas e, claro, muitos quilômetros de evolução na pista e na vida! Aproveite muito o seu dia, comemore bastante e conte comigo para seguir evoluindo de forma segura! 🥂\n\n`;
@@ -74,7 +75,7 @@ function getFallbackCoachResponse(
 
 export async function POST(req: Request) {
   try {
-    const { userId, message, chatHistory } = await req.json();
+    const { userId, message, chatHistory, clientDate } = await req.json();
     const db = await getDb();
 
     const uId = parseInt(userId || '1', 10);
@@ -100,7 +101,7 @@ export async function POST(req: Request) {
 
     // Se a API do Gemini não estiver configurada, disparar o fallback
     if (!ai) {
-      const fallbackReply = getFallbackCoachResponse(message, user, goal, metrics, workouts);
+      const fallbackReply = getFallbackCoachResponse(message, user, goal, metrics, workouts, clientDate);
       return NextResponse.json({ reply: fallbackReply });
     }
 
@@ -109,7 +110,7 @@ export async function POST(req: Request) {
       return `- Dia ${w.day_of_week} (${w.date}): ${w.title} [Status: ${w.status}, Prescrito: ${w.distance_target}km, Carga: ${w.tss_target} TSS]`;
     }).join('\n');
 
-    const celebration = getCelebration(user.birth_date);
+    const celebration = getCelebration(user.birth_date, clientDate);
     let celebrationPrompt = '';
     if (celebration) {
       if (celebration.type === 'birthday') {
