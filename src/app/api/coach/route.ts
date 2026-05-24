@@ -58,7 +58,7 @@ function getFallbackCoachResponse(
   }
   else if (msg.includes('garmin') || msg.includes('sincroniz') || msg.includes('relógio') || msg.includes('relogio')) {
     response += `A nossa ponte com o Garmin Connect tá tinindo! Sempre que você aperta o "Salvar" no relógio, ele manda a atividade direto pro meu webhook.\n\n`;
-    response += `Eu leio seu ritmo, FC média e potência. Se você der um gás extra que não tava planejado (estourando o TSS), eu entro em ação na hora e ajusto os treinos dos dias seguintes para proteger suas articulações. É o nosso seguro contra lesões! Dá pra testar isso agora mesmo usando o **Simulador Strava** ali na barra superior, dá uma olhada!`;
+    response += `Eu leio seu ritmo, FC média e potência. Se você der um gás extra que não tava planejado (estourando o TSS), eu entro em ação na hora e ajusto os treinos dos dias seguintes para proteger suas articulações. É o nosso seguro contra lesões! A sincronização é 100% automática e integrada com seu Strava real.`;
   }
   else if (msg.includes('objetivo') || msg.includes('meta') || msg.includes('ironman') || msg.includes('maratona')) {
     response += `Nossa grande missão é o **${goal.type} de ${goal.distance} km** no dia **${goal.date_target}**, e a gente vai chegar lá voando! \n\n`;

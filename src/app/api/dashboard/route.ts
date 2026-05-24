@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDb, autoCompleteExpiredRests, getCalendarToken } from '@/lib/db';
 import { calculatePhysioMetrics } from '@/lib/coach-engine';
 import { getCelebration } from '@/lib/celebrations';
+import { syncUserStravaActivities } from '@/lib/strava';
 
 export async function GET(req: Request) {
   try {
@@ -13,10 +14,20 @@ export async function GET(req: Request) {
     const db = await getDb();
 
     // 1. Obter Usuário
-    const user = await db.get('SELECT * FROM users WHERE id = ?', userId);
+    const user = await db.get<{ id: number; strava_connected: number; password?: string; birth_date?: string }>('SELECT * FROM users WHERE id = ?', userId);
     if (!user) {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
+
+    // Sincronização automática em segundo plano das atividades do Strava
+    if (user.strava_connected) {
+      try {
+        await syncUserStravaActivities(db, userId);
+      } catch (syncErr) {
+        console.error('[Dashboard Auto-Sync] Falha ao sincronizar atividades do Strava:', syncErr);
+      }
+    }
+
 
     // 2. Obter Goal
     const goal = await db.get('SELECT * FROM goals WHERE user_id = ? ORDER BY date_target ASC LIMIT 1', userId);
@@ -138,7 +149,7 @@ export async function GET(req: Request) {
     }
 
     // 8. Verificar se hoje é alguma comemoração especial (Aniversário ou Feriado)
-    const celebration = getCelebration(user.birth_date, clientDate);
+    const celebration = getCelebration(user.birth_date || null, clientDate);
 
     // 9. Gerar URL dinâmica segura do feed de calendário (iCal)
     const requestUrl = new URL(req.url);

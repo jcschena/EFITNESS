@@ -62,14 +62,54 @@ ChartJS.register(
 
 export default function Home() {
   // Estados Globais da SPA
-  const [activeUser, setActiveUser] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [activeUser, setActiveUser] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
+    
+    // Verificar se há parâmetros na URL primeiro (ex: Strava Redirect)
+    const params = new URLSearchParams(window.location.search);
+    const urlUserId = params.get('userId');
+    if (urlUserId) {
+      const parsedId = parseInt(urlUserId, 10);
+      if (!isNaN(parsedId)) {
+        localStorage.setItem('active_user_id', String(parsedId));
+        localStorage.setItem('is_authenticated', 'true');
+        return parsedId;
+      }
+    }
+
+    const savedUserId = localStorage.getItem('active_user_id');
+    const savedAuthenticated = localStorage.getItem('is_authenticated');
+    if (savedUserId && savedAuthenticated === 'true') {
+      const parsedId = parseInt(savedUserId, 10);
+      if (!isNaN(parsedId)) return parsedId;
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+
+    // Se houver parâmetros de usuário na URL ou no localStorage, precisamos carregar os dados
+    const params = new URLSearchParams(window.location.search);
+    const urlUserId = params.get('userId');
+    if (urlUserId && !isNaN(parseInt(urlUserId, 10))) return true;
+
+    const savedUserId = localStorage.getItem('active_user_id');
+    const savedAuthenticated = localStorage.getItem('is_authenticated');
+    if (savedUserId && savedAuthenticated === 'true') {
+      const parsedId = parseInt(savedUserId, 10);
+      if (!isNaN(parsedId)) return true;
+    }
+    return false;
+  });
+
   const [activeTab, setActiveTab] = useState<string>('planilha'); // 'planilha', 'coach', 'simulador'
   const [selectedWorkout, setSelectedWorkout] = useState<any>(null);
   
   // Dados do Dashboard carregados do Backend
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [isSyncingStrava, setIsSyncingStrava] = useState<boolean>(false);
 
   // Relógio e Data em tempo real
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
@@ -138,6 +178,92 @@ export default function Home() {
     const m = Math.floor((secs % 3600) / 60);
     const s = Math.round(secs % 60);
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  };
+
+  const getExecutionAnalysis = (w: any, log: any) => {
+    if (!log) return null;
+    
+    if (w.type === 'Descanso') {
+      return {
+        percentage: 100,
+        status: 'pleno',
+        label: 'Cumprido',
+        color: 'var(--neon-green)',
+        text: 'O descanso fisiológico programado foi respeitado.'
+      };
+    }
+
+    let planned = 0;
+    let actual = 0;
+    let metricName = '';
+
+    if (w.distance_target > 0) {
+      planned = w.distance_target;
+      actual = log.distance_real;
+      metricName = 'distância';
+    } else if (w.duration_target > 0) {
+      planned = w.duration_target;
+      actual = log.duration_real;
+      metricName = 'duração';
+    } else {
+      planned = w.tss_target;
+      actual = log.tss_real;
+      metricName = 'esforço (TSS)';
+    }
+
+    if (planned <= 0) {
+      return {
+        percentage: 100,
+        status: 'pleno',
+        label: 'Realizado',
+        color: 'var(--neon-cyan)',
+        text: 'Treino concluído com sucesso.'
+      };
+    }
+
+    const ratio = actual / planned;
+    const percentage = Math.round(ratio * 100);
+
+    let status = 'pleno';
+    let label = 'Plenamente Atingido';
+    let color = 'var(--neon-green)';
+    let text = '';
+
+    const formatDiff = (val1: number, val2: number, metric: string) => {
+      const diff = val1 - val2;
+      if (metric === 'distância') {
+        return `${formatDistance(diff)} km`;
+      } else if (metric === 'duração') {
+        return secondsToTime(diff);
+      } else {
+        return `${Math.round(diff)} TSS`;
+      }
+    };
+
+    if (percentage < 90) {
+      status = 'parcial';
+      label = 'Parcialmente Atingido';
+      color = 'var(--neon-orange)';
+      text = `Treino parcialmente realizado (${percentage}% da ${metricName} prevista). Faltaram ${formatDiff(planned, actual, metricName)} para atingir a meta recomendada pelo ULTRA COACH.`;
+    } else if (percentage > 110) {
+      status = 'superado';
+      label = 'Meta Superada';
+      color = 'var(--neon-cyan)';
+      text = `Treino superado (${percentage}% da ${metricName} prevista). Você realizou ${formatDiff(actual, planned, metricName)} além do prescrito. Fique atento para evitar fadiga excessiva ou lesões!`;
+    } else {
+      status = 'pleno';
+      label = 'Plenamente Atingido';
+      color = 'var(--neon-green)';
+      text = `Excelente! Meta de ${metricName} atingida com precisão cirúrgica (${percentage}% concluído, variação de apenas ${Math.abs(100 - percentage)}%).`;
+    }
+
+    return {
+      percentage,
+      status,
+      label,
+      color,
+      text
+    };
   };
 
   const getMultiSportSplits = (goalType: string | undefined | null, totalDistance: number | undefined | null, totalTimeStr: string | undefined | null) => {
@@ -602,28 +728,10 @@ export default function Home() {
     }
 
     if (urlUserId) {
-      const parsedId = parseInt(urlUserId, 10);
-      if (!isNaN(parsedId)) {
-        localStorage.setItem('active_user_id', String(parsedId));
-        localStorage.setItem('is_authenticated', 'true');
-        setActiveUser(parsedId);
-        // Limpar query string para manter a URL limpa
-        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-        window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
-        return;
-      }
+      // Limpar query string para manter a URL limpa
+      const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
     }
-
-    const savedUserId = localStorage.getItem('active_user_id');
-    const savedAuthenticated = localStorage.getItem('is_authenticated');
-    if (savedUserId && savedAuthenticated === 'true') {
-      const parsedId = parseInt(savedUserId, 10);
-      if (!isNaN(parsedId)) {
-        setActiveUser(parsedId);
-        return;
-      }
-    }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -744,6 +852,43 @@ export default function Home() {
       setCalibrationError('Erro de conexão ao servidor de calibração.');
     } finally {
       setCalibrationLoading(false);
+    }
+  };
+
+  // Disparar sincronização manual de atividades do Strava
+  const handleSyncStrava = async () => {
+    if (!activeUser) return;
+    setIsSyncingStrava(true);
+
+    try {
+      const res = await fetch('/api/strava/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: activeUser })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          if (data.syncedCount > 0) {
+            alert(`Sincronização concluída com sucesso! ${data.syncedCount} treino(s) novo(s) importado(s) e registrado(s) na planilha.`);
+          } else {
+            alert('Sincronização concluída! Nenhum treino novo encontrado no Strava.');
+          }
+          // Recarregar os dados do dashboard
+          await fetchDashboard(activeUser);
+        } else {
+          alert('Erro na sincronização: ' + (data.errors?.join(', ') || 'Erro desconhecido.'));
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert('Erro ao sincronizar com o Strava: ' + (errData.error || 'Erro interno no servidor'));
+      }
+    } catch (err: any) {
+      console.error('Erro ao sincronizar:', err);
+      alert('Erro de conexão ao servidor de sincronização.');
+    } finally {
+      setIsSyncingStrava(false);
     }
   };
 
@@ -972,7 +1117,7 @@ export default function Home() {
     );
   };
 
-  if (loading) {
+  if (loading || (activeUser && !dashboardData)) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', gap: '16px' }}>
         <RefreshCw style={{ animation: 'spin 1.5s linear infinite', color: '#00f0ff' }} size={40} />
@@ -1665,7 +1810,7 @@ export default function Home() {
               </div>
               <div>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block' }}>CTL (Fitness / Condicionamento)</span>
-                <strong style={{ fontSize: '1.75rem', color: '#fff', fontFamily: 'var(--font-title)' }}>{metrics.ctl}</strong>
+                <strong style={{ fontSize: '1.75rem', color: '#fff', fontFamily: 'var(--font-title)' }}>{metrics?.ctl || 0}</strong>
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Base de estresse de longo prazo</span>
               </div>
             </div>
@@ -1677,7 +1822,7 @@ export default function Home() {
               </div>
               <div>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block' }}>ATL (Fadiga Recente)</span>
-                <strong style={{ fontSize: '1.75rem', color: '#fff', fontFamily: 'var(--font-title)' }}>{metrics.atl}</strong>
+                <strong style={{ fontSize: '1.75rem', color: '#fff', fontFamily: 'var(--font-title)' }}>{metrics?.atl || 0}</strong>
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Carga aguda nas últimas semanas</span>
               </div>
             </div>
@@ -1689,7 +1834,7 @@ export default function Home() {
               </div>
               <div>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block' }}>TSB (Forma / Balanço)</span>
-                <strong style={{ fontSize: '1.75rem', color: tsbColor, fontFamily: 'var(--font-title)' }}>{metrics.tsb}</strong>
+                <strong style={{ fontSize: '1.75rem', color: tsbColor, fontFamily: 'var(--font-title)' }}>{metrics?.tsb || 0}</strong>
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Equilíbrio fisiológico (CTL - ATL)</span>
               </div>
             </div>
@@ -1983,26 +2128,53 @@ export default function Home() {
                   Planilha Semanal
                   <span style={{ fontSize: '0.8rem', fontWeight: 400, color: 'var(--text-secondary)' }}>({plan?.name})</span>
                 </h3>
-                <button
-                  onClick={() => openManualLog(null)}
-                  className="glow-btn"
-                  style={{
-                    padding: '8px 16px',
-                    fontSize: '0.8rem',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: 'linear-gradient(90deg, var(--neon-cyan) 0%, #00f0ff 100%)',
-                    border: 'none',
-                    color: '#030712',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    boxShadow: '0 0 10px rgba(0, 240, 255, 0.2)'
-                  }}
-                >
-                  <Plus size={14} /> Lançar Treino Manual
-                </button>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  {user?.strava_connected === 1 && (
+                    <button
+                      onClick={handleSyncStrava}
+                      disabled={isSyncingStrava}
+                      className="glow-btn"
+                      style={{
+                        padding: '8px 16px',
+                        fontSize: '0.8rem',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: 'linear-gradient(135deg, #fc4c02 0%, #e23e00 100%)',
+                        border: 'none',
+                        color: '#fff',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        boxShadow: '0 0 10px rgba(252, 76, 2, 0.2)',
+                        transition: 'var(--transition-smooth)'
+                      }}
+                    >
+                      <RefreshCw size={14} style={{ animation: isSyncingStrava ? 'spin 1.5s linear infinite' : 'none' }} />
+                      {isSyncingStrava ? 'Sincronizando...' : 'Sincronizar Strava'}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => openManualLog(null)}
+                    className="glow-btn"
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '0.8rem',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      background: 'linear-gradient(90deg, var(--neon-cyan) 0%, #00f0ff 100%)',
+                      border: 'none',
+                      color: '#030712',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      boxShadow: '0 0 10px rgba(0, 240, 255, 0.2)'
+                    }}
+                  >
+                    <Plus size={14} /> Lançar Treino Manual
+                  </button>
+                </div>
               </div>
 
               {/* Barra de Progresso Semanal */}
@@ -2190,6 +2362,29 @@ export default function Home() {
                             <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                               @ {hasLog.pace_real} {hasLog.avg_power > 0 ? `| ${hasLog.avg_power}W` : ''}
                             </span>
+                            {(() => {
+                              const analysis = getExecutionAnalysis(w, hasLog);
+                              if (!analysis) return null;
+                              return (
+                                <div style={{ marginTop: '4px' }}>
+                                  <span style={{
+                                    fontSize: '0.65rem',
+                                    padding: '2px 6px',
+                                    background: `${analysis.color}15`,
+                                    color: analysis.color,
+                                    border: `1px solid ${analysis.color}35`,
+                                    borderRadius: '4px',
+                                    fontWeight: 700,
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                  }}>
+                                    <span>{analysis.status === 'pleno' ? '🎯' : analysis.status === 'superado' ? '⚡' : '⚠️'}</span>
+                                    {analysis.label} ({analysis.percentage}%)
+                                  </span>
+                                </div>
+                              );
+                            })()}
                           </div>
                         ) : isCompleted ? (
                           <div>
@@ -2504,7 +2699,7 @@ export default function Home() {
                   <div>
                     <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#fff' }}>Nenhum treino sincronizado ainda</h4>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '4px', maxWidth: '400px', margin: '8px auto 0' }}>
-                      Assim que você subir seu primeiro treino real no Strava (ou disparar um treino simulado abaixo), os detalhes consolidados dele aparecerão aqui.
+                      Assim que você subir seu primeiro treino real no Strava, os detalhes consolidados dele aparecerão aqui.
                     </p>
                   </div>
                 </div>
@@ -3650,6 +3845,7 @@ export default function Home() {
                   const hasLog = activityLogs?.find((l: any) => l.workout_id === selectedWorkout.id);
                   if (selectedWorkout.status === 'completed') {
                     if (hasLog) {
+                      const analysis = getExecutionAnalysis(selectedWorkout, hasLog);
                       return (
                         <>
                           <div>
@@ -3680,6 +3876,36 @@ export default function Home() {
                             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Estresse Realizado:</span>
                             <strong style={{ fontSize: '1rem', color: 'var(--neon-green)' }}>{hasLog.tss_real} TSS</strong>
                           </div>
+                          
+                          {analysis && (
+                            <div style={{
+                              gridColumn: '1 / -1',
+                              marginTop: '12px',
+                              padding: '14px',
+                              background: `${analysis.color}08`,
+                              border: `1px solid ${analysis.color}25`,
+                              borderRadius: '10px',
+                              boxShadow: `0 0 10px ${analysis.color}05`
+                            }}>
+                              <span style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                fontSize: '0.75rem',
+                                color: analysis.color,
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                                marginBottom: '6px'
+                              }}>
+                                <span>{analysis.status === 'pleno' ? '🎯' : analysis.status === 'superado' ? '⚡' : '⚠️'}</span>
+                                Análise do Confronto: {analysis.label} ({analysis.percentage}%)
+                              </span>
+                              <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: 0, lineHeight: '1.5' }}>
+                                {analysis.text}
+                              </p>
+                            </div>
+                          )}
                         </>
                       );
                     } else {
