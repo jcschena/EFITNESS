@@ -182,6 +182,20 @@ export async function POST(req: Request) {
             `, activePlan.id, w.day, formatDate(weekDates[w.day - 1]), w.type, w.dist, w.dur, w.pace, w.power, w.tss, w.title, w.desc);
           }
 
+          // Atualizar o nome do plano de treino ativo para o novo nível
+          let newPlanName = `Planilha Inicial Personalizada - Nível ${level.toUpperCase()}`;
+          const weekRegex = /(Semana\s+)(\d+)/i;
+          const match = activePlan.name?.match(weekRegex);
+          if (match) {
+            newPlanName = `${newPlanName} - ${match[0]}`;
+          }
+
+          await db.run(
+            'UPDATE training_plans SET name = ? WHERE id = ?',
+            newPlanName,
+            activePlan.id
+          );
+
           // Notificação de recalibração
           const todayYmd = formatDate(new Date());
           await db.run(`

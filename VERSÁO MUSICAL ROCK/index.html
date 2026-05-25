@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under a Blues Sky - Cascavelletes reimagined by Whitesnake</title>
+    <link rel="stylesheet" href="style.css?v=2">
+    <!-- Google Fonts for premium styling -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="stage-light-left"></div>
+    <div class="stage-light-right"></div>
+
+    <header>
+        <div class="logo-container">
+            <h1 class="band-logo">WHITESNAKE</h1>
+            <p class="subtitle">Reimagines Cascavelletes</p>
+        </div>
+        <div class="track-title-container">
+            <h2 class="track-title" id="track-title">UNDER A BLUES SKY</h2>
+            <p class="track-original-info">Baseado em: "Sob um Céu de Blues" (Cascavelletes)</p>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Coluna da Letra (Lyrics Section) -->
+        <section class="lyrics-section glass-panel">
+            <div class="lyrics-header">
+                <h3>LETRA & GUIA DE PERFORMANCE</h3>
+                <div class="version-toggle">
+                    <button class="toggle-btn active" id="btn-english" onclick="switchLyrics('en')">Inglês (Whitesnake)</button>
+                    <button class="toggle-btn" id="btn-portuguese" onclick="switchLyrics('pt')">Original (Cascavelletes)</button>
+                </div>
+            </div>
+
+            <div class="lyrics-content" id="lyrics-container">
+                <!-- English Version (Default) -->
+                <div id="lyrics-en" class="lyrics-view active">
+                    <div class="section-block" id="section-intro">
+                        <span class="section-label">[Introduction]</span>
+                        <p class="vocal-cue">(Synthesizer atmosphere, dark clean guitar. David Coverdale whispers...)</p>
+                        <p class="lyric-line" data-time="0">"Ooh, yeah... listen baby..."</p>
+                        <p class="vocal-cue">(POW! Massive slow-grooving heavy rock riff enters, huge arena reverb)</p>
+                    </div>
+
+                    <div class="section-block" id="section-verse1">
+                        <span class="section-label">[Verse 1]</span>
+                        <p class="vocal-cue">(Low, husky, seductive baritone voice)</p>
+                        <p class="lyric-line" data-time="8">I look around and all I see is the night</p>
+                        <p class="lyric-line" data-time="12">Just another shadow losing the fight</p>
+                        <p class="lyric-line" data-time="16">I don't have a girl to call my own</p>
+                        <p class="lyric-line" data-time="20">Just this guitar and a heart made of stone</p>
+                        <p class="lyric-line" data-time="24">I’ve been drinking with ghosts, losing my mind</p>
+                        <p class="lyric-line" data-time="28">In the neon lights that leave me blind...</p>
+                    </div>
+
+                    <div class="section-block" id="section-prechorus">
+                        <span class="section-label">[Pre-Chorus]</span>
+                        <p class="vocal-cue">(Tension builds up, drums strike harder)</p>
+                        <p class="lyric-line" data-time="32">And that girl from the edge of the town</p>
+                        <p class="lyric-line" data-time="36">She isn’t here to slow me down</p>
+                        <p class="lyric-line" data-time="40">No, she ain't here... (Coverdale starts adding raw grit/drive)</p>
+                    </div>
+
+                    <div class="section-block" id="section-chorus">
+                        <span class="section-label">[Chorus]</span>
+                        <p class="vocal-cue">(Explosion! Wall of guitars, giant double-tracked arena backing vocals)</p>
+                        <p class="lyric-line" data-time="44">’Cause I’m living under a blues sky! <span class="backing-vocal">(Oh, yes I am!)</span></p>
+                        <p class="lyric-line" data-time="48">Walking the line, under a blues sky!</p>
+                        <p class="lyric-line" data-time="52">Holding my pain, watching the world go by</p>
+                        <p class="lyric-line" data-time="56">Lord, I’m freezing... under a blues sky!</p>
+                    </div>
+
+                    <div class="section-block" id="section-verse2">
+                        <span class="section-label">[Verse 2]</span>
+                        <p class="vocal-cue">(Heavy bass groove, very swagger/shuffle feeling)</p>
+                        <p class="lyric-line" data-time="60">My pockets are empty, my shadow is long</p>
+                        <p class="lyric-line" data-time="64">Just a broken man singing a forgotten song</p>
+                        <p class="lyric-line" data-time="68">Don't look at me with those innocent eyes</p>
+                        <p class="lyric-line" data-time="72">I’m a slave to the night, a master of lies</p>
+                        <p class="lyric-line" data-time="76">I don’t want your pity, I don’t want your tears</p>
+                        <p class="lyric-line" data-time="80">I’ve been running from love for too many years!</p>
+                    </div>
+
+                    <div class="section-block" id="section-chorus2">
+                        <span class="section-label">[Chorus 2]</span>
+                        <p class="lyric-line" data-time="84">’Cause I’m living under a blues sky!</p>
+                        <p class="lyric-line" data-time="88">Walking the line, under a blues sky!</p>
+                        <p class="lyric-line" data-time="92">Yeah, under a blues sky...</p>
+                    </div>
+
+                    <div class="section-block" id="section-solo">
+                        <span class="section-label">[Guitar Solo]</span>
+                        <p class="vocal-cue">(Tempo gets dynamic. Epic John Sykes/Steve Vai style solo starts crying bluesy bends, builds into rapid-fire tapping and high pitch harmonics)</p>
+                        <p class="lyric-line-instrumental" data-time="96">🎸 [Solo de Guitarra Virtuoso e Emocionante] 🎸</p>
+                    </div>
+
+                    <div class="section-block" id="section-bridge">
+                        <span class="section-label">[Bridge]</span>
+                        <p class="vocal-cue">(Minimalistic: Only heavy bass & thumping drum. Coverdale whispers directly to the mic)</p>
+                        <p class="lyric-line" data-time="112">I’m so cold... so cold tonight baby...</p>
+                        <p class="lyric-line" data-time="116">Will you warm my soul?</p>
+                        <p class="vocal-cue">(Volume increases, raw power rises)</p>
+                        <p class="lyric-line" data-time="120">Or will you leave me here... to die?!</p>
+                        <p class="lyric-line" data-time="124">Yeah... YEAHHH!!! <span class="backing-vocal">(High-pitch Hard Rock scream!)</span></p>
+                    </div>
+
+                    <div class="section-block" id="section-finalchorus">
+                        <span class="section-label">[Final Chorus & Outro]</span>
+                        <p class="vocal-cue">(All instruments back in full force, ad-libs overlapping the chorus)</p>
+                        <p class="lyric-line" data-time="128">Under a blues sky! <span class="backing-vocal">(Lord have mercy!)</span></p>
+                        <p class="lyric-line" data-time="132">Under a blues sky! <span class="backing-vocal">(I can't break the chains...)</span></p>
+                        <p class="vocal-cue">(Music fades out with feedback, clean guitar and warm keyboards returning)</p>
+                        <p class="lyric-line" data-time="136">Under... a blues... sky.</p>
+                        <p class="lyric-line" data-time="140">...Mmm, yeah.</p>
+                    </div>
+                </div>
+
+                <!-- Portuguese Original Version -->
+                <div id="lyrics-pt" class="lyrics-view">
+                    <div class="section-block">
+                        <span class="section-label">[Introdução]</span>
+                        <p class="vocal-cue">(Bateria entra direta no boogie acelerado original)</p>
+                        <p class="lyric-line" data-time="0">Instrumental clássico gaúcho...</p>
+                    </div>
+
+                    <div class="section-block">
+                        <span class="section-label">[Verso 1]</span>
+                        <p class="lyric-line" data-time="8">Olho ao redor, nada me interessa</p>
+                        <p class="lyric-line" data-time="12">Minha mente corre e meu corpo tem pressa</p>
+                        <p class="lyric-line" data-time="16">Não tenho garota para chamar de minha</p>
+                        <p class="lyric-line" data-time="20">A solidão é uma longa linha</p>
+                        <p class="lyric-line" data-time="24">Estou bebendo com fantasmas no bar</p>
+                        <p class="lyric-line" data-time="28">Sem rumo certo, sem lugar pra voltar...</p>
+                    </div>
+
+                    <div class="section-block">
+                        <span class="section-label">[Pré-Refrão]</span>
+                        <p class="lyric-line" data-time="32">E a garota de Berlim do outro lado</p>
+                        <p class="lyric-line" data-time="36">Não veio tirar o meu sono atrasado</p>
+                        <p class="lyric-line" data-time="40">Ela não está aqui...</p>
+                    </div>
+
+                    <div class="section-block">
+                        <span class="section-label">[Refrão]</span>
+                        <p class="lyric-line" data-time="44">Porque eu vivo sob um céu de blues!</p>
+                        <p class="lyric-line" data-time="48">Caminhando sozinho sob um céu de blues!</p>
+                        <p class="lyric-line" data-time="52">Sentindo frio, vendo o tempo passar</p>
+                        <p class="lyric-line" data-time="56">Ninguém pra me aquecer, ninguém pra me salvar!</p>
+                    </div>
+
+                    <div class="section-block">
+                        <span class="section-label">[Verso 2]</span>
+                        <p class="lyric-line" data-time="60">Meus bolsos vazios, o cigarro no fim</p>
+                        <p class="lyric-line" data-time="64">Um blues tocando dentro de mim</p>
+                        <p class="lyric-line" data-time="68">Não me olhe com esse olhar de inocente</p>
+                        <p class="lyric-line" data-time="72">Eu sou a noite, sou o fogo quente</p>
+                        <p class="lyric-line" data-time="76">Não quero piedade, não quero chorar</p>
+                        <p class="lyric-line" data-time="80">Faz tempo que eu decidi me afastar!</p>
+                    </div>
+
+                    <div class="section-block">
+                        <span class="section-label">[Refrão 2]</span>
+                        <p class="lyric-line" data-time="84">Porque eu vivo sob um céu de blues!</p>
+                        <p class="lyric-line" data-time="88">Caminhando sozinho sob um céu de blues!</p>
+                        <p class="lyric-line" data-time="92">Sob um céu de blues...</p>
+                    </div>
+
+                    <div class="section-block">
+                        <span class="section-label">[Solo de Guitarra]</span>
+                        <p class="vocal-cue">(Timbre limpo, cru e blueseiro, clássico do rock de garagem gaúcho)</p>
+                        <p class="lyric-line-instrumental" data-time="96">🎸 [Solo de Guitarra Blues/Garagem] 🎸</p>
+                    </div>
+
+                    <div class="section-block">
+                        <span class="section-label">[Ponte]</span>
+                        <p class="lyric-line" data-time="112">Está frio... tão frio esta noite...</p>
+                        <p class="lyric-line" data-time="116">Você vai me aquecer?</p>
+                        <p class="lyric-line" data-time="120">Ou vai me deixar sozinho aqui...</p>
+                        <p class="lyric-line" data-time="124">Para morrer?!</p>
+                    </div>
+
+                    <div class="section-block">
+                        <span class="section-label">[Refrão Final & Outro]</span>
+                        <p class="lyric-line" data-time="128">Sob um céu de blues!</p>
+                        <p class="lyric-line" data-time="132">Sob um céu de blues! (Neste frio...)</p>
+                        <p class="lyric-line" data-time="136">Sob um... céu de... blues.</p>
+                        <p class="lyric-line" data-time="140">Oh, baby...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Coluna de Painel de Controle e Comparação (Right Side Panels) -->
+        <div class="control-panel-container">
+            
+            <!-- Painel Interativo (Sintetizador e Audio Player) -->
+            <section class="interactive-synth-panel glass-panel">
+                <h3 id="panel-title">CONTROLE DE REPRODUÇÃO & ÁUDIO</h3>
+
+                <!-- Seleção de Fonte de Áudio -->
+                <div class="audio-source-selector">
+                    <div class="audio-source-title">FONTE DE ÁUDIO:</div>
+                    <div class="source-options">
+                        <label class="source-opt active" id="opt-synth">
+                            <input type="radio" name="audio-source" value="synth" checked onchange="toggleAudioSource('synth')">
+                            Arranjo Sintetizado
+                        </label>
+                        <label class="source-opt" id="opt-file">
+                            <input type="radio" name="audio-source" value="file" onchange="toggleAudioSource('file')">
+                            Carregar MP3 / Cover por IA
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Uploader de Arquivo Real -->
+                <div id="file-uploader-container" class="file-uploader-container hidden">
+                    <div class="drop-zone" id="drop-zone">
+                        <span class="drop-zone-icon">💿</span>
+                        <span class="drop-text" id="drop-text">Arraste seu MP3 (Cover com vozes da banda) ou clique para carregar</span>
+                        <input type="file" id="audio-file-input" accept="audio/*" style="display: none;">
+                    </div>
+                    <div class="loaded-file-info hidden" id="loaded-file-info">
+                        <span class="file-name" id="loaded-file-name">Nenhum arquivo carregado</span>
+                        <button class="remove-file-btn" onclick="removeAudioFile()">✕</button>
+                    </div>
+                </div>
+                
+                <div class="synth-controls">
+                    <button class="play-btn" id="play-button">
+                        <span class="play-icon">▶</span> TOCAR ARRANJO
+                    </button>
+                    
+                    <div class="control-row">
+                        <div class="slider-group" id="bpm-control-group">
+                            <label for="bpm-slider">TEMPO/BPM: <span id="bpm-display">85</span></label>
+                            <input type="range" id="bpm-slider" min="65" max="110" value="85">
+                        </div>
+                        <div class="slider-group">
+                            <label for="volume-slider">VOLUME: <span id="volume-display">70%</span></label>
+                            <input type="range" id="volume-slider" min="0" max="100" value="70">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualizador de Áudio (Canvas) -->
+                <div class="visualizer-container">
+                    <canvas id="audio-visualizer"></canvas>
+                </div>
+
+                <!-- Ad-libs do Coverdale -->
+                <div class="adlib-panel">
+                    <h4>COVERDALE VOCAL AD-LIBS (DISPARE EM TEMPO REAL)</h4>
+                    <div class="adlib-buttons">
+                        <button class="adlib-btn" onclick="playAdlib('oh-yeah')">🎙️ "Oh Yeah!"</button>
+                        <button class="adlib-btn" onclick="playAdlib('ooh-baby')">🎙️ "Ooh Baby!"</button>
+                        <button class="adlib-btn" onclick="playAdlib('lord-mercy')">🎙️ "Lord Have Mercy!"</button>
+                        <button class="adlib-btn" onclick="playAdlib('scream')">🔥 "YEAHHH!!!"</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Painel de Comparação -->
+            <section class="comparison-panel glass-panel">
+                <h3>ANÁLISE COMPARATIVA DE IDENTIDADE</h3>
+                <div class="comparison-grid">
+                    <div class="comp-card">
+                        <h5>A IDENTIDADE MUSICAL</h5>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Elemento</th>
+                                    <th>Cascavelletes Original</th>
+                                    <th>Whitesnake 80s Reimagined</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Andamento (BPM)</strong></td>
+                                    <td>Rápido (~140 BPM). Boogie-woogie acelerado e festivo.</td>
+                                    <td>Cadenciado e pesado (~85 BPM). Focado no groove "sexy".</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Guitarras</strong></td>
+                                    <td>Timbre limpo, cru, rítmico, pegada punk/garagem.</td>
+                                    <td>Muralhas distorcidas, afinação pesada, pinch harmonics, solo virtuso.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Vocais</strong></td>
+                                    <td>Voz irônica, juvenil e despojada de Flávio Basso.</td>
+                                    <td>Voz grave, sussurrada e explosões com agudos rasgados (Coverdale).</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Temática</strong></td>
+                                    <td>Boemia ácida, solidão urbana de Porto Alegre (Garota de Berlim).</td>
+                                    <td>Drama amoroso épico, mistério da noite, paixão universal de arena.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="credits-box">
+                    <h5>🎸 FICHA TÉCNICA CONCEITUAL (WHITESNAKE ERA DE OURO)</h5>
+                    <ul>
+                        <li><strong>Vocal Líder & Ad-Libs:</strong> David Coverdale</li>
+                        <li><strong>Guitarras Solo & Rítmicas:</strong> John Sykes / Steve Vai</li>
+                        <li><strong>Contra-baixo:</strong> Neil Murray / Tony Franklin</li>
+                        <li><strong>Bateria:</strong> Cozy Powell / Tommy Aldridge</li>
+                        <li><strong>Teclados / Sintetizadores:</strong> Don Airey</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>Desenvolvido com <span style="color: #bd00ff;">♥</span> para fins de reimaginação e apreciação de Rock 'n' Roll.</p>
+    </footer>
+
+    <script src="app.js?v=2"></script>
+</body>
+</html>
