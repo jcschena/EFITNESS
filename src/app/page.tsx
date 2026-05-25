@@ -5829,11 +5829,12 @@ export default function Home() {
                             </h5>
                             
                             {(() => {
-                              const unlinkedLogs = activityLogs?.filter((l: any) => !l.workout_id) || [];
-                              if (unlinkedLogs.length === 0) {
+                              // Filtrar todas as atividades do dia do treino selecionado
+                              const dayLogs = activityLogs?.filter((l: any) => l.timestamp && l.timestamp.startsWith(selectedWorkout.date)) || [];
+                              if (dayLogs.length === 0) {
                                 return (
                                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                    Nenhuma atividade do Strava pendente nesta semana.
+                                    Nenhuma atividade do Strava encontrada para este dia.
                                   </span>
                                 );
                               }
@@ -5854,7 +5855,7 @@ export default function Home() {
                                     }}
                                   >
                                     <option value="" disabled>Selecione uma atividade...</option>
-                                    {unlinkedLogs.map((l: any) => {
+                                    {dayLogs.map((l: any) => {
                                       const formattedDate = (() => {
                                         try {
                                           const d = new Date(l.timestamp);
@@ -5863,9 +5864,16 @@ export default function Home() {
                                           return l.timestamp;
                                         }
                                       })();
+                                      
+                                      const statusText = l.workout_id 
+                                        ? l.workout_id === selectedWorkout.id 
+                                          ? ' (Já vinculado a este treino)' 
+                                          : ' (Vinculado a outro treino)' 
+                                        : '';
+                                        
                                       return (
                                         <option key={l.id} value={l.id}>
-                                          {getWorkoutIcon(l.type)} {l.type} - {formattedDate} - {formatDistance(l.distance_real)} km ({secondsToTime(l.duration_real)})
+                                          {getWorkoutIcon(l.type)} {l.type} - {formattedDate} - {formatDistance(l.distance_real)} km ({secondsToTime(l.duration_real)}){statusText}
                                         </option>
                                       );
                                     })}
