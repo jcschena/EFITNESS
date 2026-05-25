@@ -567,16 +567,29 @@ export async function GET(req: Request) {
       workouts = await db.all('SELECT * FROM workouts WHERE plan_id = ? ORDER BY day_of_week ASC, id ASC', activePlan.id);
     }
 
-    // 4. Obter Logs de Atividades realizados na semana (todos, vinculados ou extras)
+    // 4. Obter Logs de Atividades realizados na semana (todos, vinculados ou extras, estendidos em 48h)
     let activityLogs: any[] = [];
     if (activePlan && workouts.length > 0) {
       const workoutIds = workouts.map(w => w.id).join(',');
+      
+      const endDate = new Date(activePlan.end_date + 'T23:59:59');
+      const extendedEndDate = new Date(endDate);
+      extendedEndDate.setDate(extendedEndDate.getDate() + 2); // Estender em 48 horas
+      
+      const formatYmdHms = (d: Date) => {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}T23:59:59`;
+      };
+      const extendedEndDateStr = formatYmdHms(extendedEndDate);
+
       activityLogs = await db.all(`
         SELECT * FROM activity_logs 
         WHERE workout_id IN (${workoutIds})
            OR (user_id = ? AND timestamp >= ? AND timestamp <= ?)
         ORDER BY timestamp DESC
-      `, userId, activePlan.start_date + 'T00:00:00', activePlan.end_date + 'T23:59:59');
+      `, userId, activePlan.start_date + 'T00:00:00', extendedEndDateStr);
     }
 
     // 5. Obter Notificações Recentes do Coach

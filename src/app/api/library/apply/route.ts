@@ -130,10 +130,29 @@ export async function POST(req: Request) {
 
     // 10. Atualizar Objetivo do Usuário (opcional: se não houver ou se o esporte for diferente)
     if (!goal || goal.type !== libraryPlan.sport) {
-      // Define uma prova alvo fictícia/estimada no fim da planilha
-      const raceDistance = libraryId.includes('100k') ? 100 : libraryId.includes('50m') ? 80 : libraryId.includes('703') ? 113 : libraryId.includes('olympic') ? 51.5 : libraryId.includes('marathon') ? 42.2 : 10;
-      const targetTime = libraryPlan.sport === 'Corrida' ? '00:50:00' : libraryPlan.sport === 'Ciclismo' ? '03:30:00' : '01:00:00';
-      
+      let raceDistance = 10;
+      if (libraryId.includes('100k')) raceDistance = 100;
+      else if (libraryId.includes('50m')) raceDistance = 80;
+      else if (libraryId.includes('50k')) raceDistance = 50;
+      else if (libraryId.includes('703')) raceDistance = 113;
+      else if (libraryId.includes('ironman') || libraryId.includes('full')) raceDistance = 226;
+      else if (libraryId.includes('olympic')) raceDistance = 51.5;
+      else if (libraryId.includes('sprint')) raceDistance = 25.75;
+      else if (libraryId.includes('marathon')) raceDistance = 42.2;
+      else if (libraryId.includes('5k')) raceDistance = 5;
+      else if (libraryId.includes('1000m')) raceDistance = 1;
+
+      let targetTime = '01:00:00';
+      if (libraryPlan.sport === 'Corrida') {
+        targetTime = raceDistance === 5 ? '00:25:00' : raceDistance === 42.2 ? '04:00:00' : raceDistance >= 50 ? '08:00:00' : '00:50:00';
+      } else if (libraryPlan.sport === 'Ciclismo') {
+        targetTime = raceDistance >= 100 ? '05:00:00' : '01:30:00';
+      } else if (libraryPlan.sport === 'Triathlon') {
+        targetTime = raceDistance === 226 ? '12:00:00' : raceDistance === 113 ? '05:30:00' : raceDistance === 51.5 ? '02:45:00' : '01:20:00';
+      } else if (libraryPlan.sport === 'Natacao') {
+        targetTime = raceDistance === 1 ? '00:25:00' : '00:40:00';
+      }
+
       const targetDate = new Date(monday);
       targetDate.setDate(monday.getDate() + (actualWeeksToUse * 7) - 1); // Domingo da última semana do ciclo
       const targetDateStr = formatDate(targetDate);

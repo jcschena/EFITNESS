@@ -5829,12 +5829,20 @@ export default function Home() {
                             </h5>
                             
                             {(() => {
-                              // Filtrar todas as atividades do dia do treino selecionado
-                              const dayLogs = activityLogs?.filter((l: any) => l.timestamp && l.timestamp.startsWith(selectedWorkout.date)) || [];
+                              // Filtrar todas as atividades do dia do treino selecionado e das 48h subsequentes (72h no total)
+                              const dayLogs = activityLogs?.filter((l: any) => {
+                                if (!l.timestamp) return false;
+                                const wDate = new Date(selectedWorkout.date + 'T00:00:00');
+                                const actDate = new Date(l.timestamp);
+                                const startTime = wDate.getTime();
+                                const endTime = startTime + (3 * 24 * 60 * 60 * 1000); // 72 horas em ms (dia planejado + 48h subsequentes)
+                                const actTime = actDate.getTime();
+                                return actTime >= startTime && actTime < endTime;
+                              }) || [];
                               if (dayLogs.length === 0) {
                                 return (
                                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                    Nenhuma atividade do Strava encontrada para este dia.
+                                    Nenhuma atividade do Strava encontrada para este dia ou nas 48h seguintes.
                                   </span>
                                 );
                               }

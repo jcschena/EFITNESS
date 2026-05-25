@@ -482,5 +482,223 @@ export const TRAINING_LIBRARY: Record<string, LibraryPlan> = {
       }
       return weeksData;
     }
+  },
+  'run_couch_to_5k': {
+    id: 'run_couch_to_5k',
+    name: 'Planilha de Corrida: Do Sofá aos 5K',
+    author: 'CoolRunning',
+    source: 'Couch to 5K (c25k.com)',
+    sport: 'Corrida',
+    weeks: 8,
+    level: 'iniciante',
+    description: 'Desenvolvida para iniciantes saírem do sedentarismo de forma segura. Alterna intervalos de caminhada e trote leve para construir a base aeróbica.',
+    generateWeeks: (effortPct: number) => {
+      const weeksData: LibraryWorkout[][] = [];
+      for (let w = 1; w <= 8; w++) {
+        const totalDist = parseFloat((2 + w * 0.3).toFixed(1));
+        const totalDur = Math.round((20 + w * 2.5) * 60);
+        const isRaceWeek = w === 8;
+
+        const weekWorkouts: LibraryWorkout[] = [
+          { day: 1, type: 'Descanso', title: 'Recuperação Ativa', desc: 'Descanso fisiológico ou caminhada leve.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 },
+          { day: 2, type: 'Corrida', title: `Trote e Caminhada (Microciclo ${w})`, desc: 'Principal: Aquecimento de 5 min caminhada. Repita intervalos de trote leve e caminhada ativa.', dist: totalDist, dur: totalDur, pace: '6:30/km', power: 0, tss: Math.round(15 + w * 2) },
+          { day: 3, type: 'Descanso', title: 'Descanso', desc: 'Dia livre para alongamento e repouso.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 },
+          { day: 4, type: 'Corrida', title: 'Trote e Caminhada de Progressão', desc: 'Principal: Sessão intervalada curta focada em consistência de ritmo.', dist: totalDist, dur: totalDur, pace: '6:30/km', power: 0, tss: Math.round(15 + w * 2) },
+          { day: 5, type: 'Forca', title: 'Fortalecimento de Base', desc: 'Exercícios funcionais leves (agachamento peso corporal, prancha e panturrilha).', dist: 0, dur: 900, pace: 'N/A', power: 0, tss: 8 },
+          { day: 6, type: 'Corrida', title: isRaceWeek ? '🎯 DESAFIO 5K CONTÍNUO 🏁' : 'Sessão de Longo Transição Z2', desc: isRaceWeek ? 'Chegou o dia! Tente correr os 5km contínuos no seu próprio ritmo confortável!' : 'Corrida/Caminhada mais longa da semana. Foco no volume de tempo.', dist: isRaceWeek ? 5 : parseFloat((totalDist + 0.5).toFixed(1)), dur: isRaceWeek ? 1950 : Math.round((totalDur + 300)), pace: isRaceWeek ? '6:30/km' : '6:45/km', power: 0, tss: isRaceWeek ? 50 : Math.round(20 + w * 3) },
+          { day: 7, type: 'Descanso', title: 'Descanso Semanal', desc: 'Recupere-se e comemore a semana concluída.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 }
+        ];
+
+        weeksData.push(weekWorkouts.map(wk => calibrateWorkout(wk, effortPct)));
+      }
+      return weeksData;
+    }
+  },
+  'bike_beginner_base': {
+    id: 'bike_beginner_base',
+    name: 'Planilha de Ciclismo: Base para Iniciantes',
+    author: 'Carmichael Training Systems',
+    source: 'TrainRight (trainright.com)',
+    sport: 'Ciclismo',
+    weeks: 6,
+    level: 'iniciante',
+    description: 'Planilha focada no desenvolvimento de resistência aeróbica básica na bicicleta. Ideal para ciclistas novatos construírem base e adaptação.',
+    generateWeeks: (effortPct: number) => {
+      const weeksData: LibraryWorkout[][] = [];
+      for (let w = 1; w <= 6; w++) {
+        const factor = 0.8 + (w * 0.05);
+
+        const weekWorkouts: LibraryWorkout[] = [
+          { day: 1, type: 'Descanso', title: 'Descanso', desc: 'Recuperação pós-longo.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 },
+          { day: 2, type: 'Ciclismo', title: 'Giro Confortável de Base Z2', desc: 'Pedal leve com foco em giro ágil e controle de esforço.', dist: parseFloat((15 * factor).toFixed(1)), dur: Math.round(15 * factor * 144), pace: '25 km/h', power: 100, tss: Math.round(20 * factor) },
+          { day: 3, type: 'Descanso', title: 'Descanso', desc: 'Recuperação e mobilidade.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 },
+          { day: 4, type: 'Ciclismo', title: 'Giro de Ritmo Controlado Z2', desc: 'Pedal constante em asfalto plano ou rolo de treino.', dist: parseFloat((18 * factor).toFixed(1)), dur: Math.round(18 * factor * 140), pace: '25.7 km/h', power: 110, tss: Math.round(25 * factor) },
+          { day: 5, type: 'Forca', title: 'Fortalecimento Core e Pernas', desc: 'Treino simples com peso do corpo visando estabilização na bike.', dist: 0, dur: 1200, pace: 'N/A', power: 0, tss: 10 },
+          { day: 6, type: 'Ciclismo', title: 'Pedal Longo de Endurance Z2', desc: 'Aumentando gradualmente a distância na bike de forma muito confortável.', dist: parseFloat((25 + w * 3).toFixed(1)), dur: Math.round((25 + w * 3) * 144), pace: '25 km/h', power: 105, tss: Math.round(35 + w * 8) },
+          { day: 7, type: 'Descanso', title: 'Descanso Semanal', desc: 'Aproveite o domingo para recuperar as pernas.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 }
+        ];
+
+        weeksData.push(weekWorkouts.map(wk => calibrateWorkout(wk, effortPct)));
+      }
+      return weeksData;
+    }
+  },
+  'swim_beginner_1000m': {
+    id: 'swim_beginner_1000m',
+    name: 'Planilha de Natação: Do Zero aos 1000m',
+    author: 'Ruth Kazez',
+    source: 'Zero to 1500m (ruthkazez.com)',
+    sport: 'Natacao',
+    weeks: 6,
+    level: 'iniciante',
+    description: 'Progrida de pequenas séries na piscina até nadar 1000 metros de forma contínua com técnicas de respiração bilateral e relaxamento na água.',
+    generateWeeks: (effortPct: number) => {
+      const weeksData: LibraryWorkout[][] = [];
+      for (let w = 1; w <= 6; w++) {
+        const factor = 0.75 + (w * 0.05);
+
+        const weekWorkouts: LibraryWorkout[] = [
+          { day: 1, type: 'Natacao', title: 'Educativo de Respiração e Técnica', desc: 'Principal: 6x 50m (25m perna com prancha / 25m crawl focado na respiração bilateral).', dist: parseFloat((0.5 * factor).toFixed(1)), dur: Math.round(0.5 * factor * 1500), pace: '2:30/100m', power: 0, tss: Math.round(15 * factor) },
+          { day: 2, type: 'Descanso', title: 'Descanso', desc: 'Descanso total.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 },
+          { day: 3, type: 'Natacao', title: 'Intervalado Curto de Resistência', desc: 'Principal: 8x 25m crawl com foco no deslize e 30s de descanso entre as séries.', dist: parseFloat((0.4 * factor).toFixed(1)), dur: Math.round(0.4 * factor * 1450), pace: '2:25/100m', power: 0, tss: Math.round(12 * factor) },
+          { day: 4, type: 'Descanso', title: 'Descanso', desc: 'Descanso ou alongamento leve de braços.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 },
+          { day: 5, type: 'Natacao', title: 'Série Principal de Volume', desc: 'Principal: Séries progressivas de 100m (crawl constante mantendo batida de perna suave).', dist: parseFloat((0.6 * factor).toFixed(1)), dur: Math.round(0.6 * factor * 1400), pace: '2:20/100m', power: 0, tss: Math.round(18 * factor) },
+          { day: 6, type: 'Descanso', title: 'Descanso', desc: 'Descanso de fim de semana.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 },
+          { day: 7, type: 'Natacao', title: w === 6 ? '🎯 DESAFIO: 1000M CONTÍNUOS 🏁' : 'Giro Longo de Piscina', desc: w === 6 ? 'Nade 1000m de forma contínua com técnica e calma!' : 'Nadada contínua leve para ganhar confiança aeróbica.', dist: w === 6 ? 1.0 : parseFloat((0.7 * factor).toFixed(1)), dur: w === 6 ? 1350 : Math.round((0.7 * factor) * 1350), pace: w === 6 ? '2:15/100m' : '2:20/100m', power: 0, tss: w === 6 ? 35 : Math.round(20 * factor) }
+        ];
+
+        weeksData.push(weekWorkouts.map(wk => calibrateWorkout(wk, effortPct)));
+      }
+      return weeksData;
+    }
+  },
+  'tri_beginner_sprint': {
+    id: 'tri_beginner_sprint',
+    name: 'Planilha de Triathlon: Meu Primeiro Sprint',
+    author: 'Triathlete Magazine',
+    source: 'Triathlete.com',
+    sport: 'Triathlon',
+    weeks: 8,
+    level: 'iniciante',
+    description: 'Programe-se para terminar seu primeiro Triathlon Sprint (750m natação, 20km ciclismo, 5km corrida). Foco em transições e treinos leves de adaptação.',
+    generateWeeks: (effortPct: number) => {
+      const weeksData: LibraryWorkout[][] = [];
+      for (let w = 1; w <= 8; w++) {
+        const isRaceWeek = w === 8;
+        const isTaper = w === 7;
+        const f = isRaceWeek ? 0.5 : isTaper ? 0.75 : 0.8 + (w * 0.03);
+
+        const weekWorkouts: LibraryWorkout[] = [
+          { day: 1, type: 'Natacao', title: 'Natação Técnica crawl', desc: 'Educativos de braçada e pernada constante na piscina.', dist: parseFloat((0.8 * f).toFixed(1)), dur: Math.round(0.8 * f * 1400), pace: '2:20/100m', power: 0, tss: Math.round(15 * f) },
+          { day: 2, type: 'Ciclismo', title: 'Ciclismo Giro Z2', desc: 'Pedal em cadência confortável e controle de esforço aeróbico.', dist: parseFloat((15 * f).toFixed(1)), dur: Math.round(15 * f * 144), pace: '25 km/h', power: 110, tss: Math.round(25 * f) },
+          { day: 3, type: 'Descanso', title: 'Descanso', desc: 'Recuperação fisiológica completa.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 },
+          { day: 4, type: 'Corrida', title: 'Corrida Trote / Caminhada Z2', desc: 'Intercalar corrida leve e caminhada de forma estruturada.', dist: parseFloat((3 * f).toFixed(1)), dur: Math.round(3 * f * 380), pace: '6:20/km', power: 0, tss: Math.round(18 * f) },
+          { day: 5, type: 'Natacao', title: 'Natação Resistência Leve', desc: 'Série de endurance contínua com repousos confortáveis na borda.', dist: parseFloat((1.0 * f).toFixed(1)), dur: Math.round(1.0 * f * 1350), pace: '2:15/100m', power: 0, tss: Math.round(22 * f) },
+          { day: 6, type: 'Ciclismo', title: isRaceWeek ? 'Giro de Véspera' : 'Ciclismo e Corrida (Treino de Transição)', desc: isRaceWeek ? 'Giro super curto de ativação.' : 'Pedalar e correr logo em seguida para simular a transição T2.', dist: isRaceWeek ? 8 : parseFloat((18 * f).toFixed(1)), dur: isRaceWeek ? 1100 : Math.round(18 * f * 140), pace: '25.7 km/h', power: 115, tss: Math.round(30 * f) },
+          { day: 6, type: 'Corrida', title: isRaceWeek ? 'Trote Ativação' : 'Transição T2 (Corrida)', desc: isRaceWeek ? 'Trote rápido.' : 'Correr imediatamente após descer da bicicleta.', dist: isRaceWeek ? 1 : parseFloat((2 * f).toFixed(1)), dur: isRaceWeek ? 380 : Math.round(2 * f * 370), pace: '6:10/km', power: 0, tss: Math.round(12 * f) },
+          { day: 7, type: 'Descanso', title: isRaceWeek ? '🎯 PROVA ALVO: TRIATHLON SPRINT 🏁' : 'Descanso Semanal', desc: isRaceWeek ? 'Chegou o dia! Complete os 750m nado, 20km bike e 5km corrida com sorriso no rosto!' : 'Recuperação de final de semana.', dist: isRaceWeek ? 25.75 : 0, dur: isRaceWeek ? 5400 : 0, pace: 'N/A', power: 0, tss: isRaceWeek ? 110 : 0 }
+        ];
+
+        weeksData.push(weekWorkouts.map(wk => calibrateWorkout(wk, effortPct)));
+      }
+      return weeksData;
+    }
+  },
+  'ultra_beginner_50k': {
+    id: 'ultra_beginner_50k',
+    name: 'Planilha de Ultramaratona: Meu Primeiro 50K',
+    author: 'Hal Koerner',
+    source: 'Hal Koerner\'s Field Guide to Ultrarunning',
+    sport: 'Ultramaratona',
+    weeks: 12,
+    level: 'iniciante',
+    description: 'Ideal para maratonistas que querem migrar para as trilhas. Foco em treinos em dias consecutivos (Back-to-Back) de volume moderado para adaptar musculatura à fadiga.',
+    generateWeeks: (effortPct: number) => {
+      const weeksData: LibraryWorkout[][] = [];
+      for (let w = 1; w <= 12; w++) {
+        const isRaceWeek = w === 12;
+        const isTaper = w === 11;
+        const f = isRaceWeek ? 0.45 : isTaper ? 0.70 : 0.8 + (w * 0.02);
+
+        const weekWorkouts: LibraryWorkout[] = [
+          { day: 1, type: 'Descanso', title: 'Descanso Fisiológico', desc: 'Recuperação do bloco consecutivo de fim de semana.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 },
+          { day: 2, type: 'Corrida', title: 'Trote Leve de Base Z2', desc: 'Corrida confortável em piso de terra ou asfalto.', dist: parseFloat((6 * f).toFixed(1)), dur: Math.round(6 * f * 365), pace: '6:05/km', power: 0, tss: Math.round(30 * f) },
+          { day: 3, type: 'Corrida', title: 'Treino de Ritmo em Subidas', desc: 'Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.', dist: parseFloat((8 * f).toFixed(1)), dur: Math.round(8 * f * 360), pace: '6:00/km', power: 0, tss: Math.round(45 * f) },
+          { day: 4, type: 'Forca', title: 'Fortalecimento e Core', desc: 'Exercícios específicos para joelhos, core e costas.', dist: 0, dur: 1800, pace: 'N/A', power: 0, tss: 15 },
+          { day: 5, type: 'Corrida', title: 'Trote Regenerativo Z1', desc: 'Soltura muscular super leve.', dist: parseFloat((5 * f).toFixed(1)), dur: Math.round(5 * f * 390), pace: '6:30/km', power: 0, tss: Math.round(20 * f) },
+          { day: 6, type: 'Corrida', title: isRaceWeek ? 'Trote Curto' : 'Bloco Consecutivo Sábado: Volume Z2', desc: isRaceWeek ? 'Soltura.' : 'Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.', dist: isRaceWeek ? 4 : parseFloat((15 + w).toFixed(1)), dur: isRaceWeek ? 1440 : Math.round((15 + w) * 370), pace: '6:10/km', power: 0, tss: Math.round(75 + w * 3) },
+          { day: 7, type: 'Corrida', title: isRaceWeek ? '🎯 PROVA ALVO: ULTRA 50K 🏁' : 'Bloco Consecutivo Domingo: Fadiga Z2', desc: isRaceWeek ? 'Seu primeiro 50K! Caminhe nas subidas, hidrate-se e divirta-se na trilha!' : 'Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.', dist: isRaceWeek ? 50 : parseFloat((10 + w * 0.5).toFixed(1)), dur: isRaceWeek ? 19800 : Math.round((10 + w * 0.5) * 390), pace: isRaceWeek ? '6:36/km' : '6:30/km', power: 0, tss: isRaceWeek ? 280 : Math.round(50 + w * 2) }
+        ];
+
+        weeksData.push(weekWorkouts.map(wk => calibrateWorkout(wk, effortPct)));
+      }
+      return weeksData;
+    }
+  },
+  'tri_ironman_full_friel': {
+    id: 'tri_ironman_full_friel',
+    name: 'Planilha de Triathlon: Ironman Full Estilo Friel',
+    author: 'Joe Friel',
+    source: 'Livro "The Triathlete\'s Training Bible"',
+    sport: 'Triathlon',
+    weeks: 16,
+    level: 'avancado',
+    description: 'Volume intenso e periodização científica clássica para cruzar a linha de chegada dos 226km da distância máxima do Triathlon.',
+    generateWeeks: (effortPct: number) => {
+      const weeksData: LibraryWorkout[][] = [];
+      for (let w = 1; w <= 16; w++) {
+        const isRaceWeek = w === 16;
+        const isTaper = w >= 14 && w < 16;
+        const f = isRaceWeek ? 0.40 : isTaper ? 0.65 : 0.75 + (w * 0.016);
+
+        const weekWorkouts: LibraryWorkout[] = [
+          { day: 1, type: 'Natacao', title: 'Natação: Intervalados de Limiar', desc: 'Principal: 8x 200m em ritmo de limiar aeróbico na piscina.', dist: parseFloat((2.5 * f).toFixed(1)), dur: Math.round(2.5 * f * 1150), pace: '1:55/100m', power: 0, tss: Math.round(55 * f) },
+          { day: 2, type: 'Ciclismo', title: 'Ciclismo: Sweet Spot / Ritmo', desc: 'Pedalar na Zona 3 (Sweet Spot) para adaptação mecânica muscular prolongada.', dist: parseFloat((50 * f).toFixed(1)), dur: Math.round(50 * f * 115), pace: '31.3 km/h', power: 180, tss: Math.round(90 * f) },
+          { day: 2, type: 'Corrida', title: 'Corrida de Transição T1', desc: 'Correr logo após a bike para simular fadiga de pernas.', dist: parseFloat((5 * f).toFixed(1)), dur: Math.round(5 * f * 330), pace: '5:30/km', power: 0, tss: Math.round(30 * f) },
+          { day: 3, type: 'Descanso', title: 'Descanso Fisiológico', desc: 'Descanso total e nutrição balanceada.', dist: 0, dur: 0, pace: 'N/A', power: 0, tss: 0 },
+          { day: 4, type: 'Ciclismo', title: 'Ciclismo: Giro com Intervalos Z4', desc: 'Girar com cadência alta intercalando picos de esforço em Zona 4.', dist: parseFloat((45 * f).toFixed(1)), dur: Math.round(45 * f * 120), pace: '30 km/h', power: 195, tss: Math.round(85 * f) },
+          { day: 4, type: 'Corrida', title: 'Corrida: Regenerativa Z1', desc: 'Trote super leve de soltura mecânica.', dist: parseFloat((6 * f).toFixed(1)), dur: Math.round(6 * f * 360), pace: '6:00/km', power: 0, tss: Math.round(25 * f) },
+          { day: 5, type: 'Natacao', title: 'Natação: Endurance Contínua', desc: 'Série de natação de volume aeróbico contínuo na Zona 2.', dist: parseFloat((3.0 * f).toFixed(1)), dur: Math.round(3.0 * f * 1200), pace: '2:00/100m', power: 0, tss: Math.round(65 * f) },
+          { day: 6, type: 'Ciclismo', title: isRaceWeek ? 'Giro Curto' : 'Ciclismo: Pedal Longão Z2 (Endurance)', desc: isRaceWeek ? 'Ativação.' : 'Acumulando volume de endurance aeróbica severa e testando nutrição de prova.', dist: isRaceWeek ? 20 : parseFloat((80 + w * 5).toFixed(1)), dur: isRaceWeek ? 2400 : Math.round((80 + w * 5) * 115), pace: '31.3 km/h', power: 165, tss: Math.round(140 + w * 8) },
+          { day: 6, type: 'Corrida', title: isRaceWeek ? 'Trote' : 'Corrida de Transição T2 (Brick)', desc: isRaceWeek ? 'Soltura.' : 'Correr imediatamente após descer da bike.', dist: isRaceWeek ? 2 : parseFloat((8 * f).toFixed(1)), dur: isRaceWeek ? 660 : Math.round(8 * f * 330), pace: '5:30/km', power: 0, tss: Math.round(45 * f) },
+          { day: 7, type: 'Descanso', title: isRaceWeek ? '🎯 PROVA ALVO: IRONMAN FULL (226K) 🏁' : 'Descanso Semanal', desc: isRaceWeek ? 'O grande dia! 3.8k natação, 180k bike, 42.2k corrida. Concentre-se e conquiste!' : 'Descanso total.', dist: isRaceWeek ? 226 : 0, dur: isRaceWeek ? 41400 : 0, pace: 'N/A', power: 0, tss: isRaceWeek ? 600 : 0 }
+        ];
+
+        weeksData.push(weekWorkouts.map(wk => calibrateWorkout(wk, effortPct)));
+      }
+      return weeksData;
+    }
+  },
+  'tri_ironman_full_8020': {
+    id: 'tri_ironman_full_8020',
+    name: 'Planilha de Triathlon: Ironman Full 80/20',
+    author: 'Matt Fitzgerald',
+    source: '80/20 Endurance (8020endurance.com)',
+    sport: 'Triathlon',
+    weeks: 16,
+    level: 'avancado',
+    description: 'Metodologia 80/20 aplicada à distância rainha do Triathlon. Maximiza o volume aeróbico e reduz a fadiga neuromuscular excessiva.',
+    generateWeeks: (effortPct: number) => {
+      const weeksData: LibraryWorkout[][] = [];
+      for (let w = 1; w <= 16; w++) {
+        const isRaceWeek = w === 16;
+        const isTaper = w >= 14 && w < 16;
+        const f = isRaceWeek ? 0.40 : isTaper ? 0.65 : 0.75 + (w * 0.015);
+
+        const weekWorkouts: LibraryWorkout[] = [
+          { day: 1, type: 'Natacao', title: 'Natação 80/20: Técnica e Limiar', desc: 'Educativos e séries de limiar intervaladas com descanso curto.', dist: parseFloat((2.2 * f).toFixed(1)), dur: Math.round(2.2 * f * 1200), pace: '2:00/100m', power: 0, tss: Math.round(45 * f) },
+          { day: 2, type: 'Ciclismo', title: 'Ciclismo 80/20: Giro Aeróbico Z2', desc: 'Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.', dist: parseFloat((45 * f).toFixed(1)), dur: Math.round(45 * f * 120), pace: '30 km/h', power: 170, tss: Math.round(75 * f) },
+          { day: 3, type: 'Corrida', title: 'Corrida 80/20: Intervalado Z3/Z4', desc: 'Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.', dist: parseFloat((10 * f).toFixed(1)), dur: Math.round(10 * f * 330), pace: '5:30/km', power: 0, tss: Math.round(70 * f) },
+          { day: 4, type: 'Forca', title: 'Fortalecimento Funcional', desc: 'Prevenção de lesões e fortalecimento de pernas e core.', dist: 0, dur: 2100, pace: 'N/A', power: 0, tss: 15 },
+          { day: 5, type: 'Natacao', title: 'Natação 80/20: Endurance Longo Z2', desc: 'Nadada contínua longa confortável.', dist: parseFloat((2.8 * f).toFixed(1)), dur: Math.round(2.8 * f * 1200), pace: '2:00/100m', power: 0, tss: Math.round(60 * f) },
+          { day: 6, type: 'Ciclismo', title: isRaceWeek ? 'Giro Curto' : 'Ciclismo 80/20: Longão + Transição T2', desc: isRaceWeek ? 'Soltura.' : 'Pedal de endurance longo em Zona 2 seguido de corrida leve.', dist: isRaceWeek ? 15 : parseFloat((75 + w * 4.5).toFixed(1)), dur: isRaceWeek ? 1800 : Math.round((75 + w * 4.5) * 115), pace: '31.3 km/h', power: 175, tss: Math.round(130 + w * 7) },
+          { day: 6, type: 'Corrida', title: isRaceWeek ? 'Trote' : 'Corrida Transição Brick Z2', desc: isRaceWeek ? 'Trote.' : 'Corrida leve imediata pós-pedal.', dist: isRaceWeek ? 2 : parseFloat((6 * f).toFixed(1)), dur: isRaceWeek ? 660 : Math.round(6 * f * 330), pace: '5:30/km', power: 0, tss: Math.round(40 * f) },
+          { day: 7, type: 'Descanso', title: isRaceWeek ? '🎯 PROVA ALVO: IRONMAN FULL (226K) 🏁' : 'Descanso Semanal', desc: isRaceWeek ? 'Encare os 226km no seu ritmo 80/20 calibrado! Sucesso!' : 'Recupere-se e alimente-se bem.', dist: isRaceWeek ? 226 : 0, dur: isRaceWeek ? 41400 : 0, pace: 'N/A', power: 0, tss: isRaceWeek ? 580 : 0 }
+        ];
+
+        weeksData.push(weekWorkouts.map(wk => calibrateWorkout(wk, effortPct)));
+      }
+      return weeksData;
+    }
   }
 };
