@@ -198,6 +198,14 @@ export const SPORTS_CONFIG: SportConfig[] = [
     stravaTypes: ['Rowing']
   },
   {
+    id: 'RemoIndoor',
+    name: 'Remo Indoor',
+    emoji: '🚣',
+    color: 'var(--neon-purple)',
+    isEndurance: true,
+    stravaTypes: ['IndoorRow']
+  },
+  {
     id: 'Vela',
     name: 'Velejar',
     emoji: '⛵',

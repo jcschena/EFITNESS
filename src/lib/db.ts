@@ -132,6 +132,60 @@ class PostgreSQLAdapter implements DatabaseClient {
       } catch (e) {
         console.warn('Erro ao rodar migration user_id no Postgres:', e);
       }
+      try {
+        await this.exec('ALTER TABLE goals ADD COLUMN IF NOT EXISTS daily_available_hours DOUBLE PRECISION;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration goals.daily_available_hours no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE goals ADD COLUMN IF NOT EXISTS train_in_morning INTEGER DEFAULT 1;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration goals.train_in_morning no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE goals ADD COLUMN IF NOT EXISTS morning_available_time INTEGER DEFAULT 60;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration goals.morning_available_time no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE goals ADD COLUMN IF NOT EXISTS train_at_lunch INTEGER DEFAULT 0;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration goals.train_at_lunch no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE goals ADD COLUMN IF NOT EXISTS lunch_available_time INTEGER DEFAULT 0;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration goals.lunch_available_time no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE goals ADD COLUMN IF NOT EXISTS train_at_night INTEGER DEFAULT 1;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration goals.train_at_night no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE goals ADD COLUMN IF NOT EXISTS night_available_time INTEGER DEFAULT 60;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration goals.night_available_time no Postgres:', e);
+      }
+      try {
+        await this.exec(`
+          CREATE TABLE IF NOT EXISTS races (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            organizer TEXT,
+            website TEXT,
+            date_time TEXT NOT NULL,
+            sport_type TEXT NOT NULL,
+            distance DOUBLE PRECISION NOT NULL,
+            country TEXT,
+            city TEXT,
+            is_target INTEGER DEFAULT 0
+          );
+        `);
+      } catch (e) {
+        console.warn('Erro ao rodar migration races no Postgres:', e);
+      }
 
       // Limpar atletas duplicados "JOAO CLAUDIO SCHENA"
       try {
@@ -219,6 +273,47 @@ class SQLiteAdapter implements DatabaseClient {
     }
     try {
       await this.db.exec('ALTER TABLE activity_logs ADD COLUMN user_id INTEGER;');
+    } catch (e) {
+      // Ignorar se já existe
+    }
+    try {
+      await this.db.exec('ALTER TABLE goals ADD COLUMN daily_available_hours REAL;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE goals ADD COLUMN train_in_morning INTEGER DEFAULT 1;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE goals ADD COLUMN morning_available_time INTEGER DEFAULT 60;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE goals ADD COLUMN train_at_lunch INTEGER DEFAULT 0;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE goals ADD COLUMN lunch_available_time INTEGER DEFAULT 0;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE goals ADD COLUMN train_at_night INTEGER DEFAULT 1;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE goals ADD COLUMN night_available_time INTEGER DEFAULT 60;');
+    } catch (e) {}
+    try {
+      await this.db.exec(`
+        CREATE TABLE IF NOT EXISTS races (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          name TEXT NOT NULL,
+          organizer TEXT,
+          website TEXT,
+          date_time TEXT NOT NULL,
+          sport_type TEXT NOT NULL,
+          distance REAL NOT NULL,
+          country TEXT,
+          city TEXT,
+          is_target INTEGER DEFAULT 0,
+          FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+      `);
     } catch (e) {
       // Ignorar se já existe
     }
@@ -313,6 +408,13 @@ function getInitialSchemaDDL(): string {
       date_target TEXT NOT NULL,
       target_time TEXT,
       weekly_tss_target INTEGER NOT NULL,
+      daily_available_hours REAL,
+      train_in_morning INTEGER DEFAULT 1,
+      morning_available_time INTEGER DEFAULT 60,
+      train_at_lunch INTEGER DEFAULT 0,
+      lunch_available_time INTEGER DEFAULT 0,
+      train_at_night INTEGER DEFAULT 1,
+      night_available_time INTEGER DEFAULT 60,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
@@ -373,6 +475,21 @@ function getInitialSchemaDDL(): string {
       read INTEGER DEFAULT 0,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS races (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      organizer TEXT,
+      website TEXT,
+      date_time TEXT NOT NULL,
+      sport_type TEXT NOT NULL,
+      distance REAL NOT NULL,
+      country TEXT,
+      city TEXT,
+      is_target INTEGER DEFAULT 0,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
   `;
 }
 
@@ -398,7 +515,19 @@ export function formatDate(date: Date): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-export function generateWorkoutsForPlan(goalType: string, level: string): any[] {
+export function generateWorkoutsForPlan(
+  goalType: string, 
+  level: string,
+  availability?: {
+    daily_available_hours?: number;
+    train_in_morning?: number;
+    morning_available_time?: number;
+    train_at_lunch?: number;
+    lunch_available_time?: number;
+    train_at_night?: number;
+    night_available_time?: number;
+  }
+): any[] {
   const workoutsToInsert: any[] = [];
   const normalizedGoal = goalType ? goalType.trim() : 'Corrida';
   const normalizedLevel = level ? level.trim() : 'intermediario';
@@ -623,6 +752,109 @@ export function generateWorkoutsForPlan(goalType: string, level: string): any[] 
         { day: 7, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso', desc: 'Dia de repouso total.' }
       );
     }
+  }
+
+  let trainInMorning = availability?.train_in_morning !== 0;
+  let morningMinutes = availability?.morning_available_time ?? 60;
+  let trainAtLunch = availability?.train_at_lunch === 1;
+  let lunchMinutes = availability?.lunch_available_time ?? 0;
+  let trainAtNight = availability?.train_at_night !== 0;
+  let nightMinutes = availability?.night_available_time ?? 60;
+
+  // Se as variáveis específicas de turnos não estiverem presentes, mas daily_available_hours estiver
+  if (availability && availability.daily_available_hours !== undefined &&
+      availability.train_in_morning === undefined &&
+      availability.train_at_night === undefined) {
+    if (trainAtLunch && lunchMinutes > 0) {
+      trainInMorning = true;
+      morningMinutes = Math.max(0, availability.daily_available_hours * 60 - lunchMinutes);
+      trainAtNight = false;
+      nightMinutes = 0;
+    } else {
+      trainInMorning = true;
+      morningMinutes = availability.daily_available_hours * 60;
+      trainAtNight = false;
+      nightMinutes = 0;
+    }
+  }
+
+  const morningLimit = trainInMorning ? morningMinutes * 60 : 0;
+  const lunchLimit = trainAtLunch ? lunchMinutes * 60 : 0;
+  const nightLimit = trainAtNight ? nightMinutes * 60 : 0;
+
+  const slots: { name: string; limit: number; emoji: string; titleSuffix: string }[] = [];
+  if (morningLimit > 0) slots.push({ name: 'Manhã', limit: morningLimit, emoji: '🌅', titleSuffix: 'Sessão Manhã' });
+  if (lunchLimit > 0) slots.push({ name: 'Almoço', limit: lunchLimit, emoji: '🥗', titleSuffix: 'Sessão Almoço' });
+  if (nightLimit > 0) slots.push({ name: 'Fim do Dia', limit: nightLimit, emoji: '🌃', titleSuffix: 'Sessão Fim do Dia' });
+
+  if (slots.length > 0) {
+    const adjustedWorkouts: any[] = [];
+
+    for (const w of workoutsToInsert) {
+      if (w.type === 'Descanso' || w.type === 'Forca') {
+        adjustedWorkouts.push(w);
+        continue;
+      }
+
+      const exceedsFirstSlot = w.dur > slots[0].limit;
+      const shouldSplit = exceedsFirstSlot && slots.length > 1;
+
+      if (shouldSplit) {
+        // Distribuir a duração nos slots
+        let remainingDur = w.dur;
+        const sessionDurs: number[] = [];
+        for (const slot of slots) {
+          if (remainingDur <= 0) break;
+          const allocated = Math.min(remainingDur, slot.limit);
+          sessionDurs.push(allocated);
+          remainingDur -= allocated;
+        }
+
+        if (sessionDurs.length > 1) {
+          // Mais de uma sessão: dividimos!
+          for (let i = 0; i < sessionDurs.length; i++) {
+            const sScale = sessionDurs[i] / w.dur;
+            const sDist = w.dist > 0 ? parseFloat((w.dist * sScale).toFixed(2)) : 0;
+            const sTss = Math.max(5, Math.round(w.tss * sScale));
+
+            adjustedWorkouts.push({
+              day: w.day,
+              type: w.type,
+              dist: sDist,
+              dur: sessionDurs[i],
+              pace: w.pace,
+              power: w.power,
+              tss: sTss,
+              title: `${w.title} - ${slots[i].titleSuffix} ${slots[i].emoji}`,
+              desc: `Parte ${i + 1}: ${slots[i].titleSuffix}. ${w.desc}`
+            });
+          }
+        } else {
+          // Apenas 1 sessão
+          adjustedWorkouts.push(w);
+        }
+      } else {
+        // Não é para split ou só tem 1 slot. Verificamos se precisa capar.
+        const totalLimit = slots.reduce((acc, s) => acc + s.limit, 0);
+        if (w.dur > totalLimit) {
+          const scale = totalLimit / w.dur;
+          adjustedWorkouts.push({
+            day: w.day,
+            type: w.type,
+            dist: w.dist > 0 ? parseFloat((w.dist * scale).toFixed(2)) : 0,
+            dur: totalLimit,
+            pace: w.pace,
+            power: w.power,
+            tss: Math.max(5, Math.round(w.tss * scale)),
+            title: w.title,
+            desc: `${w.desc} [Ajustado para limite diário de ${totalLimit / 60} min]`
+          });
+        } else {
+          adjustedWorkouts.push(w);
+        }
+      }
+    }
+    return adjustedWorkouts;
   }
 
   return workoutsToInsert;

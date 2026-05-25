@@ -487,3 +487,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 }
 
+/* Efeitos de Hover para os Cards de Métricas Fisiológicas */
+.physiological-metric-card {
+  border: 1px solid transparent !important;
+  transition: var(--transition-smooth);
+}
+
+.physiological-metric-card:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.physiological-metric-card:active {
+  transform: translateY(0);
+}
+

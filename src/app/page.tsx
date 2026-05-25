@@ -26,7 +26,9 @@ import {
   X,
   Plus,
   Target,
-  Copy
+  Copy,
+  Info,
+  Trophy
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { SPORTS_CONFIG, getSportConfig } from '@/lib/sports';
@@ -58,6 +60,32 @@ ChartJS.register(
   Tooltip,
   Legend,
   Filler
+);
+
+const RunnerIcon = ({ color }: { color: string }) => (
+  <svg viewBox="0 0 448 512" fill={color} width="100%" height="100%">
+    <path d="M320 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM125.7 175.5c9.9-9.9 23.4-15.5 37.5-15.5c1.9 0 3.8 .1 5.6 .3L137.6 254c-9.3 28 1.7 58.8 26.8 74.5l86.2 53.9-25.4 88.8c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l28.7-100.4c5.9-20.6-2.6-42.6-20.7-53.9L238 299l30.9-82.4 5.1 12.3C289 264.7 323.9 288 362.7 288l21.3 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-21.3 0c-12.9 0-24.6-7.8-29.5-19.7l-6.3-15c-14.6-35.1-44.1-61.9-80.5-73.1l-48.7-15c-11.1-3.4-22.7-5.2-34.4-5.2c-31 0-60.8 12.3-82.7 34.3L57.4 153.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l23.1-23.1zM91.2 352L32 352c-17.7 0-32 14.3-32 32s14.3 32 32 32l69.6 0c19 0 36.2-11.2 43.9-28.5L157 361.6l-9.5-6c-17.5-10.9-30.5-26.8-37.9-44.9L91.2 352z" />
+  </svg>
+);
+
+const CyclistIcon = ({ color }: { color: string }) => (
+  <svg viewBox="0 0 640 512" fill={color} width="100%" height="100%">
+    <path d="M400 96a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm27.2 64l-61.8-48.8c-17.3-13.6-41.7-13.8-59.1-.3l-83.1 64.2c-30.7 23.8-28.5 70.8 4.3 91.6L288 305.1 288 416c0 17.7 14.3 32 32 32s32-14.3 32-32l0-128c0-10.7-5.3-20.7-14.2-26.6L295 232.9l60.3-48.5L396 217c5.7 4.5 12.7 7 20 7l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-52.8 0zM56 384a72 72 0 1 1 144 0A72 72 0 1 1 56 384zm200 0A128 128 0 1 0 0 384a128 128 0 1 0 256 0zm184 0a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zm200 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z" />
+  </svg>
+);
+
+const SwimmerIcon = ({ color }: { color: string }) => (
+  <svg viewBox="0 0 576 512" fill={color} width="100%" height="100%">
+    <path d="M309.5 178.4L447.9 297.1c-1.6 .9-3.2 2-4.8 3c-18 12.4-40.1 20.3-59.2 20.3c-19.6 0-40.8-7.7-59.2-20.3c-22.1-15.5-51.6-15.5-73.7 0c-17.1 11.8-38 20.3-59.2 20.3c-10.1 0-21.1-2.2-31.9-6.2C163.1 193.2 262.2 96 384 96l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-26.9 0-52.3 6.6-74.5 18.4zM160 160A64 64 0 1 1 32 160a64 64 0 1 1 128 0zM306.5 325.9C329 341.4 356.5 352 384 352c26.9 0 55.4-10.8 77.4-26.1c0 0 0 0 0 0c11.9-8.5 28.1-7.8 39.2 1.7c14.4 11.9 32.5 21 50.6 25.2c17.2 4 27.9 21.2 23.9 38.4s-21.2 27.9-38.4 23.9c-24.5-5.7-44.9-16.5-58.2-25C449.5 405.7 417 416 384 416c-31.9 0-60.6-9.9-80.4-18.9c-5.8-2.7-11.1-5.3-15.6-7.7c-4.5 2.4-9.7 5.1-15.6 7.7c-19.8 9-48.5 18.9-80.4 18.9c-33 0-65.5-10.3-94.5-25.8c-13.4 8.4-33.7 19.3-58.2 25c-17.2 4-34.4-6.7-38.4-23.9s6.7-34.4 23.9-38.4c18.1-4.2 36.2-13.3 50.6-25.2c11.1-9.4 27.3-10.1 39.2-1.7c0 0 0 0 0 0C136.7 341.2 165.1 352 192 352c27.5 0 55-10.6 77.5-26.1c11.1-7.9 25.9-7.9 37 0z" />
+  </svg>
+);
+
+const UltraLogoIcon = ({ color }: { color: string }) => (
+  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <path d="M6 18L16 6L26 18" stroke={color} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M10 24L16 16L22 24" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+    <path d="M6 18C6 24 10 28 16 28C22 28 26 24 26 18" stroke={color} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+  </svg>
 );
 
 export default function Home() {
@@ -103,6 +131,9 @@ export default function Home() {
     return false;
   });
 
+  const [minLoadingTimePassed, setMinLoadingTimePassed] = useState<boolean>(true);
+  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const [activeTab, setActiveTab] = useState<string>('planilha'); // 'planilha', 'coach', 'simulador'
   const [selectedWorkout, setSelectedWorkout] = useState<any>(null);
   
@@ -137,6 +168,10 @@ export default function Home() {
 
   // Estados de Lançamento Manual de Treino
   const [showManualLogModal, setShowManualLogModal] = useState<boolean>(false);
+
+  // Estados das Métricas Fisiológicas
+  const [showMetricsModal, setShowMetricsModal] = useState<boolean>(false);
+  const [metricsModalTab, setMetricsModalTab] = useState<'ctl' | 'atl' | 'tsb' | 'zones'>('ctl');
   const [isSubmittingManualLog, setIsSubmittingManualLog] = useState<boolean>(false);
   const [manualLogForm, setManualLogForm] = useState({
     workoutId: '' as string | number,
@@ -150,6 +185,31 @@ export default function Home() {
     avgHr: '',
     avgPower: '',
     tssReal: ''
+  });
+
+  // Estados do Calendário de Provas
+  const [races, setRaces] = useState<any[]>([]);
+  const [racesLoading, setRacesLoading] = useState<boolean>(false);
+  const [showRaceModal, setShowRaceModal] = useState<boolean>(false);
+  const [raceSaving, setRaceSaving] = useState<boolean>(false);
+  const [raceForm, setRaceForm] = useState({
+    id: '',
+    name: '',
+    organizer: '',
+    website: '',
+    date_time: '',
+    sport_type: 'Corrida',
+    distance: '',
+    country: '',
+    city: '',
+    is_target: false,
+    daily_available_hours: '',
+    train_in_morning: true,
+    morning_available_time: '60',
+    train_at_lunch: false,
+    lunch_available_time: '',
+    train_at_night: true,
+    night_available_time: '60'
   });
 
   const paceToSeconds = (paceStr: string): number => {
@@ -526,6 +586,11 @@ export default function Home() {
     window.open(url, '_blank');
   };
 
+  const openMetricsModal = (tab: 'ctl' | 'atl' | 'tsb' | 'zones') => {
+    setMetricsModalTab(tab);
+    setShowMetricsModal(true);
+  };
+
   const openManualLog = (workout: any = null) => {
     const todayYmd = new Date().toLocaleDateString('en-CA');
     if (workout) {
@@ -648,6 +713,175 @@ export default function Home() {
     }
   };
 
+  const fetchRaces = async (userId: number) => {
+    setRacesLoading(true);
+    try {
+      const res = await fetch(`/api/races?userId=${userId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setRaces(data.races || []);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar provas:', err);
+    } finally {
+      setRacesLoading(false);
+    }
+  };
+
+  const handleOpenRaceModal = (race: any = null) => {
+    if (race) {
+      const isTarget = race.is_target === 1 || race.is_target === true;
+      const goal = dashboardData?.goal;
+      setRaceForm({
+        id: race.id.toString(),
+        name: race.name,
+        organizer: race.organizer || '',
+        website: race.website || '',
+        date_time: race.date_time ? race.date_time.slice(0, 16) : '', // format YYYY-MM-DDTHH:MM
+        sport_type: race.sport_type || 'Corrida',
+        distance: race.distance.toString(),
+        country: race.country || '',
+        city: race.city || '',
+        is_target: isTarget,
+        daily_available_hours: isTarget && goal && goal.daily_available_hours != null ? goal.daily_available_hours.toString() : '',
+        train_in_morning: isTarget && goal ? (goal.train_in_morning !== 0) : true,
+        morning_available_time: isTarget && goal && goal.morning_available_time != null ? goal.morning_available_time.toString() : '60',
+        train_at_lunch: isTarget && goal ? goal.train_at_lunch === 1 : false,
+        lunch_available_time: isTarget && goal && goal.lunch_available_time != null ? goal.lunch_available_time.toString() : '',
+        train_at_night: isTarget && goal ? (goal.train_at_night !== 0) : true,
+        night_available_time: isTarget && goal && goal.night_available_time != null ? goal.night_available_time.toString() : '60'
+      });
+    } else {
+      setRaceForm({
+        id: '',
+        name: '',
+        organizer: '',
+        website: '',
+        date_time: '',
+        sport_type: 'Corrida',
+        distance: '',
+        country: '',
+        city: '',
+        is_target: false,
+        daily_available_hours: '',
+        train_in_morning: true,
+        morning_available_time: '60',
+        train_at_lunch: false,
+        lunch_available_time: '',
+        train_at_night: true,
+        night_available_time: '60'
+      });
+    }
+    setShowRaceModal(true);
+  };
+
+  const handleSaveRace = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeUser) return;
+
+    setRaceSaving(true);
+    try {
+      const payload = {
+        id: raceForm.id || null,
+        userId: activeUser,
+        name: raceForm.name,
+        organizer: raceForm.organizer,
+        website: raceForm.website,
+        date_time: raceForm.date_time,
+        sport_type: raceForm.sport_type,
+        distance: parseFloat(raceForm.distance.replace(',', '.')) || 0,
+        country: raceForm.country,
+        city: raceForm.city,
+        is_target: raceForm.is_target,
+        daily_available_hours: raceForm.is_target ? (parseFloat(raceForm.daily_available_hours.replace(',', '.')) || null) : null,
+        train_in_morning: raceForm.is_target ? (raceForm.train_in_morning ? 1 : 0) : 1,
+        morning_available_time: raceForm.is_target && raceForm.train_in_morning ? (parseInt(raceForm.morning_available_time, 10) || 0) : 0,
+        train_at_lunch: raceForm.is_target ? (raceForm.train_at_lunch ? 1 : 0) : 0,
+        lunch_available_time: raceForm.is_target && raceForm.train_at_lunch ? (parseInt(raceForm.lunch_available_time, 10) || 0) : 0,
+        train_at_night: raceForm.is_target ? (raceForm.train_at_night ? 1 : 0) : 0,
+        night_available_time: raceForm.is_target && raceForm.train_at_night ? (parseInt(raceForm.night_available_time, 10) || 0) : 0
+      };
+
+      const res = await fetch('/api/races', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        setShowRaceModal(false);
+        await fetchRaces(activeUser);
+        if (raceForm.is_target) {
+          await fetchDashboard(activeUser);
+        }
+      } else {
+        const errorData = await res.json();
+        alert('Erro ao salvar prova: ' + (errorData.error || 'Erro desconhecido'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro de conexão ao salvar prova.');
+    } finally {
+      setRaceSaving(false);
+    }
+  };
+
+  const handleDeleteRace = async (raceId: number) => {
+    if (!activeUser) return;
+    if (!confirm('Deseja realmente excluir esta prova?')) return;
+
+    try {
+      const res = await fetch(`/api/races?id=${raceId}&userId=${activeUser}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        await fetchRaces(activeUser);
+        await fetchDashboard(activeUser);
+      } else {
+        const errorData = await res.json();
+        alert('Erro ao excluir prova: ' + (errorData.error || 'Erro desconhecido'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro de conexão ao excluir prova.');
+    }
+  };
+
+  const handleToggleTargetRace = async (race: any) => {
+    if (!activeUser) return;
+    if (race.is_target === 0 || race.is_target === false) {
+      // Abrir modal para preencher o formulário obrigatoriamente
+      handleOpenRaceModal({ ...race, is_target: 1 });
+      return;
+    }
+
+    try {
+      const payload = {
+        ...race,
+        userId: activeUser,
+        is_target: false
+      };
+
+      const res = await fetch('/api/races', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        await fetchRaces(activeUser);
+        await fetchDashboard(activeUser);
+      } else {
+        const errorData = await res.json();
+        alert('Erro ao alterar prova alvo: ' + (errorData.error || 'Erro desconhecido'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro de conexão ao alterar prova alvo.');
+    }
+  };
+
   // Estados do Novo Sistema de Login e Senha
   const [usernameInput, setUsernameInput] = useState<string>('');
   const [passwordInput, setPasswordInput] = useState<string>('');
@@ -681,6 +915,11 @@ export default function Home() {
   const [calibrationLoading, setCalibrationLoading] = useState<boolean>(false);
   const [calibrationResult, setCalibrationResult] = useState<any>(null);
   const [calibrationError, setCalibrationError] = useState<string>('');
+
+  // Estados para Controle de Tempo da Comemoração (Silhuetas Esportivas)
+  const [loginCelebrationActive, setLoginCelebrationActive] = useState<boolean>(false);
+  const [weeklyPlanCelebrationActive, setWeeklyPlanCelebrationActive] = useState<boolean>(false);
+  const prevWeeklyPlanCompleted = useRef<boolean>(false);
 
   // Enviar Login
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -739,6 +978,7 @@ export default function Home() {
       localStorage.setItem('active_user_id', String(activeUser));
       localStorage.setItem('is_authenticated', 'true');
       fetchDashboard(activeUser);
+      fetchRaces(activeUser);
     } else {
       localStorage.removeItem('active_user_id');
       localStorage.removeItem('is_authenticated');
@@ -746,6 +986,72 @@ export default function Home() {
       setLoading(false);
     }
   }, [activeUser]);
+
+  // Efeito para garantir tempo mínimo do loader (1 ciclo completo dos esportes = 6s)
+  const isCurrentlyLoading = !!(loading || (activeUser && !dashboardData));
+  useEffect(() => {
+    if (!activeUser) {
+      setMinLoadingTimePassed(true);
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+        loadingTimerRef.current = null;
+      }
+      return;
+    }
+
+    if (isCurrentlyLoading) {
+      if (!loadingTimerRef.current) {
+        setMinLoadingTimePassed(false);
+        loadingTimerRef.current = setTimeout(() => {
+          setMinLoadingTimePassed(true);
+          loadingTimerRef.current = null;
+        }, 6000); // 6 segundos
+      }
+    }
+  }, [activeUser, isCurrentlyLoading]);
+
+  // Limpeza de timer na desmontagem
+  useEffect(() => {
+    return () => {
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Efeito para ativar comemoração por 60 segundos após login
+  useEffect(() => {
+    if (activeUser) {
+      setLoginCelebrationActive(true);
+      const timer = setTimeout(() => {
+        setLoginCelebrationActive(false);
+      }, 60000); // 60 segundos
+      return () => clearTimeout(timer);
+    } else {
+      setLoginCelebrationActive(false);
+    }
+  }, [activeUser]);
+
+  // Efeito para ativar comemoração por 60 segundos ao concluir planilha semanal
+  useEffect(() => {
+    const workouts = dashboardData?.workouts;
+    const total = workouts ? workouts.length : 0;
+    const completed = workouts ? workouts.filter((w: any) => w.status === 'completed').length : 0;
+    const completedAll = workouts && workouts.length > 0 && completed === total;
+
+    if (completedAll) {
+      if (!prevWeeklyPlanCompleted.current) {
+        setWeeklyPlanCelebrationActive(true);
+        const timer = setTimeout(() => {
+          setWeeklyPlanCelebrationActive(false);
+        }, 60000); // 60 segundos
+        return () => clearTimeout(timer);
+      }
+    } else {
+      setWeeklyPlanCelebrationActive(false);
+    }
+    prevWeeklyPlanCompleted.current = !!completedAll;
+  }, [dashboardData?.workouts]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -1062,19 +1368,19 @@ export default function Home() {
     setChatInput(question);
   };
 
-  // Componente de Confete para Comemorações
+  // Componente de Confete para Comemorações (Troféus Coloridos)
   const ConfettiShower = () => {
     const [pieces, setPieces] = useState<Array<{ id: number; left: number; delay: number; color: string; duration: number; size: number }>>([]);
     
     useEffect(() => {
       const colors = ['#fc4c02', '#00f0ff', '#39ff14', '#a855f7', '#ff6b35', '#ffeb3b', '#e91e63'];
-      const newPieces = Array.from({ length: 60 }).map((_, i) => ({
+      const newPieces = Array.from({ length: 50 }).map((_, i) => ({
         id: i,
         left: Math.random() * 100,
         delay: Math.random() * 5,
         color: colors[Math.floor(Math.random() * colors.length)],
-        duration: 3 + Math.random() * 4,
-        size: 6 + Math.random() * 8,
+        duration: 4 + Math.random() * 4,
+        size: 18 + Math.random() * 12,
       }));
       setPieces(newPieces);
     }, []);
@@ -1086,22 +1392,23 @@ export default function Home() {
             key={p.id} 
             style={{
               position: 'absolute',
-              top: '-20px',
+              top: '-40px',
               left: `${p.left}%`,
               width: `${p.size}px`,
-              height: `${p.size * 1.5}px`,
-              background: p.color,
-              borderRadius: '2px',
-              opacity: 0.8,
+              height: `${p.size}px`,
+              opacity: 0.85,
+              filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.35))',
               transform: 'rotate(0deg)',
               animation: `fall ${p.duration}s linear ${p.delay}s infinite`,
             }}
-          />
+          >
+            <UltraLogoIcon color={p.color} />
+          </div>
         ))}
         <style jsx global>{`
           @keyframes fall {
             0% {
-              top: -20px;
+              top: -40px;
               transform: translateX(0) rotate(0deg);
             }
             50% {
@@ -1117,16 +1424,277 @@ export default function Home() {
     );
   };
 
-  if (loading || (activeUser && !dashboardData)) {
+  const showLoadingScreen = isCurrentlyLoading || (activeUser && !minLoadingTimePassed);
+
+  if (showLoadingScreen) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', gap: '16px' }}>
-        <RefreshCw style={{ animation: 'spin 1.5s linear infinite', color: '#00f0ff' }} size={40} />
-        <p style={{ fontFamily: 'var(--font-title)', fontWeight: 600, color: 'var(--text-secondary)' }}>
-          Carregando cockpit fisiológico ULTRA...
-        </p>
+      <div className="loader-container">
+        <div className="loader-spotlight" />
+        
+        <div className="loader-avatar-ring">
+          <div className="loader-sport-icon swim-icon">
+            <SwimmerIcon color="var(--neon-cyan)" />
+          </div>
+          <div className="loader-sport-icon bike-icon">
+            <CyclistIcon color="var(--neon-green)" />
+          </div>
+          <div className="loader-sport-icon run-icon">
+            <RunnerIcon color="var(--neon-orange)" />
+          </div>
+        </div>
+        
+        <div className="loader-text-container">
+          <h3 className="loader-title">ULTRA COACH</h3>
+          <div className="loader-progress-bar">
+            <div className="loader-progress-fill" />
+          </div>
+          <p className="loader-subtitle">Carregando cockpit fisiológico...</p>
+        </div>
+        
         <style jsx global>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
+          .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10000;
+            background-color: var(--bg-deep, #060913);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            font-family: var(--font-main);
+          }
+
+          .loader-spotlight {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+          }
+
+          .loader-avatar-ring {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: rgba(13, 21, 39, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            animation: ringGlow 6s linear infinite;
+          }
+
+          .loader-sport-icon {
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+          }
+
+          .swim-icon {
+            animation: swimLoop 6s linear infinite;
+          }
+
+          .bike-icon {
+            animation: bikeLoop 6s linear infinite;
+          }
+
+          .run-icon {
+            animation: runLoop 6s linear infinite;
+          }
+
+          .loader-text-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            text-align: center;
+            z-index: 1;
+          }
+
+          .loader-title {
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            color: #fff;
+            margin: 0;
+            background: linear-gradient(90deg, #fff 0%, var(--neon-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+
+          .loader-progress-bar {
+            width: 180px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+          }
+
+          .loader-progress-fill {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-green), var(--neon-orange), transparent);
+            animation: progressSweep 2s ease-in-out infinite;
+          }
+
+          .loader-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+          }
+
+          @keyframes swimLoop {
+            0% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+              filter: blur(0px);
+            }
+            26.67% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+              filter: blur(0px);
+            }
+            33.33% {
+              opacity: 0;
+              transform: scale(1.15) translateY(-5px);
+              filter: blur(6px);
+            }
+            90% {
+              opacity: 0;
+              transform: scale(0.7) translateY(5px);
+              filter: blur(6px);
+            }
+            96.67% {
+              opacity: 0.5;
+              transform: scale(0.85) translateY(5px);
+              filter: blur(2px);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+              filter: blur(0px);
+            }
+          }
+
+          @keyframes bikeLoop {
+            0% {
+              opacity: 0;
+              transform: scale(0.7) translateY(5px);
+              filter: blur(6px);
+            }
+            23.33% {
+              opacity: 0;
+              transform: scale(0.7) translateY(5px);
+              filter: blur(6px);
+            }
+            30.0% {
+              opacity: 0.5;
+              transform: scale(0.85) translateY(5px);
+              filter: blur(2px);
+            }
+            33.33% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+              filter: blur(0px);
+            }
+            60.0% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+              filter: blur(0px);
+            }
+            66.67% {
+              opacity: 0;
+              transform: scale(1.15) translateY(-5px);
+              filter: blur(6px);
+            }
+            100% {
+              opacity: 0;
+              transform: scale(0.7) translateY(5px);
+              filter: blur(6px);
+            }
+          }
+
+          @keyframes runLoop {
+            0% {
+              opacity: 0;
+              transform: scale(0.7) translateY(5px);
+              filter: blur(6px);
+            }
+            56.67% {
+              opacity: 0;
+              transform: scale(0.7) translateY(5px);
+              filter: blur(6px);
+            }
+            63.33% {
+              opacity: 0.5;
+              transform: scale(0.85) translateY(5px);
+              filter: blur(2px);
+            }
+            66.67% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+              filter: blur(0px);
+            }
+            90.0% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+              filter: blur(0px);
+            }
+            96.67% {
+              opacity: 0;
+              transform: scale(1.15) translateY(-5px);
+              filter: blur(6px);
+            }
+            100% {
+              opacity: 0;
+              transform: scale(0.7) translateY(5px);
+              filter: blur(6px);
+            }
+          }
+
+          @keyframes ringGlow {
+            0%, 26.67%, 100% {
+              border-color: rgba(0, 240, 255, 0.3);
+              box-shadow: 0 0 20px rgba(0, 240, 255, 0.25), inset 0 0 10px rgba(0, 240, 255, 0.1);
+            }
+            33.33%, 60.0% {
+              border-color: rgba(57, 255, 20, 0.3);
+              box-shadow: 0 0 20px rgba(57, 255, 20, 0.25), inset 0 0 10px rgba(57, 255, 20, 0.1);
+            }
+            66.67%, 93.33% {
+              border-color: rgba(255, 107, 53, 0.3);
+              box-shadow: 0 0 20px rgba(255, 107, 53, 0.25), inset 0 0 10px rgba(255, 107, 53, 0.1);
+            }
+          }
+
+          @keyframes progressSweep {
+            0% {
+              left: -100%;
+              width: 50%;
+            }
+            100% {
+              left: 100%;
+              width: 50%;
+            }
           }
         `}</style>
       </div>
@@ -1255,13 +1823,28 @@ export default function Home() {
       const idx = w.day_of_week - 1;
       if (idx >= 0 && idx < 7) {
         tssTargetData[idx] += w.tss_target;
-        // Se estiver completo, o TSS realizado é computado.
-        // Tentamos achar se tem log na mesma data/treino.
+        // Se estiver completo e não possuir log de atividade associado no activityLogs,
+        // somamos o tss_target como fallback (ex: Descanso autoconcluído ou manual sem log).
         if (w.status === 'completed') {
-          // Achar se tem log de atividade correspondente
-          const log = activityLogs?.find((l: any) => l.workout_id === w.id);
-          tssRealData[idx] += log ? log.tss_real : w.tss_target; // Fallback para target se não tiver log
+          const hasLog = activityLogs?.some((l: any) => l.workout_id === w.id);
+          if (!hasLog) {
+            tssRealData[idx] += w.tss_target;
+          }
         }
+      }
+    });
+  }
+
+  if (activityLogs && plan) {
+    activityLogs.forEach((l: any) => {
+      if (!l.timestamp) return;
+      const logDateStr = l.timestamp.split('T')[0];
+      const start = new Date(plan.start_date + 'T12:00:00');
+      const current = new Date(logDateStr + 'T12:00:00');
+      const diffDays = Math.round((current.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays >= 0 && diffDays < 7) {
+        tssRealData[diffDays] += l.tss_real || 0;
       }
     });
   }
@@ -1493,7 +2076,7 @@ export default function Home() {
 
       {/* CORE CONTENT LAYOUT */}
       <main style={{ flex: 1, width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {(celebration || showProfileCelebration || isWeeklyPlanCompleted) && <ConfettiShower />}
+        {((celebration && loginCelebrationActive) || showProfileCelebration || (isWeeklyPlanCompleted && weeklyPlanCelebrationActive)) && <ConfettiShower />}
 
         {/* COCKPIT CHRONOMETER & CALENDAR WIDGET */}
         <section className="animate-slide-up" style={{ 
@@ -1804,48 +2387,108 @@ export default function Home() {
           <section className="premium-card animate-slide-up" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', padding: '20px', background: 'linear-gradient(135deg, rgba(13, 21, 39, 0.8) 0%, rgba(6, 9, 19, 0.8) 100%)' }}>
             
             {/* CTL */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div 
+              className="physiological-metric-card"
+              onClick={() => openMetricsModal('ctl')}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '16px', 
+                cursor: 'pointer',
+                padding: '12px',
+                borderRadius: '14px',
+                transition: 'var(--transition-smooth)'
+              }}
+            >
               <div style={{ display: 'flex', padding: '12px', background: 'rgba(57, 255, 20, 0.08)', borderRadius: '12px', border: '1px solid rgba(57, 255, 20, 0.15)' }}>
                 <TrendingUp style={{ color: 'var(--neon-green)' }} size={24} />
               </div>
               <div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block' }}>CTL (Fitness / Condicionamento)</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  CTL (Fitness / Condicionamento)
+                  <Info size={12} style={{ color: 'var(--text-muted)' }} />
+                </span>
                 <strong style={{ fontSize: '1.75rem', color: '#fff', fontFamily: 'var(--font-title)' }}>{metrics?.ctl || 0}</strong>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Base de estresse de longo prazo</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Média de 42 dias • Quanto maior, mais preparado (↑ Melhor)</span>
               </div>
             </div>
 
             {/* ATL */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div 
+              className="physiological-metric-card"
+              onClick={() => openMetricsModal('atl')}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '16px', 
+                cursor: 'pointer',
+                padding: '12px',
+                borderRadius: '14px',
+                transition: 'var(--transition-smooth)'
+              }}
+            >
               <div style={{ display: 'flex', padding: '12px', background: 'rgba(255, 107, 53, 0.08)', borderRadius: '12px', border: '1px solid rgba(255, 107, 53, 0.15)' }}>
                 <Heart style={{ color: 'var(--neon-orange)' }} size={24} />
               </div>
               <div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block' }}>ATL (Fadiga Recente)</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  ATL (Fadiga Recente)
+                  <Info size={12} style={{ color: 'var(--text-muted)' }} />
+                </span>
                 <strong style={{ fontSize: '1.75rem', color: '#fff', fontFamily: 'var(--font-title)' }}>{metrics?.atl || 0}</strong>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Carga aguda nas últimas semanas</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Média de 7 dias • Fadiga acumulada (Monitorar)</span>
               </div>
             </div>
 
             {/* TSB */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div 
+              className="physiological-metric-card"
+              onClick={() => openMetricsModal('tsb')}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '16px', 
+                cursor: 'pointer',
+                padding: '12px',
+                borderRadius: '14px',
+                transition: 'var(--transition-smooth)'
+              }}
+            >
               <div style={{ display: 'flex', padding: '12px', background: 'rgba(0, 240, 255, 0.08)', borderRadius: '12px', border: '1px solid rgba(0, 240, 255, 0.15)' }}>
                 <Clock style={{ color: '#fc4c02' }} size={24} />
               </div>
               <div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block' }}>TSB (Forma / Balanço)</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  TSB (Forma / Balanço)
+                  <Info size={12} style={{ color: 'var(--text-muted)' }} />
+                </span>
                 <strong style={{ fontSize: '1.75rem', color: tsbColor, fontFamily: 'var(--font-title)' }}>{metrics?.tsb || 0}</strong>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Equilíbrio fisiológico (CTL - ATL)</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>CTL - ATL • Ideal: -10 a -30 para evolução</span>
               </div>
             </div>
 
             {/* STATUS BRIEF */}
-            <div className="status-brief-container">
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Status do Organismo</span>
+            <div 
+              className="status-brief-container physiological-metric-card"
+              onClick={() => openMetricsModal('zones')}
+              style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                justifyContent: 'center', 
+                cursor: 'pointer',
+                padding: '12px',
+                borderRadius: '14px',
+                transition: 'var(--transition-smooth)'
+              }}
+            >
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                Status do Organismo
+                <Info size={12} style={{ color: 'var(--text-muted)' }} />
+              </span>
               <strong style={{ fontSize: '0.95rem', color: '#fff', margin: '4px 0' }}>{tsbStatus}</strong>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: tsbColor }}></span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Métricas científicas de adaptação</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Fisiologia de adaptação • Detalhes da ciência</span>
               </div>
             </div>
 
@@ -1936,6 +2579,28 @@ export default function Home() {
             <Database size={18} style={{ color: activeTab === 'simulador' ? 'var(--neon-cyan)' : 'inherit' }} />
             Último Treino Strava
             <span style={{ fontSize: '0.65rem', background: '#fc4c02', padding: '1px 5px', color: '#fff', borderRadius: '4px', fontWeight: 700 }}>CONECTADO</span>
+          </button>
+
+          <button 
+            className="tab-btn" 
+            onClick={() => setActiveTab('provas')}
+            style={{ 
+              background: 'transparent', 
+              border: 'none', 
+              borderBottom: activeTab === 'provas' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              color: activeTab === 'provas' ? '#fff' : 'var(--text-secondary)', 
+              fontWeight: activeTab === 'provas' ? 700 : 500,
+              padding: '10px 16px',
+              cursor: 'pointer',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'var(--transition-smooth)'
+            }}
+          >
+            <Trophy size={18} style={{ color: activeTab === 'provas' ? 'var(--neon-cyan)' : 'inherit' }} />
+            Provas
           </button>
 
           <button 
@@ -2228,7 +2893,8 @@ export default function Home() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {workouts && workouts.map((w: any) => {
-                  const hasLog = activityLogs?.find((l: any) => l.workout_id === w.id);
+                  const hasLog = activityLogs?.find((l: any) => l.workout_id === w.id) ||
+                                 activityLogs?.find((l: any) => !l.workout_id && l.timestamp && l.timestamp.split('T')[0] === w.date);
                   const isRest = w.type === 'Descanso';
                   const isCompleted = w.status === 'completed';
                   const isAdjusted = w.status === 'adjusted';
@@ -2707,6 +3373,271 @@ export default function Home() {
             </div>
 
 
+          </div>
+        )}
+
+        {/* 3B. CALENDÁRIO DE PROVAS */}
+        {activeTab === 'provas' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
+            {/* Header com botão de adicionar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Trophy size={28} style={{ color: 'var(--neon-cyan)' }} />
+                  Calendário de Provas
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '4px' }}>
+                  Planeje sua temporada esportiva. Defina qual é a prova alvo para reestruturar toda a planilha de treinos semanal e orientar o Coach IA.
+                </p>
+              </div>
+              <button 
+                onClick={() => handleOpenRaceModal()}
+                className="glow-btn"
+                style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <Plus size={18} />
+                Cadastrar Prova
+              </button>
+            </div>
+
+            {/* Listagem de Provas */}
+            {racesLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                <RefreshCw style={{ animation: 'spin 1.5s linear infinite', color: 'var(--neon-cyan)' }} size={32} />
+              </div>
+            ) : races.length === 0 ? (
+              <div className="premium-card" style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                padding: '60px 20px', 
+                textAlign: 'center',
+                border: '1px dashed rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.01)'
+              }}>
+                <Trophy size={48} style={{ color: 'var(--text-muted)', marginBottom: '16px' }} />
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fff' }}>Nenhuma prova cadastrada</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', maxWidth: '400px', marginTop: '6px', marginBottom: '24px' }}>
+                  Organize seus objetivos esportivos cadastrando as provas que você pretende participar.
+                </p>
+                <button 
+                  onClick={() => handleOpenRaceModal()}
+                  className="glow-btn"
+                  style={{ padding: '12px 24px', borderRadius: '12px' }}
+                >
+                  Adicionar Minha Primeira Prova
+                </button>
+              </div>
+            ) : (
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
+                gap: '24px' 
+              }}>
+                {races.map((race) => {
+                  const sportConfig = getSportConfig(race.sport_type);
+                  return (
+                    <div 
+                      key={race.id}
+                      className="premium-card animate-slide-up"
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        gap: '20px',
+                        border: race.is_target === 1 ? '1.5px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.05)',
+                        boxShadow: race.is_target === 1 ? '0 8px 32px rgba(0, 240, 255, 0.12), 0 0 15px rgba(0, 240, 255, 0.05)' : 'none',
+                        position: 'relative',
+                        transition: 'var(--transition-smooth)'
+                      }}
+                    >
+                      {/* Badge de Prova Alvo */}
+                      {race.is_target === 1 && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '16px',
+                          right: '16px',
+                          fontSize: '0.7rem',
+                          background: 'linear-gradient(135deg, var(--neon-cyan) 0%, #0099ff 100%)',
+                          color: '#030712',
+                          padding: '4px 10px',
+                          borderRadius: '8px',
+                          fontWeight: 850,
+                          boxShadow: '0 0 10px rgba(0, 240, 255, 0.3)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <Target size={12} />
+                          PROVA ALVO
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        {/* Tipo de Esporte e Nome */}
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            background: 'rgba(255, 255, 255, 0.03)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: '10px',
+                            fontSize: '1.4rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            {sportConfig?.emoji || '🏆'}
+                          </div>
+                          <div style={{ maxWidth: race.is_target === 1 ? 'calc(100% - 130px)' : '100%' }}>
+                            <span style={{ fontSize: '0.75rem', color: sportConfig?.color || 'var(--neon-cyan)', fontWeight: 700, textTransform: 'uppercase' }}>
+                              {sportConfig?.name || race.sport_type}
+                            </span>
+                            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                              {race.name}
+                            </h3>
+                          </div>
+                        </div>
+
+                        {/* Informações detalhadas */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                            <Clock size={15} style={{ color: 'var(--neon-cyan)', flexShrink: 0 }} />
+                            <span>{new Date(race.date_time).toLocaleDateString('pt-BR')} às {new Date(race.date_time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                            <TrendingUp size={15} style={{ color: 'var(--neon-cyan)', flexShrink: 0 }} />
+                            <span>Distância: <strong>{formatDistance(race.distance)} km</strong></span>
+                          </div>
+
+                          {race.organizer && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                              <Users size={15} style={{ color: 'var(--neon-cyan)', flexShrink: 0 }} />
+                              <span>Organizador: {race.organizer}</span>
+                            </div>
+                          )}
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                            <Compass size={15} style={{ color: 'var(--neon-cyan)', flexShrink: 0 }} />
+                            <span>Local: {race.city ? `${race.city}, ` : ''}{race.country || 'Brasil'}</span>
+                          </div>
+
+                          {race.website && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                              <ArrowRight size={15} style={{ color: 'var(--neon-cyan)', flexShrink: 0 }} />
+                              <a 
+                                href={race.website} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                style={{ color: 'var(--neon-cyan)', textDecoration: 'none', fontWeight: 600 }}
+                                onMouseOver={e => e.currentTarget.style.textDecoration = 'underline'}
+                                onMouseOut={e => e.currentTarget.style.textDecoration = 'none'}
+                              >
+                                Site Oficial
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Botões de Ação */}
+                      <div style={{ display: 'flex', gap: '10px', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '14px', alignItems: 'center' }}>
+                        {race.is_target === 1 ? (
+                          <button
+                            disabled
+                            style={{ 
+                              flex: 1, 
+                              padding: '10px 14px', 
+                              fontSize: '0.8rem', 
+                              cursor: 'default',
+                              background: 'rgba(57, 255, 20, 0.08)',
+                              border: '1.5px solid var(--neon-green)',
+                              color: 'var(--neon-green)',
+                              borderRadius: '8px',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px'
+                            }}
+                          >
+                            <Target size={14} />
+                            Alvo do Treino
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleToggleTargetRace(race)}
+                            style={{ 
+                              flex: 1, 
+                              padding: '10px 14px', 
+                              fontSize: '0.8rem', 
+                              background: 'rgba(255,255,255,0.03)',
+                              border: '1px solid rgba(255,255,255,0.08)',
+                              color: '#fff',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              fontWeight: 600,
+                              transition: 'var(--transition-smooth)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px'
+                            }}
+                            onMouseOver={e => { e.currentTarget.style.background = 'rgba(0, 240, 255, 0.08)'; e.currentTarget.style.borderColor = 'var(--neon-cyan)'; }}
+                            onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+                          >
+                            <Target size={14} />
+                            Tornar Alvo
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => handleOpenRaceModal(race)}
+                          style={{
+                            padding: '10px',
+                            background: 'rgba(255,255,255,0.03)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            color: 'var(--text-secondary)',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'var(--transition-smooth)'
+                          }}
+                          onMouseOver={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+                          onMouseOut={e => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+                        >
+                          <Sliders size={15} />
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteRace(race.id)}
+                          style={{
+                            padding: '10px',
+                            background: 'rgba(255,255,255,0.03)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            color: 'var(--neon-red)',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'var(--transition-smooth)'
+                          }}
+                          onMouseOver={e => { e.currentTarget.style.background = 'rgba(255, 59, 48, 0.08)'; }}
+                          onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+                        >
+                          <X size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -3538,13 +4469,13 @@ export default function Home() {
                     lineHeight: '1.4'
                   }}>
                     <li>
-                      <strong>Google Agenda (Web):</strong> No menu esquerdo, ao lado de <em>"Outras agendas"</em>, clique no botão <strong>+</strong> &gt; <strong>"Do URL"</strong>, cole o link acima e clique em <em>"Adicionar agenda"</em>.
+                      <strong>Google Agenda (Web):</strong> No menu esquerdo, ao lado de <em>{"Outras agendas"}</em>, clique no botão <strong>+</strong> &gt; <strong>{"Do URL"}</strong>, cole o link acima e clique em <em>{"Adicionar agenda"}</em>.
                     </li>
                     <li>
                       <strong>Apple Calendar (Mac/iPhone):</strong> Abra o aplicativo Calendário, vá em <strong>Arquivo</strong> &gt; <strong>Nova Assinatura de Calendário...</strong>, cole o link e clique em OK. No iPhone, vá em Ajustes &gt; Calendário &gt; Contas &gt; Adicionar Conta &gt; Outra &gt; Adicionar Assinatura de Calendário.
                     </li>
                     <li>
-                      <strong>Outlook (Web/Desktop):</strong> Clique em <strong>Adicionar Calendário</strong> &gt; <strong>Inscrever-se da Web</strong>, insira o link, dê um nome ao calendário (ex: "Treinos ULTRA") e clique em Salvar.
+                      <strong>Outlook (Web/Desktop):</strong> Clique em <strong>Adicionar Calendário</strong> &gt; <strong>Inscrever-se da Web</strong>, insira o link, dê um nome ao calendário (ex: {"Treinos ULTRA"}) e clique em Salvar.
                     </li>
                   </ul>
                 </div>
@@ -3842,7 +4773,8 @@ export default function Home() {
                 </h4>
                 
                 {(() => {
-                  const hasLog = activityLogs?.find((l: any) => l.workout_id === selectedWorkout.id);
+                  const hasLog = activityLogs?.find((l: any) => l.workout_id === selectedWorkout.id) ||
+                                 activityLogs?.find((l: any) => !l.workout_id && l.timestamp && l.timestamp.split('T')[0] === selectedWorkout.date);
                   if (selectedWorkout.status === 'completed') {
                     if (hasLog) {
                       const analysis = getExecutionAnalysis(selectedWorkout, hasLog);
@@ -3991,6 +4923,389 @@ export default function Home() {
                 Treino sincronizado via API Strava
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CADASTRO/EDIÇÃO DE PROVA */}
+      {showRaceModal && (
+        <div 
+          onClick={() => setShowRaceModal(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(3, 7, 18, 0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+          className="animate-fade-in"
+        >
+          <div 
+            onClick={e => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '600px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              background: 'linear-gradient(135deg, rgba(13, 21, 39, 0.95) 0%, rgba(3, 7, 18, 0.98) 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '20px',
+              padding: '30px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 240, 255, 0.05)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '24px'
+            }}
+            className="animate-scale-up"
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Trophy size={24} style={{ color: 'var(--neon-cyan)' }} />
+                <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', fontFamily: 'var(--font-title)' }}>
+                  {raceForm.id ? 'Editar Prova' : 'Cadastrar Nova Prova'}
+                </h3>
+              </div>
+              <button 
+                onClick={() => setShowRaceModal(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', transition: 'color 0.2s' }}
+                onMouseOver={e => e.currentTarget.style.color = '#fff'}
+                onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveRace} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div>
+                <label htmlFor="race-name" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Nome da Prova</label>
+                <input 
+                  id="race-name"
+                  type="text" 
+                  className="glass-input" 
+                  placeholder="Ex: Maratona do Rio, Ironman Brasil"
+                  value={raceForm.name} 
+                  onChange={e => setRaceForm({ ...raceForm, name: e.target.value })} 
+                  required 
+                  disabled={raceSaving}
+                />
+              </div>
+
+              <div className="form-grid-2">
+                <div>
+                  <label htmlFor="race-organizer" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Organizador</label>
+                  <input 
+                    id="race-organizer"
+                    type="text" 
+                    className="glass-input" 
+                    placeholder="Ex: Iguana Sports, Dream Factory"
+                    value={raceForm.organizer} 
+                    onChange={e => setRaceForm({ ...raceForm, organizer: e.target.value })} 
+                    disabled={raceSaving}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="race-website" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Site da Prova</label>
+                  <input 
+                    id="race-website"
+                    type="url" 
+                    className="glass-input" 
+                    placeholder="Ex: https://www.exemplo.com"
+                    value={raceForm.website} 
+                    onChange={e => setRaceForm({ ...raceForm, website: e.target.value })} 
+                    disabled={raceSaving}
+                  />
+                </div>
+              </div>
+
+              <div className="form-grid-2">
+                <div>
+                  <label htmlFor="race-date-time" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Data e Horário</label>
+                  <input 
+                    id="race-date-time"
+                    type="datetime-local" 
+                    className="glass-input" 
+                    value={raceForm.date_time} 
+                    onChange={e => setRaceForm({ ...raceForm, date_time: e.target.value })} 
+                    required
+                    disabled={raceSaving}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="race-sport" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Esporte</label>
+                  <select 
+                    id="race-sport"
+                    className="glass-input" 
+                    value={raceForm.sport_type} 
+                    onChange={e => setRaceForm({ ...raceForm, sport_type: e.target.value })} 
+                    disabled={raceSaving}
+                    style={{ background: 'rgba(3, 7, 18, 0.8)', color: '#fff', border: '1px solid var(--border-color)' }}
+                  >
+                    {SPORTS_CONFIG.filter(sport => sport.id !== 'Descanso' && sport.id !== 'Forca').map(sport => (
+                      <option key={sport.id} value={sport.id} style={{ background: '#0d1527', color: '#fff' }}>
+                        {sport.emoji} {sport.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-grid-2">
+                <div>
+                  <label htmlFor="race-distance" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Distância (km)</label>
+                  <input 
+                    id="race-distance"
+                    type="number" 
+                    step="0.01"
+                    className="glass-input" 
+                    placeholder="Ex: 21.1 ou 42.2"
+                    value={raceForm.distance} 
+                    onChange={e => setRaceForm({ ...raceForm, distance: e.target.value })} 
+                    required 
+                    disabled={raceSaving}
+                  />
+                </div>
+                <div className="form-grid-2">
+                  <div>
+                    <label htmlFor="race-country" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>País</label>
+                    <input 
+                      id="race-country"
+                      type="text" 
+                      className="glass-input" 
+                      placeholder="Ex: Brasil"
+                      value={raceForm.country} 
+                      onChange={e => setRaceForm({ ...raceForm, country: e.target.value })} 
+                      disabled={raceSaving}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="race-city" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Município</label>
+                    <input 
+                      id="race-city"
+                      type="text" 
+                      className="glass-input" 
+                      placeholder="Ex: São Paulo"
+                      value={raceForm.city} 
+                      onChange={e => setRaceForm({ ...raceForm, city: e.target.value })} 
+                      disabled={raceSaving}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '12px',
+                padding: '12px 16px',
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: '12px',
+                marginTop: '6px'
+              }}>
+                <input 
+                  id="race-target"
+                  type="checkbox" 
+                  checked={raceForm.is_target}
+                  onChange={e => setRaceForm({ ...raceForm, is_target: e.target.checked })}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--neon-cyan)' }}
+                  disabled={raceSaving}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <label htmlFor="race-target" style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
+                    Definir como Prova Alvo do Treinamento
+                  </label>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                    Se marcado, a planilha semanal de treinos e o Coach IA focarão totalmente nesta prova.
+                  </span>
+                </div>
+              </div>
+
+              {raceForm.is_target && (
+                <div 
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    padding: '20px',
+                    background: 'rgba(0, 240, 255, 0.02)',
+                    border: '1px solid rgba(0, 240, 255, 0.15)',
+                    borderRadius: '12px',
+                    marginTop: '6px'
+                  }}
+                  className="animate-fade-in"
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(0, 240, 255, 0.15)', paddingBottom: '8px', marginBottom: '4px' }}>
+                    <Sparkles size={16} style={{ color: 'var(--neon-cyan)', flexShrink: 0 }} />
+                    <strong style={{ fontSize: '0.85rem', color: 'var(--neon-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Disponibilidade do Atleta (Formulário)
+                    </strong>
+                  </div>
+
+                  {/* Turno da Manhã */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <input 
+                        id="availability-morning"
+                        type="checkbox" 
+                        checked={raceForm.train_in_morning}
+                        onChange={e => setRaceForm({ ...raceForm, train_in_morning: e.target.checked })}
+                        style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: 'var(--neon-cyan)' }}
+                        disabled={raceSaving}
+                      />
+                      <label htmlFor="availability-morning" style={{ fontSize: '0.8rem', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>
+                        Disponível no turno da manhã? 🌅
+                      </label>
+                    </div>
+                    {raceForm.train_in_morning && (
+                      <div className="animate-fade-in" style={{ paddingLeft: '26px' }}>
+                        <label htmlFor="availability-morning-time" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>
+                          Tempo disponível na manhã (em minutos):
+                        </label>
+                        <input 
+                          id="availability-morning-time"
+                          type="number" 
+                          step="5"
+                          min="15"
+                          max="240"
+                          className="glass-input" 
+                          placeholder="Ex: 60 ou 90"
+                          value={raceForm.morning_available_time} 
+                          onChange={e => setRaceForm({ ...raceForm, morning_available_time: e.target.value })} 
+                          required={raceForm.is_target && raceForm.train_in_morning}
+                          disabled={raceSaving}
+                          style={{ borderColor: 'rgba(0, 240, 255, 0.2)' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Turno do Almoço */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <input 
+                        id="availability-lunch"
+                        type="checkbox" 
+                        checked={raceForm.train_at_lunch}
+                        onChange={e => setRaceForm({ ...raceForm, train_at_lunch: e.target.checked })}
+                        style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: 'var(--neon-cyan)' }}
+                        disabled={raceSaving}
+                      />
+                      <label htmlFor="availability-lunch" style={{ fontSize: '0.8rem', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>
+                        Disponível no horário de almoço? 🥗
+                      </label>
+                    </div>
+                    {raceForm.train_at_lunch && (
+                      <div className="animate-fade-in" style={{ paddingLeft: '26px' }}>
+                        <label htmlFor="availability-lunch-time" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>
+                          Tempo disponível no almoço (em minutos):
+                        </label>
+                        <input 
+                          id="availability-lunch-time"
+                          type="number" 
+                          step="5"
+                          min="15"
+                          max="240"
+                          className="glass-input" 
+                          placeholder="Ex: 30 ou 45"
+                          value={raceForm.lunch_available_time} 
+                          onChange={e => setRaceForm({ ...raceForm, lunch_available_time: e.target.value })} 
+                          required={raceForm.is_target && raceForm.train_at_lunch}
+                          disabled={raceSaving}
+                          style={{ borderColor: 'rgba(0, 240, 255, 0.2)' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Turno do Fim do Dia / Noite */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <input 
+                        id="availability-night"
+                        type="checkbox" 
+                        checked={raceForm.train_at_night}
+                        onChange={e => setRaceForm({ ...raceForm, train_at_night: e.target.checked })}
+                        style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: 'var(--neon-cyan)' }}
+                        disabled={raceSaving}
+                      />
+                      <label htmlFor="availability-night" style={{ fontSize: '0.8rem', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>
+                        Disponível no fim do dia? 🌃
+                      </label>
+                    </div>
+                    {raceForm.train_at_night && (
+                      <div className="animate-fade-in" style={{ paddingLeft: '26px' }}>
+                        <label htmlFor="availability-night-time" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>
+                          Tempo disponível no fim do dia (em minutos):
+                        </label>
+                        <input 
+                          id="availability-night-time"
+                          type="number" 
+                          step="5"
+                          min="15"
+                          max="240"
+                          className="glass-input" 
+                          placeholder="Ex: 60 ou 90"
+                          value={raceForm.night_available_time} 
+                          onChange={e => setRaceForm({ ...raceForm, night_available_time: e.target.value })} 
+                          required={raceForm.is_target && raceForm.train_at_night}
+                          disabled={raceSaving}
+                          style={{ borderColor: 'rgba(0, 240, 255, 0.2)' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Resumo do limite de tempo total */}
+                  <div 
+                    style={{ 
+                      padding: '10px 12px', 
+                      background: 'rgba(0, 240, 255, 0.04)', 
+                      border: '1px solid rgba(0, 240, 255, 0.08)', 
+                      borderRadius: '8px',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.75rem',
+                      lineHeight: '1.4',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      marginTop: '4px'
+                    }}
+                  >
+                    <span>
+                      <strong>Tempo total diário disponível:</strong>{' '}
+                      {((raceForm.train_in_morning ? (parseInt(raceForm.morning_available_time, 10) || 0) : 0) +
+                        (raceForm.train_at_lunch ? (parseInt(raceForm.lunch_available_time, 10) || 0) : 0) +
+                        (raceForm.train_at_night ? (parseInt(raceForm.night_available_time, 10) || 0) : 0)) / 60}{' '}
+                      horas (
+                      {(raceForm.train_in_morning ? (parseInt(raceForm.morning_available_time, 10) || 0) : 0) +
+                        (raceForm.train_at_lunch ? (parseInt(raceForm.lunch_available_time, 10) || 0) : 0) +
+                        (raceForm.train_at_night ? (parseInt(raceForm.night_available_time, 10) || 0) : 0)}{' '}
+                      minutos)
+                    </span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                      Ajustaremos o volume semanal, as durações e distribuiremos os treinos em sessões diárias compatíveis com estes limites.
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <button 
+                type="submit" 
+                className="glow-btn"
+                style={{ width: '100%', padding: '14px', fontWeight: 700, marginTop: '10px' }}
+                disabled={raceSaving}
+              >
+                {raceSaving ? 'Salvando...' : 'Salvar Prova'}
+              </button>
+            </form>
           </div>
         </div>
       )}
@@ -4307,6 +5622,328 @@ export default function Home() {
             </div>
 
           </form>
+        </div>
+      )}
+
+      {/* MODAL DE EXPLICAÇÃO DE MÉTRICAS FISIOLÓGICAS */}
+      {showMetricsModal && (
+        <div 
+          onClick={() => setShowMetricsModal(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(3, 7, 18, 0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1010,
+            padding: '20px',
+            boxSizing: 'border-box'
+          }}
+        >
+          <div 
+            onClick={e => e.stopPropagation()}
+            className="premium-card animate-fade-in"
+            style={{
+              width: '100%',
+              maxWidth: '650px',
+              padding: '28px',
+              background: 'linear-gradient(135deg, rgba(13, 21, 39, 0.95) 0%, rgba(6, 9, 19, 0.95) 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.15)',
+              position: 'relative',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              borderRadius: '16px'
+            }}
+          >
+            {/* Botão de Fechar */}
+            <button 
+              type="button"
+              onClick={() => setShowMetricsModal(false)}
+              aria-label="Fechar"
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                padding: '8px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'var(--transition-smooth)'
+              }}
+              onMouseOver={e => {
+                e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)';
+                e.currentTarget.style.color = 'var(--neon-red)';
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            {/* Cabeçalho */}
+            <div style={{ marginBottom: '24px' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--neon-cyan)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Ciência do Esporte
+              </span>
+              <h2 style={{ fontSize: '1.5rem', color: '#fff', marginTop: '4px', fontFamily: 'var(--font-title)' }}>
+                Métricas Fisiológicas de Carga
+              </h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                Entenda como o ULTRA COACH calcula sua evolução e regula sua planilha semanal.
+              </p>
+            </div>
+
+            {/* Abas */}
+            <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '8px', marginBottom: '20px', overflowX: 'auto' }} className="hide-scrollbar">
+              {(['ctl', 'atl', 'tsb', 'zones'] as const).map(tab => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setMetricsModalTab(tab)}
+                  style={{
+                    background: metricsModalTab === tab ? 'rgba(0, 240, 255, 0.08)' : 'transparent',
+                    border: 'none',
+                    borderBottom: metricsModalTab === tab ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+                    color: metricsModalTab === tab ? '#fff' : 'var(--text-secondary)',
+                    fontWeight: metricsModalTab === tab ? 700 : 500,
+                    padding: '8px 16px',
+                    cursor: 'pointer',
+                    borderRadius: '6px 6px 0 0',
+                    fontSize: '0.85rem',
+                    whiteSpace: 'nowrap',
+                    transition: 'var(--transition-smooth)'
+                  }}
+                >
+                  {tab === 'ctl' && 'CTL (Fitness)'}
+                  {tab === 'atl' && 'ATL (Fadiga)'}
+                  {tab === 'tsb' && 'TSB (Forma)'}
+                  {tab === 'zones' && 'Zonas de TSB'}
+                </button>
+              ))}
+            </div>
+
+            {/* Conteúdo das Abas */}
+            <div style={{ fontSize: '0.9rem', lineHeight: '1.6', color: 'var(--text-primary)' }}>
+              {metricsModalTab === 'ctl' && (
+                <div className="animate-fade-in">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', padding: '10px', background: 'rgba(57, 255, 20, 0.08)', borderRadius: '10px', border: '1px solid rgba(57, 255, 20, 0.15)' }}>
+                      <TrendingUp style={{ color: 'var(--neon-green)' }} size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '1.1rem', color: '#fff' }}>CTL - Chronic Training Load</h3>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--neon-green)', fontWeight: 600 }}>Fitness / Condicionamento Crônico</span>
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '10px', marginBottom: '16px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    <p style={{ fontWeight: 600, color: 'var(--neon-green)', marginBottom: '8px' }}>
+                      💡 O que representa?
+                    </p>
+                    <p style={{ color: 'var(--text-secondary)' }}>
+                      O <strong>CTL</strong> mede o estresse acumulado no seu organismo no <strong>longo prazo</strong>. É o tamanho da sua base física ou &quot;tamanho do seu motor&quot;.
+                      <strong style={{ color: '#fff', display: 'block', marginTop: '6px' }}>
+                        📈 Quanto MAIOR for o número, mais preparado e condicionado você estará, permitindo suportar maiores volumes e intensidades de treino com menor risco de lesão.
+                      </strong>
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.01)', padding: '12px', borderRadius: '8px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Fórmula de Cálculo</span>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                        Média exponencial dos valores de <strong>TSS</strong> (Training Stress Score) diários dos últimos <strong>42 dias</strong>.
+                      </p>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.01)', padding: '12px', borderRadius: '8px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Alvo do Treinador</span>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                        Deve subir de forma gradual (entre 4 e 7 pontos por semana). Aumentos rápidos demais aumentam o risco de lesões.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {metricsModalTab === 'atl' && (
+                <div className="animate-fade-in">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', padding: '10px', background: 'rgba(255, 107, 53, 0.08)', borderRadius: '10px', border: '1px solid rgba(255, 107, 53, 0.15)' }}>
+                      <Heart style={{ color: 'var(--neon-orange)' }} size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '1.1rem', color: '#fff' }}>ATL - Acute Training Load</h3>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--neon-orange)', fontWeight: 600 }}>Fadiga Acumulada Recente / Carga Aguda</span>
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '10px', marginBottom: '16px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    <p style={{ fontWeight: 600, color: 'var(--neon-orange)', marginBottom: '8px' }}>
+                      💡 O que representa?
+                    </p>
+                    <p style={{ color: 'var(--text-secondary)' }}>
+                      O <strong>ATL</strong> mede a sobrecarga colocada sobre o seu corpo nos treinos <strong>recentes</strong>. Representa o nível de cansaço acumulado.
+                      <strong style={{ color: '#fff', display: 'block', marginTop: '6px' }}>
+                        ⚠️ Um número MAIOR representa maior fadiga imediata. Ter fadiga alta é necessário para evoluir (supercompensação), mas requer monitoramento para evitar lesões.
+                      </strong>
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.01)', padding: '12px', borderRadius: '8px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Fórmula de Cálculo</span>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                        Média exponencial dos valores de <strong>TSS</strong> (Training Stress Score) diários dos últimos <strong>7 dias</strong>.
+                      </p>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.01)', padding: '12px', borderRadius: '8px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Alvo do Treinador</span>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                        Alternar semanas de fadiga alta (estímulo) com semanas de recuperação (descanso) para permitir a supercompensação.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {metricsModalTab === 'tsb' && (
+                <div className="animate-fade-in">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', padding: '10px', background: 'rgba(0, 240, 255, 0.08)', borderRadius: '10px', border: '1px solid rgba(0, 240, 255, 0.15)' }}>
+                      <Clock style={{ color: '#fc4c02' }} size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '1.1rem', color: '#fff' }}>TSB - Training Stress Balance</h3>
+                      <span style={{ fontSize: '0.75rem', color: '#fc4c02', fontWeight: 600 }}>Forma Física / Balanço de Estresse</span>
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '10px', marginBottom: '16px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    <p style={{ fontWeight: 600, color: '#fc4c02', marginBottom: '8px' }}>
+                      💡 O que representa?
+                    </p>
+                    <p style={{ color: 'var(--text-secondary)' }}>
+                      O <strong>TSB</strong> representa o seu <strong>equilíbrio fisiológico</strong>. É a diferença matemática entre o seu condicionamento (CTL) e sua fadiga (ATL).
+                      <strong style={{ color: '#fff', display: 'block', marginTop: '6px' }}>
+                        ⚖️ Ele pode ser POSITIVO ou NEGATIVO. O número reflete se você está apto para competir (positivo) ou acumulando fadiga para gerar adaptação (negativo).
+                      </strong>
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.01)', padding: '12px', borderRadius: '8px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Fórmula de Cálculo</span>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '4px', fontWeight: 600 }}>
+                        TSB = CTL - ATL
+                      </p>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.01)', padding: '12px', borderRadius: '8px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Zona Recomendada</span>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                        Fase de desenvolvimento: <strong>-10 a -30</strong>. Provas importantes: <strong>&gt; +10</strong>. Evite valores menores que <strong>-30</strong>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {metricsModalTab === 'zones' && (
+                <div className="animate-fade-in">
+                  <h3 style={{ fontSize: '1.1rem', color: '#fff', marginBottom: '12px' }}>Zonas Fisiológicas do TSB</h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                    Dependendo do valor do TSB, o seu organismo se encontra em uma destas faixas científicas de rendimento:
+                  </p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    
+                    {/* Zona de Polimento */}
+                    <div style={{ display: 'flex', gap: '12px', background: 'rgba(0, 240, 255, 0.04)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(0, 240, 255, 0.1)' }}>
+                      <span style={{ padding: '4px 8px', background: 'rgba(0, 240, 255, 0.15)', color: 'var(--neon-cyan)', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, alignSelf: 'flex-start', whiteSpace: 'nowrap' }}>
+                        &gt; +10
+                      </span>
+                      <div>
+                        <h4 style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 600 }}>Fase de Polimento / Descanso (Pronto p/ Prova)</h4>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                          Seu corpo se livrou da fadiga recente mantendo o condicionamento. Você está descansado, ágil e pronto para render o máximo.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Zona de Manutenção */}
+                    <div style={{ display: 'flex', gap: '12px', background: 'rgba(57, 255, 20, 0.04)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(57, 255, 20, 0.1)' }}>
+                      <span style={{ padding: '4px 8px', background: 'rgba(57, 255, 20, 0.15)', color: 'var(--neon-green)', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, alignSelf: 'flex-start', whiteSpace: 'nowrap' }}>
+                        0 a +10
+                      </span>
+                      <div>
+                        <h4 style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 600 }}>Zona de Manutenção / Transição</h4>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                          Estado equilibrado. Baixo nível de fadiga, mas sem estímulo forte de evolução. Bom para semanas regenerativas simples.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Zona Ótima */}
+                    <div style={{ display: 'flex', gap: '12px', background: 'rgba(255, 107, 53, 0.04)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(255, 107, 53, 0.1)' }}>
+                      <span style={{ padding: '4px 8px', background: 'rgba(255, 107, 53, 0.15)', color: 'var(--neon-orange)', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, alignSelf: 'flex-start', whiteSpace: 'nowrap' }}>
+                        -10 a -30
+                      </span>
+                      <div>
+                        <h4 style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 600 }}>Estresse de Desenvolvimento (Evolução Ótima)</h4>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                          <strong>A zona doce de treino!</strong> O corpo está sendo estimulado na medida ideal para induzir ganho de condicionamento de forma segura.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Zona de Perigo */}
+                    <div style={{ display: 'flex', gap: '12px', background: 'rgba(255, 59, 48, 0.04)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(255, 59, 48, 0.1)' }}>
+                      <span style={{ padding: '4px 8px', background: 'rgba(255, 59, 48, 0.15)', color: 'var(--neon-red)', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, alignSelf: 'flex-start', whiteSpace: 'nowrap' }}>
+                        &lt; -30
+                      </span>
+                      <div>
+                        <h4 style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 600 }}>Zona de Sobrecarga (Risco de Lesão / Perigo)</h4>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                          Fadiga excessiva acumulada. Risco muito alto de lesão muscular, fadiga crônica ou overtraining. Recomenda-se descanso imediato.
+                        </p>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Rodapé do Modal */}
+            <div style={{ marginTop: '28px', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px' }}>
+              <button 
+                type="button"
+                className="glow-btn"
+                onClick={() => setShowMetricsModal(false)}
+                style={{ 
+                  padding: '10px 24px', 
+                  borderRadius: '10px',
+                  fontSize: '0.85rem'
+                }}
+              >
+                Entendido, continuar
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
     </div>

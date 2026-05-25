@@ -166,10 +166,10 @@ export async function POST(req: Request) {
         "UPDATE workouts SET status = 'completed' WHERE id = ?",
         workoutId
       );
-
-      // Disparar o Loop de Auto-Regulação Fisiológica
-      await autoRegulateTrainingPlan(db, userId, workoutId, tssReal);
     }
+
+    // Disparar o Loop de Auto-Regulação Fisiológica
+    await autoRegulateTrainingPlan(db, userId, workoutId, tssReal, timestamp);
 
     // RECALIBRAÇÃO FISIOLÓGICA AUTOMÁTICA
     // Se a atividade for de Corrida/Trilha e durou pelo menos 30 minutos (1800 segundos)

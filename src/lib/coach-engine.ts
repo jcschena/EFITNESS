@@ -70,9 +70,7 @@ export async function calculatePhysioMetrics(db: DatabaseClient, userId: number)
   const activities = await db.all(`
     SELECT al.tss_real, al.timestamp
     FROM activity_logs al
-    JOIN workouts w ON al.workout_id = w.id
-    JOIN training_plans tp ON w.plan_id = tp.id
-    WHERE tp.user_id = ?
+    WHERE al.user_id = ?
     ORDER BY al.timestamp ASC
   `, userId);
 
@@ -106,26 +104,52 @@ export async function calculatePhysioMetrics(db: DatabaseClient, userId: number)
  * Algoritmo Científico de Auto-Regulação
  * Recalcula a planilha para evitar Overtraining ou Compensar faltas
  */
-export async function autoRegulateTrainingPlan(db: DatabaseClient, userId: number, lastWorkoutId: number, lastTssReal: number) {
-  // 1. Obter o treino de referência prescrito
-  const lastWorkout = await db.get<{
-    id: number;
-    plan_id: number;
-    day_of_week: number;
-    date: string;
-    tss_target: number;
-    title: string;
-    type: string;
-  }>('SELECT * FROM workouts WHERE id = ?', lastWorkoutId);
+export async function autoRegulateTrainingPlan(
+  db: DatabaseClient,
+  userId: number,
+  lastWorkoutId: number | null,
+  lastTssReal: number,
+  activityDateStr?: string
+) {
+  let planId: number;
+  let currentDay: number;
+  let tssTarget = 0;
+  let workoutTitle = 'Treino Extra';
 
-  if (!lastWorkout) return;
+  const activePlan = await db.get<{ id: number; start_date: string; end_date: string }>(
+    'SELECT id, start_date, end_date FROM training_plans WHERE user_id = ? AND active = 1',
+    userId
+  );
+  if (!activePlan) return;
+  planId = activePlan.id;
 
-  const tssTarget = lastWorkout.tss_target;
-  const planId = lastWorkout.plan_id;
-  const currentDay = lastWorkout.day_of_week;
+  if (lastWorkoutId) {
+    const lastWorkout = await db.get<{
+      id: number;
+      plan_id: number;
+      day_of_week: number;
+      date: string;
+      tss_target: number;
+      title: string;
+      type: string;
+    }>('SELECT * FROM workouts WHERE id = ?', lastWorkoutId);
 
-  // Se for descanso, não há regulação necessária
-  if (lastWorkout.type === 'Descanso') return;
+    if (!lastWorkout) return;
+    if (lastWorkout.type === 'Descanso') return;
+
+    tssTarget = lastWorkout.tss_target;
+    currentDay = lastWorkout.day_of_week;
+    workoutTitle = lastWorkout.title;
+  } else {
+    // É um treino extra (sem workout correspondente na planilha)
+    // Determinar o dia da semana a partir da data da atividade
+    const dateToUse = activityDateStr ? activityDateStr.split('T')[0] : new Date().toISOString().split('T')[0];
+    const d = new Date(dateToUse + 'T12:00:00');
+    let dayOfWeek = d.getDay();
+    currentDay = dayOfWeek === 0 ? 7 : dayOfWeek;
+    tssTarget = 0; // Meta planejada padrão de um treino extra é zero
+    workoutTitle = 'Treino Extra/Não Planejado';
+  }
 
   const tssDiff = lastTssReal - tssTarget;
   const percentDiff = tssTarget > 0 ? (tssDiff / tssTarget) * 100 : (lastTssReal > 0 ? 100 : 0);
@@ -154,7 +178,7 @@ export async function autoRegulateTrainingPlan(db: DatabaseClient, userId: numbe
   // Caso 1: Risco de Overtraining (TSS Executado > 15% acima da meta ou excedeu muito o volume)
   if (percentDiff > 15 && tssDiff > 15) {
     notificationTitle = 'Ajuste de Carga: Proteção contra Overtraining';
-    notificationContent = `Identifiquei que sua sessão "${lastWorkout.title}" gerou uma sobrecarga de ${Math.round(percentDiff)}% acima do planejado (TSS executado: ${lastTssReal} vs planejado: ${tssTarget}). Para mitigar o risco de lesão e fadiga excessiva (ATL elevada), ajustei a intensidade e o volume das suas próximas sessões da semana.`;
+    notificationContent = `Identifiquei que sua sessão "${workoutTitle}" gerou uma sobrecarga de ${Math.round(percentDiff)}% acima do planejado (TSS executado: ${lastTssReal} vs planejado: ${tssTarget}). Para mitigar o risco de lesão e fadiga excessiva (ATL elevada), ajustei a intensidade e o volume das suas próximas sessões da semana.`;
 
     // Reduzir proporcionalmente os treinos dos próximos dias da semana
     // O próximo treino de alta intensidade (ou longo) sofre uma redução de ~15% a 20%
@@ -170,7 +194,7 @@ export async function autoRegulateTrainingPlan(db: DatabaseClient, userId: numbe
         const newDur = fw.duration_target > 0 ? Math.round(fw.duration_target * (1 - reductionFactor)) : 0;
         
         let newPaceStr = fw.pace_target;
-        if (['Corrida', 'CorridaTrilha'].includes(fw.type) && fw.pace_target !== 'N/A') {
+        if (['Corrida', 'CorridaTrilha'].includes(fw.type) && fw.pace_target && fw.pace_target !== 'N/A') {
           // Ajusta o ritmo planejado deixando-o ligeiramente mais lento (recuperação)
           const currentPaceSecs = paceToSeconds(fw.pace_target);
           const adjustedPaceSecs = Math.round(currentPaceSecs * 1.05); // 5% mais lento
@@ -189,9 +213,9 @@ export async function autoRegulateTrainingPlan(db: DatabaseClient, userId: numbe
     }
   } 
   // Caso 2: Sessão Sub-realizada ou Pulada (TSS Executado < 40% do alvo, ou pulou)
-  else if (lastTssReal < tssTarget * 0.4) {
+  else if (lastWorkoutId && lastTssReal < tssTarget * 0.4) {
     notificationTitle = 'Ajuste de Planejamento: Recuperação de Volume';
-    notificationContent = `Notamos que o treino de ontem "${lastWorkout.title}" foi sub-realizado ou pulado (TSS real: ${lastTssReal} vs planejado: ${tssTarget}). Para manter o volume crônico de condicionamento (CTL) sem comprometer a sua recuperação, redistribuí parte da carga não realizada suavemente nas próximas sessões de endurance desta semana.`;
+    notificationContent = `Notamos que o treino de ontem "${workoutTitle}" foi sub-realizado ou pulado (TSS real: ${lastTssReal} vs planejado: ${tssTarget}). Para manter o volume crônico de condicionamento (CTL) sem comprometer a sua recuperação, redistribuí parte da carga não realizada suavemente nas próximas sessões de endurance desta semana.`;
 
     // Redistribuir 40% do TSS faltante de forma diluída nas sessões de endurance restantes da semana (máximo +15% de aumento por treino)
     const tssMissing = tssTarget - lastTssReal;

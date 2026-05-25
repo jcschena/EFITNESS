@@ -202,8 +202,8 @@ export async function syncUserStravaActivities(
             "UPDATE workouts SET status = 'completed' WHERE id = ?",
             workoutId
           );
-          await autoRegulateTrainingPlan(db, userId, workoutId, tssReal);
         }
+        await autoRegulateTrainingPlan(db, userId, workoutId, tssReal, timestamp);
 
         if (['Corrida', 'CorridaTrilha'].includes(activityType) && durationReal >= 1800) {
           let newLthr = user.threshold_hr;
@@ -264,6 +264,9 @@ export function getCompatibleSportTypes(type: string): string[] {
   }
   if (['Natacao', 'NatacaoAguasAbertas'].includes(type)) {
     return ['Natacao', 'NatacaoAguasAbertas'];
+  }
+  if (['Remo', 'RemoIndoor'].includes(type)) {
+    return ['Remo', 'RemoIndoor'];
   }
   return [type];
 }

@@ -15,13 +15,14 @@ function getFallbackCoachResponse(
   goal: any, 
   metrics: any, 
   weeklyWorkouts: any[],
+  activityLogs: any[],
   clientDate?: string
 ): string {
   const msg = message.toLowerCase();
   
   // Calcular totais semanais
   const totalTssTarget = weeklyWorkouts.reduce((acc, w) => acc + w.tss_target, 0);
-  const totalTssReal = weeklyWorkouts.reduce((acc, w) => acc + (w.status === 'completed' ? w.tss_target : 0), 0); // simplificado
+  const totalTssReal = activityLogs.reduce((acc, al) => acc + (al.tss_real || 0), 0);
   const completedCount = weeklyWorkouts.filter(w => w.status === 'completed').length;
   let response = `[Fisiologista de Fallback Ativado - Chave Gemini API não detectada]\n\n`;
 
@@ -92,10 +93,19 @@ export async function POST(req: Request) {
     // 3. Carregar planilha e treinos da semana corrente
     const activePlan = await db.get('SELECT * FROM training_plans WHERE user_id = ? AND active = 1', uId);
     let workouts: any[] = [];
+    let activityLogs: any[] = [];
     if (activePlan) {
       const today = clientDate ? new Date(clientDate + 'T12:00:00') : new Date();
       await autoCompleteExpiredRests(db, activePlan.id, today);
       workouts = await db.all('SELECT * FROM workouts WHERE plan_id = ? ORDER BY day_of_week ASC, id ASC', activePlan.id);
+      
+      // Carregar os logs de atividade da semana corrente (vinculados ou extras)
+      activityLogs = await db.all(`
+        SELECT * FROM activity_logs 
+        WHERE user_id = ? 
+          AND timestamp >= ? 
+          AND timestamp <= ?
+      `, uId, activePlan.start_date + 'T00:00:00', activePlan.end_date + 'T23:59:59');
     }
 
     // 4. Calcular métricas fisiológicas acumuladas (CTL, ATL, TSB)
@@ -103,9 +113,12 @@ export async function POST(req: Request) {
 
     // Se a API do Gemini não estiver configurada, disparar o fallback
     if (!ai) {
-      const fallbackReply = getFallbackCoachResponse(message, user, goal, metrics, workouts, clientDate);
+      const fallbackReply = getFallbackCoachResponse(message, user, goal, metrics, workouts, activityLogs, clientDate);
       return NextResponse.json({ reply: fallbackReply, dbUpdated: false });
     }
+
+    // Calcular TSS real acumulado na semana
+    const totalTssReal = activityLogs.reduce((acc, al) => acc + (al.tss_real || 0), 0);
 
     // 5. Configurar o Contexto Fisiológico Científico no Prompt do Gemini
     const workoutsSummary = workouts.map(w => {
@@ -134,6 +147,7 @@ Seu perfil de atleta atual:
 - Frequência Cardíaca de Limiar (Lactato): ${user.threshold_hr} bpm
 - Ritmo (Pace) de Limiar: ${user.threshold_pace}/km
 - Carga Alvo Semanal: ${goal ? goal.weekly_tss_target : 300} TSS
+- Carga Realizada Acumulada Semanal: ${totalTssReal} TSS (Soma de toda fadiga/esforço acumulado no Strava/Manual nesta semana, incluindo treinos planejados e treinos extras/não planejados)
 
 Métricas Fisiológicas Atuais do Atleta:
 - CTL (Fitness/Condicionamento Crônico): ${metrics.ctl} (Representa o estresse acumulado de longo prazo)

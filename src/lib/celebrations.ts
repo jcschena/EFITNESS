@@ -37,6 +37,7 @@ export function getCelebration(birthDateStr: string | null, currentDateStr?: str
     '01-01': { name: 'Ano Novo', message: 'Feliz Ano Novo! Que este novo ciclo traga muitos quilômetros de evolução, saúde e novos recordes pessoais!', type: 'holiday' },
     '04-21': { name: 'Tiradentes', message: 'Feriado de Tiradentes! Bom dia para um treino com garra e determinação.', type: 'holiday' },
     '05-01': { name: 'Dia do Trabalho', message: 'Feliz Dia do Trabalho! Hoje é dia de comemorar descansando o corpo ou fazendo aquele treino longo com calma.', type: 'holiday' },
+    '05-24': { name: 'Dia do Teste de Comemoração', message: 'Verificando o novo efeito de comemoração com a logomarca oficial da ULTRA em cores vibrantes!', type: 'holiday' },
     '09-07': { name: 'Independência do Brasil', message: 'Dia da Independência do Brasil! Que tal celebrar correndo com liberdade e buscando sua independência fisiológica?', type: 'holiday' },
     '10-12': { name: 'Nossa Senhora Aparecida / Dia das Crianças', message: 'Feriado de 12 de Outubro! Dia de resgatar a leveza da infância e correr com alegria.', type: 'holiday' },
     '11-02': { name: 'Finados', message: 'Dia de Finados. Um bom momento para respeitar o descanso do corpo e recuperar a musculatura.', type: 'holiday' },
