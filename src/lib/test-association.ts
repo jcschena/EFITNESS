@@ -67,21 +67,19 @@ async function runTests() {
   console.log('--- Testando Timezone Offset (Local: Segunda à noite, UTC: Terça de madrugada) ---');
   // Se a atividade ocorreu na segunda local (2026-05-18T21:30:00-03:00), o UTC é terça (2026-05-19T00:30:00Z)
   // Usando start_date_local (2026-05-18T21:30:00), a data local extraída deve ser 2026-05-18 (segunda-feira).
-  // Como segunda-feira é Natação no banco, a busca exata falha. 
-  // O aplicativo deve procurar outro treino pendente na semana mais próximo.
-  // O treino de terça (2026-05-19, Corrida) está pendente e é o mais próximo na semana.
+  // Como segunda-feira é Natação no banco, a busca exata falha.
+  // Pela nova regra de negócio, a busca por proximidade na semana foi desativada (só associa no mesmo dia).
+  // Portanto, a associação automática deve retornar null.
   const localTimestamp = '2026-05-18T21:30:00'; // start_date_local (Segunda-feira)
   
   const match3 = await findBestMatchingWorkout(db, userId, localTimestamp, 'Corrida');
-  if (match3) {
-    const workoutDetails = await db.get('SELECT * FROM workouts WHERE id = ?', match3.id);
-    console.log(`✅ Sucesso! Corrida local de Segunda-feira associada ao treino de Corrida mais próximo (Terça-feira):`);
-    console.log(`   - ID Treino: ${workoutDetails.id}`);
-    console.log(`   - Título: "${workoutDetails.title}"`);
-    console.log(`   - Data Planejada: ${workoutDetails.date}`);
-    console.log(`   - Tipo: ${workoutDetails.type}`);
+  if (match3 === null) {
+    console.log(`✅ Sucesso! Corrida local de Segunda-feira NÃO foi associada automaticamente ao treino de Terça-feira (busca restrita ao mesmo dia).`);
   } else {
-    console.log('❌ Falha ao associar usando start_date_local.');
+    const workoutDetails = await db.get('SELECT * FROM workouts WHERE id = ?', match3.id);
+    console.log(`❌ Falha! Esperava-se que não houvesse associação automática para dias diferentes, mas associou ao treino:`);
+    console.log(`   - ID Treino: ${workoutDetails.id}`);
+    console.log(`   - Data Planejada: ${workoutDetails.date}`);
   }
   console.log();
 

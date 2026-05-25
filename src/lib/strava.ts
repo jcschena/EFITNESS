@@ -288,53 +288,11 @@ export async function findBestMatchingWorkout(
   const compatibleTypes = getCompatibleSportTypes(activityType);
   const typesPlaceholder = compatibleTypes.map(() => '?').join(',');
 
-  // 1. Tentar achar na mesma data com tipo compatível
-  let workout = await db.get<{ id: number; plan_id: number }>(
+  // Procurar na mesma data com tipo compatível (mesmo esporte e mesmo dia)
+  const workout = await db.get<{ id: number; plan_id: number }>(
     `SELECT id, plan_id FROM workouts 
      WHERE date = ? AND type IN (${typesPlaceholder}) AND status IN ('pending', 'adjusted')`,
     dateStr,
-    ...compatibleTypes
-  );
-
-  if (workout) {
-    return workout;
-  }
-
-  // 2. Se não achar na mesma data, tentar na mesma semana da planilha ativa
-  const activePlan = await db.get<{ id: number; start_date: string; end_date: string }>(
-    'SELECT id, start_date, end_date FROM training_plans WHERE user_id = ? AND active = 1',
-    userId
-  );
-
-  if (activePlan) {
-    const weeklyWorkouts = await db.all<{ id: number; plan_id: number; date: string }>(
-      `SELECT id, plan_id, date FROM workouts 
-       WHERE plan_id = ? AND date >= ? AND date <= ? AND type IN (${typesPlaceholder}) AND status IN ('pending', 'adjusted')`,
-      activePlan.id,
-      activePlan.start_date,
-      activePlan.end_date,
-      ...compatibleTypes
-    );
-
-    if (weeklyWorkouts.length > 0) {
-      // Ordenar por proximidade de data em JavaScript (compatível com SQLite e PostgreSQL)
-      const activityTime = new Date(dateStr + 'T12:00:00').getTime();
-      weeklyWorkouts.sort((a, b) => {
-        const diffA = Math.abs(new Date(a.date + 'T12:00:00').getTime() - activityTime);
-        const diffB = Math.abs(new Date(b.date + 'T12:00:00').getTime() - activityTime);
-        return diffA - diffB;
-      });
-      return weeklyWorkouts[0];
-    }
-  }
-
-  // 3. Fallback: buscar o primeiro pendente geral de tipo compatível na planilha ativa
-  workout = await db.get<{ id: number; plan_id: number }>(
-    `SELECT w.id, w.plan_id FROM workouts w
-     JOIN training_plans tp ON w.plan_id = tp.id
-     WHERE tp.user_id = ? AND tp.active = 1 AND w.type IN (${typesPlaceholder}) AND w.status IN ('pending', 'adjusted')
-     ORDER BY w.date ASC LIMIT 1`,
-    userId,
     ...compatibleTypes
   );
 

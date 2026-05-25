@@ -168,6 +168,16 @@ class PostgreSQLAdapter implements DatabaseClient {
         console.warn('Erro ao rodar migration goals.night_available_time no Postgres:', e);
       }
       try {
+        await this.exec('ALTER TABLE training_plans ADD COLUMN IF NOT EXISTS library_id TEXT;');
+        await this.exec('ALTER TABLE training_plans ADD COLUMN IF NOT EXISTS effort_pct INTEGER DEFAULT 100;');
+        await this.exec('ALTER TABLE training_plans ADD COLUMN IF NOT EXISTS cut_choice TEXT DEFAULT \'none\';');
+        await this.exec('ALTER TABLE training_plans ADD COLUMN IF NOT EXISTS current_week INTEGER DEFAULT 1;');
+        await this.exec('ALTER TABLE training_plans ADD COLUMN IF NOT EXISTS total_weeks INTEGER DEFAULT 1;');
+        await this.exec('ALTER TABLE training_plans ADD COLUMN IF NOT EXISTS start_cycle_date TEXT;');
+      } catch (e) {
+        console.warn('Erro ao rodar migrations de training_plans no Postgres:', e);
+      }
+      try {
         await this.exec(`
           CREATE TABLE IF NOT EXISTS races (
             id SERIAL PRIMARY KEY,
@@ -298,6 +308,24 @@ class SQLiteAdapter implements DatabaseClient {
       await this.db.exec('ALTER TABLE goals ADD COLUMN night_available_time INTEGER DEFAULT 60;');
     } catch (e) {}
     try {
+      await this.db.exec('ALTER TABLE training_plans ADD COLUMN library_id TEXT;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE training_plans ADD COLUMN effort_pct INTEGER DEFAULT 100;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE training_plans ADD COLUMN cut_choice TEXT DEFAULT \'none\';');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE training_plans ADD COLUMN current_week INTEGER DEFAULT 1;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE training_plans ADD COLUMN total_weeks INTEGER DEFAULT 1;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE training_plans ADD COLUMN start_cycle_date TEXT;');
+    } catch (e) {}
+    try {
       await this.db.exec(`
         CREATE TABLE IF NOT EXISTS races (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -425,6 +453,12 @@ function getInitialSchemaDDL(): string {
       start_date TEXT NOT NULL,
       end_date TEXT NOT NULL,
       active INTEGER DEFAULT 1,
+      library_id TEXT,
+      effort_pct INTEGER DEFAULT 100,
+      cut_choice TEXT DEFAULT 'none',
+      current_week INTEGER DEFAULT 1,
+      total_weeks INTEGER DEFAULT 1,
+      start_cycle_date TEXT,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 

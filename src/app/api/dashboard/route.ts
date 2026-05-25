@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getDb, autoCompleteExpiredRests, getCalendarToken } from '@/lib/db';
+import { getDb, autoCompleteExpiredRests, getCalendarToken, getWeekDates, formatDate } from '@/lib/db';
 import { calculatePhysioMetrics } from '@/lib/coach-engine';
 import { getCelebration } from '@/lib/celebrations';
 import { syncUserStravaActivities } from '@/lib/strava';
+import { TRAINING_LIBRARY, getWeeksAfterCut } from '@/lib/training-library';
 
 export async function GET(req: Request) {
   try {
@@ -66,9 +67,102 @@ export async function GET(req: Request) {
       const endOfWeekStr = formatYmd(sunday);
       
       if (activePlan.start_date !== startOfWeekStr || activePlan.end_date !== endOfWeekStr) {
-        // Incrementa o número da semana no nome do plano de treinos
-        let newPlanName = activePlan.name || '';
-        const weekRegex = /(Semana\s+)(\d+)/i;
+        if (activePlan.library_id) {
+          const libraryPlan = TRAINING_LIBRARY[activePlan.library_id];
+          if (libraryPlan) {
+            const nextWeekNum = (activePlan.current_week || 1) + 1;
+            const totalWeeks = activePlan.total_weeks || libraryPlan.weeks;
+            
+            if (nextWeekNum <= totalWeeks) {
+              let newPlanName = activePlan.name || '';
+              const weekRegex = /(Semana\s+)(\d+)/i;
+              const match = newPlanName.match(weekRegex);
+              if (match) {
+                newPlanName = newPlanName.replace(weekRegex, `$1${nextWeekNum}`);
+              } else {
+                newPlanName = `${newPlanName} - Semana ${nextWeekNum}`;
+              }
+
+              await db.run(
+                'UPDATE training_plans SET start_date = ?, end_date = ?, name = ?, current_week = ? WHERE id = ?',
+                startOfWeekStr,
+                endOfWeekStr,
+                newPlanName,
+                nextWeekNum,
+                activePlan.id
+              );
+              activePlan.start_date = startOfWeekStr;
+              activePlan.end_date = endOfWeekStr;
+              activePlan.name = newPlanName;
+              activePlan.current_week = nextWeekNum;
+
+              await db.run('DELETE FROM workouts WHERE plan_id = ?', activePlan.id);
+
+              const originalWeekIndices = Array.from({ length: libraryPlan.weeks }, (_, i) => i);
+              const selectedWeekIndices = getWeeksAfterCut(originalWeekIndices, totalWeeks, activePlan.cut_choice || 'none');
+              const targetWeekIndex = selectedWeekIndices[nextWeekNum - 1];
+
+              const originalWeeksData = libraryPlan.generateWeeks(activePlan.effort_pct || 100);
+              const nextWeekWorkouts = originalWeeksData[targetWeekIndex];
+
+              const weekDates = getWeekDates(startOfWeekStr);
+
+              for (const w of nextWeekWorkouts) {
+                const workoutDate = formatDate(weekDates[w.day - 1]);
+                await db.run(`
+                  INSERT INTO workouts (
+                    plan_id, day_of_week, date, type, distance_target, 
+                    duration_target, pace_target, power_target, tss_target, title, description, status
+                  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+                `,
+                  activePlan.id,
+                  w.day,
+                  workoutDate,
+                  w.type,
+                  w.dist,
+                  w.dur,
+                  w.pace,
+                  w.power || 0,
+                  w.tss,
+                  w.title,
+                  w.desc
+                );
+              }
+
+              const systemNow = new Date();
+              const systemTodayStr = `${systemNow.getFullYear()}-${String(systemNow.getMonth() + 1).padStart(2, '0')}-${String(systemNow.getDate()).padStart(2, '0')}`;
+              
+              await db.run(`
+                INSERT INTO coach_notifs (user_id, date, title, content, read)
+                VALUES (?, ?, ?, ?, 0)
+              `,
+                userId,
+                systemTodayStr,
+                'Nova Semana do Ciclo Periodizado! 📅',
+                `Sua planilha avançou para a Semana ${nextWeekNum} de ${totalWeeks} ("${newPlanName}"). Os treinos desta semana foram gerados e calibrados com base na sua intensidade selecionada.`
+              );
+            } else {
+              await db.run('UPDATE training_plans SET active = 0 WHERE id = ?', activePlan.id);
+              
+              const systemNow = new Date();
+              const systemTodayStr = `${systemNow.getFullYear()}-${String(systemNow.getMonth() + 1).padStart(2, '0')}-${String(systemNow.getDate()).padStart(2, '0')}`;
+              
+              await db.run(`
+                INSERT INTO coach_notifs (user_id, date, title, content, read)
+                VALUES (?, ?, ?, ?, 0)
+              `,
+                userId,
+                systemTodayStr,
+                'Planilha Concluída com Sucesso! 🏆',
+                `Parabéns, campeão! Você completou com sucesso todo o ciclo periodizado de treinos da planilha "${activePlan.name}". Escolha uma nova planilha na biblioteca para continuar evoluindo!`
+              );
+              activePlan.active = 0;
+            }
+          }
+        } else {
+          // Incrementa o número da semana no nome do plano de treinos (LEGADO)
+          let newPlanName = activePlan.name || '';
+          const weekRegex = /(Semana\s+)(\d+)/i;
         const match = newPlanName.match(weekRegex);
         if (match) {
           const currentWeekNum = parseInt(match[2], 10);
@@ -464,6 +558,7 @@ export async function GET(req: Request) {
           );
         }
       }
+    }
       
       // Autoconcluir treinos de Descanso expirados há mais de 48h
       await autoCompleteExpiredRests(db, activePlan.id, today);

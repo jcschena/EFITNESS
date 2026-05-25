@@ -28,10 +28,17 @@ import {
   Target,
   Copy,
   Info,
-  Trophy
+  Trophy,
+  Apple,
+  Accessibility,
+  Link as LinkIcon
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { SPORTS_CONFIG, getSportConfig } from '@/lib/sports';
+import { NUTRITION_DATA, STRETCHING_DATA } from '@/lib/nutrition-stretching';
+import { TRAINING_LIBRARY, getWeeksAfterCut } from '@/lib/training-library';
+import { BookOpen, Award, Settings, Eye, HelpCircle } from 'lucide-react';
+
 
 const BarChart = dynamic(
   () => import('react-chartjs-2').then((mod) => mod.Bar),
@@ -134,8 +141,21 @@ export default function Home() {
   const [minLoadingTimePassed, setMinLoadingTimePassed] = useState<boolean>(true);
   const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [activeTab, setActiveTab] = useState<string>('planilha'); // 'planilha', 'coach', 'simulador'
+  const [activeTab, setActiveTab] = useState<string>('planilha'); // 'planilha', 'coach', 'simulador', 'nutricao', 'alongamento'
+  
+  // Estados para a Biblioteca de Planilhas Periodizadas
+  const [selectedSportFilter, setSelectedSportFilter] = useState<string>('Corrida');
+  const [viewingLibraryPlan, setViewingLibraryPlan] = useState<any>(null);
+  const [effortPctCalibration, setEffortPctCalibration] = useState<number>(100);
+  const [cutChoiceSelection, setCutChoiceSelection] = useState<'inicial' | 'polimento' | 'ambos' | 'none'>('none');
+  const [applyPlanLoading, setApplyPlanLoading] = useState<boolean>(false);
+  const [selectedPreviewWeek, setSelectedPreviewWeek] = useState<number>(1);
+
   const [selectedWorkout, setSelectedWorkout] = useState<any>(null);
+  
+  // Estados para as abas de Nutrição e Alongamento
+  const [nutritionMonth, setNutritionMonth] = useState<number>(() => new Date().getMonth());
+  const [stretchingCategory, setStretchingCategory] = useState<string>('dynamic');
   
   // Dados do Dashboard carregados do Backend
   const [dashboardData, setDashboardData] = useState<any>(null);
@@ -1198,6 +1218,35 @@ export default function Home() {
     }
   };
 
+  // Realizar associação/desassociação manual de atividade do Strava com treino planejado
+  const handleManualAssociation = async (workoutId: number, activityLogId: number, unlink = false) => {
+    if (!activeUser) return;
+    try {
+      const res = await fetch('/api/workouts/associate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: activeUser,
+          workoutId,
+          activityLogId,
+          unlink
+        })
+      });
+
+      if (res.ok) {
+        alert(unlink ? 'Atividade desvinculada com sucesso!' : 'Atividade vinculada com sucesso!');
+        setSelectedWorkout(null); // Fechar o modal de detalhes do treino
+        await fetchDashboard(activeUser);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert('Erro ao processar correspondência: ' + (err.error || 'Erro desconhecido'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro de conexão ao processar correspondência.');
+    }
+  };
+
   // Aplicar as sugestões da calibração no perfil
   const handleApplyCalibration = async () => {
     if (!activeUser || !calibrationResult) return;
@@ -1258,6 +1307,44 @@ export default function Home() {
       setProfileMessage({ type: 'error', text: 'Falha ao aplicar calibração fisiológica.' });
     } finally {
       setProfileSaving(false);
+    }
+  };
+
+
+  // Aplicar planilha periodizada da biblioteca
+  const handleApplyLibraryPlan = async (libraryPlanId: string) => {
+    if (!activeUser || applyPlanLoading) return;
+    
+    setApplyPlanLoading(true);
+    try {
+      const clientDateStr = new Date().toLocaleDateString('en-CA');
+      const res = await fetch('/api/library/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: activeUser,
+          libraryId: libraryPlanId,
+          effortPct: effortPctCalibration,
+          cutChoice: cutChoiceSelection,
+          clientDate: clientDateStr
+        })
+      });
+
+      if (res.ok) {
+        alert('Planilha periodizada aplicada e calibrada com sucesso!');
+        setViewingLibraryPlan(null);
+        setActiveTab('planilha');
+        // Recarregar os dados do dashboard
+        await fetchDashboard(activeUser);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(`Erro ao aplicar planilha: ${data.error || 'Erro desconhecido'}`);
+      }
+    } catch (err: any) {
+      console.error('Erro ao aplicar planilha da biblioteca:', err);
+      alert('Falha de conexão com o servidor ao aplicar a planilha.');
+    } finally {
+      setApplyPlanLoading(false);
     }
   };
 
@@ -1443,12 +1530,15 @@ export default function Home() {
           </div>
         </div>
         
-        <div className="loader-text-container">
+        <div className="loader-text-container" style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <h3 className="loader-title">ULTRA COACH</h3>
           <div className="loader-progress-bar">
             <div className="loader-progress-fill" />
           </div>
           <p className="loader-subtitle">Carregando cockpit fisiológico...</p>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '28px', maxWidth: '320px', lineHeight: '1.5', fontStyle: 'italic', textAlign: 'center', opacity: 0.8 }}>
+            ⚠️ O aplicativo é uma ferramenta e não substitui o acompanhamento de um profissional credenciado de educação física.
+          </p>
         </div>
         
         <style jsx global>{`
@@ -2537,7 +2627,10 @@ export default function Home() {
           
           <button 
             className="tab-btn" 
-            onClick={() => setActiveTab('coach')}
+            onClick={() => {
+              setActiveTab('coach');
+              setSelectedPreviewWeek(1);
+            }}
             style={{ 
               background: 'transparent', 
               border: 'none', 
@@ -2553,9 +2646,9 @@ export default function Home() {
               transition: 'var(--transition-smooth)'
             }}
           >
-            <MessageSquare size={18} style={{ color: activeTab === 'coach' ? 'var(--neon-cyan)' : 'inherit' }} />
-            Treinador IA (PhD)
-            <Sparkles size={12} style={{ color: 'var(--neon-lime)' }} />
+            <BookOpen size={18} style={{ color: activeTab === 'coach' ? 'var(--neon-cyan)' : 'inherit' }} />
+            Biblioteca de Planilhas
+            <Award size={12} style={{ color: 'var(--neon-orange)' }} />
           </button>
 
           <button 
@@ -2601,6 +2694,50 @@ export default function Home() {
           >
             <Trophy size={18} style={{ color: activeTab === 'provas' ? 'var(--neon-cyan)' : 'inherit' }} />
             Provas
+          </button>
+
+          <button 
+            className="tab-btn" 
+            onClick={() => setActiveTab('nutricao')}
+            style={{ 
+              background: 'transparent', 
+              border: 'none', 
+              borderBottom: activeTab === 'nutricao' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              color: activeTab === 'nutricao' ? '#fff' : 'var(--text-secondary)', 
+              fontWeight: activeTab === 'nutricao' ? 700 : 500,
+              padding: '10px 16px',
+              cursor: 'pointer',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'var(--transition-smooth)'
+            }}
+          >
+            <Apple size={18} style={{ color: activeTab === 'nutricao' ? 'var(--neon-cyan)' : 'inherit' }} />
+            Nutrição
+          </button>
+
+          <button 
+            className="tab-btn" 
+            onClick={() => setActiveTab('alongamento')}
+            style={{ 
+              background: 'transparent', 
+              border: 'none', 
+              borderBottom: activeTab === 'alongamento' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              color: activeTab === 'alongamento' ? '#fff' : 'var(--text-secondary)', 
+              fontWeight: activeTab === 'alongamento' ? 700 : 500,
+              padding: '10px 16px',
+              cursor: 'pointer',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'var(--transition-smooth)'
+            }}
+          >
+            <Accessibility size={18} style={{ color: activeTab === 'alongamento' ? 'var(--neon-cyan)' : 'inherit' }} />
+            Alongamentos
           </button>
 
           <button 
@@ -2893,8 +3030,7 @@ export default function Home() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {workouts && workouts.map((w: any) => {
-                  const hasLog = activityLogs?.find((l: any) => l.workout_id === w.id) ||
-                                 activityLogs?.find((l: any) => !l.workout_id && l.timestamp && l.timestamp.split('T')[0] === w.date);
+                  const hasLog = activityLogs?.find((l: any) => l.workout_id === w.id);
                   const isRest = w.type === 'Descanso';
                   const isCompleted = w.status === 'completed';
                   const isAdjusted = w.status === 'adjusted';
@@ -3104,133 +3240,465 @@ export default function Home() {
           </div>
         )}
 
-        {/* 2. CHAT COM O COACH IA */}
+        {/* 2. BIBLIOTECA DE PLANILHAS PERIODIZADAS */}
         {activeTab === 'coach' && (
-          <div className="premium-card animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '620px', padding: 0, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
             
-            {/* Chat Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--border-color)', background: 'rgba(13, 21, 39, 0.4)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ display: 'flex', padding: '8px', background: 'rgba(0, 240, 255, 0.1)', borderRadius: '10px' }}>
-                  <Sparkles style={{ color: '#fc4c02' }} size={20} />
+            {/* Se viewingLibraryPlan estiver nulo, exibe a lista de planilhas. Caso contrário, exibe o painel de calibração/prévia */}
+            {!viewingLibraryPlan ? (
+              <div>
+                {/* Cabeçalho da Biblioteca */}
+                <div className="premium-card" style={{ background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, rgba(57, 255, 20, 0.02) 100%)', padding: '28px', border: '1px solid rgba(0, 240, 255, 0.15)', borderRadius: '16px', marginBottom: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div style={{ display: 'flex', padding: '12px', background: 'rgba(0, 240, 255, 0.1)', borderRadius: '12px', border: '1px solid rgba(0, 240, 255, 0.2)' }}>
+                      <BookOpen style={{ color: 'var(--neon-cyan)' }} size={28} />
+                    </div>
+                    <div>
+                      <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fff', margin: 0, letterSpacing: '0.02em' }}>Biblioteca de Planilhas Periodizadas</h2>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '4px 0 0 0' }}>Planilhas clássicas encontradas na internet, com fontes e autores reais, estruturadas cientificamente.</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>ULTRA COACH</h3>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--neon-lime)', display: 'block' }}>PhD em Fisiologia do Exercício | On-line</span>
+
+                {/* Filtro de Esportes */}
+                <div className="hide-scrollbar" style={{ display: 'flex', gap: '10px', overflowX: 'auto', marginBottom: '24px', paddingBottom: '4px' }}>
+                  {['Corrida', 'Ciclismo', 'Natação', 'Triathlon', 'Ultramaratona'].map((sport) => {
+                    const isActive = selectedSportFilter === sport;
+                    const emoji = sport === 'Corrida' ? '🏃‍♂️' : sport === 'Ciclismo' ? '🚴‍♂️' : sport === 'Natação' ? '🏊‍♂️' : sport === 'Triathlon' ? '🏊‍♂️🚴‍♂️🏃‍♂️' : '🥾';
+                    const activeColor = sport === 'Corrida' ? 'var(--neon-green)' : sport === 'Ciclismo' ? 'var(--neon-cyan)' : sport === 'Natação' ? 'var(--neon-purple)' : sport === 'Triathlon' ? 'var(--neon-cyan)' : 'var(--neon-orange)';
+                    
+                    return (
+                      <button
+                        key={sport}
+                        onClick={() => setSelectedSportFilter(sport)}
+                        style={{
+                          background: isActive ? `rgba(${sport === 'Corrida' ? '57, 255, 20' : sport === 'Ciclismo' ? '0, 240, 255' : '168, 85, 247'}, 0.15)` : 'rgba(255,255,255,0.03)',
+                          border: isActive ? `1.5px solid ${activeColor}` : '1px solid rgba(255,255,255,0.08)',
+                          color: isActive ? '#fff' : 'var(--text-secondary)',
+                          fontWeight: isActive ? 700 : 500,
+                          padding: '10px 20px',
+                          borderRadius: '24px',
+                          cursor: 'pointer',
+                          fontSize: '0.9rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          whiteSpace: 'nowrap',
+                          transition: 'all 0.25s ease'
+                        }}
+                      >
+                        <span>{emoji}</span>
+                        <span>{sport}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Grid de Planilhas */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+                  {Object.values(TRAINING_LIBRARY)
+                    .filter(plan => {
+                      if (selectedSportFilter === 'Natação') return plan.sport === 'Natacao';
+                      return plan.sport === selectedSportFilter;
+                    })
+                    .map((plan) => {
+                      const levelLabel = plan.level === 'iniciante' ? 'Iniciante' : plan.level === 'intermediario' ? 'Intermediário' : 'Avançado';
+                      const levelColor = plan.level === 'iniciante' ? 'var(--neon-green)' : plan.level === 'intermediario' ? 'var(--neon-cyan)' : 'var(--neon-orange)';
+                      
+                      return (
+                        <div key={plan.id} className="premium-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', border: '1px solid rgba(255,255,255,0.06)', transition: 'all 0.3s ease' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: levelColor, background: `rgba(255,255,255,0.03)`, padding: '2px 8px', borderRadius: '4px', border: `1px solid rgba(255,255,255,0.05)` }}>
+                              {levelLabel}
+                            </span>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                              ⏱️ {plan.weeks} Semanas
+                            </span>
+                          </div>
+                          
+                          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', margin: '0 0 8px 0', lineHeight: '1.3' }}>{plan.name}</h3>
+                          
+                          <div style={{ marginBottom: '14px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                            Autor: <strong style={{ color: 'var(--text-primary)' }}>{plan.author}</strong> <br />
+                            Fonte: <em style={{ color: 'var(--neon-cyan)' }}>{plan.source}</em>
+                          </div>
+
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0 0 20px 0', lineHeight: '1.5', flexGrow: 1 }}>{plan.description}</p>
+                          
+                          <button
+                            onClick={() => {
+                              setViewingLibraryPlan(plan);
+                              setEffortPctCalibration(100);
+                              setCutChoiceSelection(goal?.date_target ? 'ambos' : 'none');
+                              setSelectedPreviewWeek(1);
+                            }}
+                            className="glow-btn"
+                            style={{ width: '100%', padding: '12px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                          >
+                            <Eye size={16} />
+                            Visualizar e Aplicar
+                          </button>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Métricas e cargas atuais no contexto</span>
-            </div>
-
-            {/* Chat Message Box */}
-            <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {chatMessages.map((msg, index) => {
-                const isCoach = msg.sender === 'coach';
-                return (
-                  <div 
-                    key={index} 
-                    style={{ 
-                      alignSelf: isCoach ? 'flex-start' : 'flex-end',
-                      maxWidth: '85%',
-                      display: 'flex',
-                      gap: '8px',
-                      flexDirection: isCoach ? 'row' : 'row-reverse'
-                    }}
-                  >
-                    {/* Avatar */}
-                    <div style={{ 
-                      width: '32px', 
-                      height: '32px', 
-                      borderRadius: '50%', 
-                      background: isCoach ? 'linear-gradient(135deg, var(--neon-cyan) 0%, #0088ff 100%)' : 'rgba(255, 255, 255, 0.1)',
-                      color: isCoach ? '#030712' : '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      flexShrink: 0
-                    }}>
-                      {isCoach ? 'C' : 'U'}
-                    </div>
-
-                    {/* Bubble */}
-                    <div style={{ 
-                      background: isCoach ? 'rgba(255,255,255,0.03)' : 'linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 136, 255, 0.05) 100%)', 
-                      border: isCoach ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(0, 240, 255, 0.2)', 
-                      borderRadius: isCoach ? '0 16px 16px 16px' : '16px 0 16px 16px',
-                      padding: '12px 16px',
-                      fontSize: '0.85rem',
-                      lineHeight: '1.5',
-                      color: 'var(--text-primary)',
-                      whiteSpace: 'pre-line'
-                    }}>
-                      {msg.text}
-                    </div>
+            ) : (
+              /* Detalhes, Calibração de Esforço e Ajuste de Tempo */
+              <div className="premium-card animate-slide-up" style={{ padding: '32px', border: '1px solid rgba(0, 240, 255, 0.15)' }}>
+                {/* Header do Detalhe */}
+                <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '20px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                  <div>
+                    <button
+                      onClick={() => setViewingLibraryPlan(null)}
+                      style={{ background: 'transparent', border: 'none', color: 'var(--neon-cyan)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', fontWeight: 600, marginBottom: '12px', padding: 0 }}
+                    >
+                      ← Voltar para Biblioteca
+                    </button>
+                    <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fff', margin: 0 }}>{viewingLibraryPlan.name}</h2>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '4px 0 0 0' }}>
+                      Autor: <strong style={{ color: '#fff' }}>{viewingLibraryPlan.author}</strong> | Fonte: <span style={{ color: 'var(--neon-cyan)' }}>{viewingLibraryPlan.source}</span>
+                    </p>
                   </div>
-                );
-              })}
-              
-              {chatLoading && (
-                <div style={{ alignSelf: 'flex-start', display: 'flex', gap: '8px' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <RefreshCw style={{ animation: 'spin 1.5s linear infinite', color: 'var(--text-muted)' }} size={14} />
-                  </div>
-                  <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '0 16px 16px 16px', padding: '12px 16px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                    Analisando métricas de estresse CTL/ATL e preparando prescrição adaptada...
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '6px 14px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.06)', fontWeight: 600 }}>
+                      📋 {viewingLibraryPlan.weeks} Semanas Originais
+                    </span>
                   </div>
                 </div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
 
-            {/* Quick Questions suggestion */}
-            <div style={{ padding: '8px 20px', display: 'flex', gap: '8px', overflowX: 'auto', borderTop: '1px solid var(--border-color)', background: 'rgba(6, 9, 19, 0.2)' }}>
-              <button 
-                onClick={() => handleQuickQuestion('Por que estou me sentindo cansado hoje?')}
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '6px 12px', fontSize: '0.75rem', color: 'var(--text-secondary)', cursor: 'pointer', whiteSpace: 'nowrap' }}
-              >
-                Por que estou cansado?
-              </button>
-              <button 
-                onClick={() => handleQuickQuestion('Como está meu nível de fadiga (ATL/TSB) atual?')}
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '6px 12px', fontSize: '0.75rem', color: 'var(--text-secondary)', cursor: 'pointer', whiteSpace: 'nowrap' }}
-              >
-                Analisar fadiga ATL/TSB
-              </button>
-              <button 
-                onClick={() => handleQuickQuestion('O que devo fazer para o treino de amanhã?')}
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '6px 12px', fontSize: '0.75rem', color: 'var(--text-secondary)', cursor: 'pointer', whiteSpace: 'nowrap' }}
-              >
-                Instruções de amanhã
-              </button>
-              <button 
-                onClick={() => handleQuickQuestion('Como funciona a auto-regulação com o Strava?')}
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '6px 12px', fontSize: '0.75rem', color: 'var(--text-secondary)', cursor: 'pointer', whiteSpace: 'nowrap' }}
-              >
-                Como o Strava auto-regula?
-              </button>
-            </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '32px' }} className="responsive-grid">
+                  {/* Bloco 1: Calibração de Esforço */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Settings size={18} style={{ color: 'var(--neon-cyan)' }} />
+                      1. Calibrar Intensidade do Esforço
+                    </h4>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.4' }}>
+                      Ajuste o percentual do esforço da planilha. Reduzir o esforço recalcula de forma científica o ritmo (pace/velocidade), a potência e o TSS das sessões de treino por regra de 3.
+                    </p>
+                    
+                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.04)', marginTop: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Esforço da Planilha</span>
+                        <span style={{ fontSize: '1.3rem', fontWeight: 800, color: effortPctCalibration === 100 ? 'var(--neon-green)' : 'var(--neon-cyan)' }}>
+                          {effortPctCalibration}%
+                        </span>
+                      </div>
+                      
+                      <input
+                        type="range"
+                        min="50"
+                        max="100"
+                        step="5"
+                        value={effortPctCalibration}
+                        onChange={(e) => {
+                          setEffortPctCalibration(parseInt(e.target.value, 10));
+                        }}
+                        style={{
+                          width: '100%',
+                          height: '6px',
+                          background: 'rgba(255,255,255,0.1)',
+                          borderRadius: '5px',
+                          outline: 'none',
+                          cursor: 'pointer',
+                          accentColor: 'var(--neon-cyan)'
+                        }}
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+                        <span>50% (Ritmo Regenerativo)</span>
+                        <span>100% (Original)</span>
+                      </div>
+                    </div>
+                  </div>
 
-            {/* Chat Input Box */}
-            <form onSubmit={handleSendMessage} style={{ padding: '16px 20px', borderTop: '1px solid var(--border-color)', background: 'rgba(13, 21, 39, 0.4)', display: 'flex', gap: '12px' }}>
-              <input 
-                type="text" 
-                className="glass-input" 
-                placeholder="Pergunte ao seu treinador sobre seu cansaço, metas ou adaptação de planilha..." 
-                value={chatInput}
-                onChange={e => setChatInput(e.target.value)}
-                disabled={chatLoading}
-              />
-              <button 
-                type="submit" 
-                className="glow-btn" 
-                style={{ borderRadius: '10px', padding: '12px' }}
-                disabled={chatLoading}
-              >
-                <Send size={16} />
-              </button>
-            </form>
+                  {/* Bloco 2: Adaptação de Calendário (Prova Alvo) */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Award size={18} style={{ color: 'var(--neon-orange)' }} />
+                      2. Adequar Periodização para Prova Alvo
+                    </h4>
+                    
+                    {(() => {
+                      const goal = dashboardData?.goal;
+                      if (!goal || !goal.date_target) {
+                        return (
+                          <div style={{ padding: '16px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.04)', borderRadius: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                            💡 <strong>Sem Prova Alvo cadastrada:</strong> Você fará as {viewingLibraryPlan.weeks} semanas completas do ciclo original. Você pode definir uma prova no formulário de Perfil no Cockpit se desejar.
+                          </div>
+                        );
+                      }
+
+                      // Calcular semanas disponíveis
+                      const today = new Date();
+                      const day = today.getDay();
+                      const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+                      const monday = new Date(today);
+                      monday.setDate(diff);
+                      
+                      const targetDate = new Date(goal.date_target + 'T12:00:00');
+                      const diffTime = targetDate.getTime() - monday.getTime();
+                      const weeksAvailable = Math.ceil(diffTime / (7 * 24 * 60 * 60 * 1000));
+
+                      if (weeksAvailable <= 0) {
+                        return (
+                          <div style={{ padding: '16px', background: 'rgba(255, 59, 48, 0.08)', border: '1px solid rgba(255, 59, 48, 0.2)', borderRadius: '12px', fontSize: '0.85rem', color: 'var(--neon-red)', lineHeight: '1.4' }}>
+                            ⚠️ A data da sua prova alvo cadastrada no perfil ({new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}) já passou. Atualize seu objetivo no formulário de Perfil.
+                          </div>
+                        );
+                      }
+
+                      if (weeksAvailable >= viewingLibraryPlan.weeks) {
+                        return (
+                          <div style={{ padding: '16px', background: 'rgba(57, 255, 20, 0.08)', border: '1px solid rgba(57, 255, 20, 0.2)', borderRadius: '12px', fontSize: '0.85rem', color: 'var(--neon-green)', lineHeight: '1.4' }}>
+                            ✅ <strong>Preparação Ideal!</strong> Faltam <strong>{weeksAvailable} semanas</strong> até sua prova alvo ({new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}). Tempo ideal para realizar as {viewingLibraryPlan.weeks} semanas completas sem cortes.
+                          </div>
+                        );
+                      }
+
+                      // Tempo insuficiente! Pergunta o que cortar
+                      return (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          <div style={{ padding: '12px 16px', background: 'rgba(255, 107, 53, 0.08)', border: '1px solid rgba(255, 107, 53, 0.25)', borderRadius: '12px', fontSize: '0.85rem', color: 'var(--neon-orange)', lineHeight: '1.4' }}>
+                            ⚠️ <strong>Conflito de Calendário:</strong> Restam apenas <strong>{weeksAvailable} semanas</strong> até sua prova alvo, mas esta planilha original tem <strong>{viewingLibraryPlan.weeks} semanas</strong>. Escolha a estratégia para ajustar o ciclo:
+                          </div>
+                          
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>
+                              <input
+                                type="radio"
+                                name="cutChoice"
+                                checked={cutChoiceSelection === 'inicial'}
+                                onChange={() => setCutChoiceSelection('inicial')}
+                                style={{ accentColor: 'var(--neon-orange)' }}
+                              />
+                              <div>
+                                <strong>Remover semanas iniciais</strong>
+                                <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Corta as semanas iniciais de base, focando no pico/especificidade.</span>
+                              </div>
+                            </label>
+                            
+                            <hr style={{ border: 0, borderTop: '1px solid rgba(255,255,255,0.05)', margin: '8px 0' }} />
+
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>
+                              <input
+                                type="radio"
+                                name="cutChoice"
+                                checked={cutChoiceSelection === 'polimento'}
+                                onChange={() => setCutChoiceSelection('polimento')}
+                                style={{ accentColor: 'var(--neon-orange)' }}
+                              />
+                              <div>
+                                <strong>Reduzir fase de polimento (Taper)</strong>
+                                <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Corta semanas finais de taper para manter a base, mantendo apenas a semana pré-prova.</span>
+                              </div>
+                            </label>
+
+                            <hr style={{ border: 0, borderTop: '1px solid rgba(255,255,255,0.05)', margin: '8px 0' }} />
+
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>
+                              <input
+                                type="radio"
+                                name="cutChoice"
+                                checked={cutChoiceSelection === 'ambos'}
+                                onChange={() => setCutChoiceSelection('ambos')}
+                                style={{ accentColor: 'var(--neon-orange)' }}
+                              />
+                              <div>
+                                <strong>Cortar um pouco dos dois (Equilibrado)</strong>
+                                <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Corta metade da diferença no início do ciclo e metade na fase de polimento.</span>
+                              </div>
+                            </label>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                {/* 3. PRÉVIA INTERATIVA DE TREINOS DO CICLO */}
+                <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '24px', marginBottom: '32px' }}>
+                  <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Eye size={18} style={{ color: 'var(--neon-green)' }} />
+                    3. Prévia dos Treinos Periodizados (Calibrados)
+                  </h4>
+                  
+                  {(() => {
+                    const goal = dashboardData?.goal;
+                    let weeksCount = viewingLibraryPlan.weeks;
+                    
+                    if (goal?.date_target) {
+                      const today = new Date();
+                      const day = today.getDay();
+                      const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+                      const monday = new Date(today);
+                      monday.setDate(diff);
+                      const targetDate = new Date(goal.date_target + 'T12:00:00');
+                      const diffTime = targetDate.getTime() - monday.getTime();
+                      const computedWeeks = Math.ceil(diffTime / (7 * 24 * 60 * 60 * 1000));
+                      if (computedWeeks > 0 && computedWeeks < viewingLibraryPlan.weeks) {
+                        weeksCount = computedWeeks;
+                      }
+                    }
+
+                    const originalWeekIndices = Array.from({ length: viewingLibraryPlan.weeks }, (_, i) => i);
+                    const selectedWeekIndices = getWeeksAfterCut(originalWeekIndices, weeksCount, cutChoiceSelection);
+                    
+                    const maxWeeks = selectedWeekIndices.length;
+                    const safePreviewWeek = Math.min(selectedPreviewWeek, maxWeeks);
+                    
+                    const originalWeeksData = viewingLibraryPlan.generateWeeks(effortPctCalibration);
+                    const targetWeekIndex = selectedWeekIndices[safePreviewWeek - 1] ?? 0;
+                    const previewWorkouts = originalWeeksData[targetWeekIndex] || [];
+
+                    return (
+                      <div>
+                        {/* Navegação de semanas da prévia */}
+                        <div className="hide-scrollbar" style={{ display: 'flex', gap: '6px', overflowX: 'auto', marginBottom: '16px', paddingBottom: '4px' }}>
+                          {Array.from({ length: maxWeeks }).map((_, idx) => {
+                            const weekNum = idx + 1;
+                            const isSelected = safePreviewWeek === weekNum;
+                            // Encontrar a semana física original correspondente
+                            const originalWeekNum = selectedWeekIndices[idx] + 1;
+                            
+                            return (
+                              <button
+                                key={weekNum}
+                                onClick={() => setSelectedPreviewWeek(weekNum)}
+                                style={{
+                                  background: isSelected ? 'var(--neon-green)' : 'rgba(255,255,255,0.03)',
+                                  border: isSelected ? '1px solid var(--neon-green)' : '1px solid rgba(255,255,255,0.06)',
+                                  color: isSelected ? '#030712' : 'var(--text-secondary)',
+                                  fontWeight: isSelected ? 700 : 500,
+                                  padding: '6px 12px',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  fontSize: '0.8rem',
+                                  whiteSpace: 'nowrap',
+                                  transition: 'all 0.2s ease'
+                                }}
+                              >
+                                Semana {weekNum} {originalWeekNum !== weekNum && <span style={{ fontSize: '0.65rem', opacity: 0.7 }}>(Orig: S{originalWeekNum})</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Listagem de treinos da semana selecionada na prévia */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {previewWorkouts.map((w: any, index: number) => {
+                            const isRest = w.type === 'Descanso';
+                            const dayNames = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+                            
+                            // Cor do ícone por tipo de esporte
+                            const sportColor = w.type === 'Corrida' ? 'var(--neon-green)' : w.type === 'Ciclismo' ? 'var(--neon-cyan)' : w.type === 'Natacao' ? 'var(--neon-purple)' : w.type === 'Forca' ? 'var(--neon-orange)' : 'var(--text-muted)';
+                            
+                            return (
+                              <div
+                                key={index}
+                                style={{
+                                  background: isRest ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.02)',
+                                  border: '1px solid rgba(255,255,255,0.05)',
+                                  borderRadius: '10px',
+                                  padding: '12px 18px',
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  flexWrap: 'wrap',
+                                  gap: '12px'
+                                }}
+                              >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: '220px' }}>
+                                  {/* Dia da semana */}
+                                  <div style={{ width: '80px', flexShrink: 0 }}>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', fontWeight: 600 }}>{dayNames[w.day - 1]}</span>
+                                    <span style={{ fontSize: '0.85rem', color: sportColor, fontWeight: 700 }}>{w.type}</span>
+                                  </div>
+                                  
+                                  {/* Título e Descrição */}
+                                  <div>
+                                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff', display: 'block' }}>{w.title}</span>
+                                    <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'block', marginTop: '2px', lineHeight: '1.3' }}>{w.desc}</span>
+                                  </div>
+                                </div>
+
+                                {/* Métricas */}
+                                <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexShrink: 0 }}>
+                                  {!isRest ? (
+                                    <>
+                                      {w.dist > 0 && (
+                                        <div style={{ textAlign: 'right' }}>
+                                          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>Distância</span>
+                                          <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 700 }}>{w.dist} km</span>
+                                        </div>
+                                      )}
+                                      {w.dur > 0 && (
+                                        <div style={{ textAlign: 'right' }}>
+                                          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>Duração</span>
+                                          <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 700 }}>{Math.round(w.dur / 60)} min</span>
+                                        </div>
+                                      )}
+                                      {w.pace && w.pace !== 'N/A' && (
+                                        <div style={{ textAlign: 'right' }}>
+                                          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>Ritmo</span>
+                                          <span style={{ fontSize: '0.85rem', color: 'var(--neon-cyan)', fontWeight: 700 }}>{w.pace}</span>
+                                        </div>
+                                      )}
+                                      {w.power > 0 && (
+                                        <div style={{ textAlign: 'right' }}>
+                                          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>Potência</span>
+                                          <span style={{ fontSize: '0.85rem', color: 'var(--neon-green)', fontWeight: 700 }}>{w.power} W</span>
+                                        </div>
+                                      )}
+                                      <div style={{ textAlign: 'right', background: 'rgba(255,255,255,0.03)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>Sobrecarga</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--neon-orange)', fontWeight: 700 }}>{w.tss} TSS</span>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', padding: '4px 12px', borderRadius: '20px' }}>
+                                      Descanso Ativo 💤
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Ações */}
+                <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => setViewingLibraryPlan(null)}
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '12px 24px', fontSize: '0.9rem', color: '#fff', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => handleApplyLibraryPlan(viewingLibraryPlan.id)}
+                    className="glow-btn"
+                    disabled={applyPlanLoading}
+                    style={{ padding: '12px 32px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700 }}
+                  >
+                    {applyPlanLoading ? (
+                      <>
+                        <RefreshCw style={{ animation: 'spin 1.5s linear infinite' }} size={16} />
+                        Aplicando Planilha...
+                      </>
+                    ) : (
+                      <>
+                        <Check size={16} />
+                        Confirmar e Ativar Planilha
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
 
           </div>
         )}
@@ -4485,13 +4953,421 @@ export default function Home() {
           </div>
         )}
 
+        {/* 5. DICAS DE NUTRIÇÃO */}
+        {activeTab === 'nutricao' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
+            {/* Header com Informação de Atualização */}
+            <div className="premium-card" style={{ 
+              background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(13, 21, 39, 0.8) 100%)',
+              border: '1px solid rgba(0, 240, 255, 0.25)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+                  <div style={{ 
+                    width: '45px', 
+                    height: '45px', 
+                    background: 'rgba(0, 240, 255, 0.15)', 
+                    borderRadius: '12px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    border: '1px solid rgba(0, 240, 255, 0.3)'
+                  }}>
+                    <Apple style={{ color: 'var(--neon-cyan)' }} size={24} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff', fontFamily: 'var(--font-title)' }}>
+                      Guia de Nutrição & Hidratação Esportiva
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
+                      Estratégias nutricionais periodizadas mensalmente para otimização do rendimento e recuperação metabólica.
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                  <span style={{ 
+                    fontSize: '0.75rem', 
+                    color: 'var(--neon-green)', 
+                    background: 'rgba(57, 255, 20, 0.1)', 
+                    padding: '6px 14px', 
+                    borderRadius: '20px', 
+                    border: '1px solid rgba(57, 255, 20, 0.25)', 
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <Clock size={12} />
+                    Atualizado Mensalmente
+                  </span>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                    Mês Atual: {(() => {
+                      const mNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+                      return mNames[new Date().getMonth()];
+                    })()} de {new Date().getFullYear()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Seletor de Meses */}
+              <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '16px' }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  Selecione o Mês para Visualizar as Dicas:
+                </label>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"].map((m, idx) => {
+                    const isSelected = nutritionMonth === idx;
+                    const isCurrent = new Date().getMonth() === idx;
+                    return (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setNutritionMonth(idx)}
+                        style={{
+                          background: isSelected ? 'rgba(0, 240, 255, 0.15)' : 'rgba(255, 255, 255, 0.02)',
+                          border: isSelected ? '1.5px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: '8px',
+                          padding: '6px 12px',
+                          color: isSelected ? '#fff' : isCurrent ? 'var(--neon-green)' : 'var(--text-secondary)',
+                          fontWeight: isSelected || isCurrent ? 700 : 500,
+                          fontSize: '0.8rem',
+                          cursor: 'pointer',
+                          transition: 'var(--transition-smooth)',
+                          position: 'relative'
+                        }}
+                      >
+                        {m}
+                        {isCurrent && (
+                          <span style={{
+                            position: 'absolute',
+                            top: '-3px',
+                            right: '-3px',
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: 'var(--neon-green)',
+                            boxShadow: '0 0 6px var(--neon-green)'
+                          }} />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Foco e Diretriz Geral */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
+              <div className="premium-card" style={{ 
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.01) 0%, rgba(13, 21, 39, 0.5) 100%)',
+                padding: '24px'
+              }}>
+                <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--neon-cyan)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>🎯</span> Foco de {NUTRITION_DATA[nutritionMonth].monthName}: {NUTRITION_DATA[nutritionMonth].title}
+                </h4>
+                <p style={{ fontSize: '0.95rem', color: '#fff', fontWeight: 600, lineHeight: '1.4', marginBottom: '14px' }}>
+                  {NUTRITION_DATA[nutritionMonth].focus}
+                </p>
+                <div style={{ 
+                  background: 'rgba(255, 255, 255, 0.02)', 
+                  borderLeft: '3px solid var(--neon-cyan)', 
+                  padding: '12px 16px', 
+                  borderRadius: '0 8px 8px 0',
+                  fontSize: '0.9rem',
+                  lineHeight: '1.5',
+                  color: 'var(--text-secondary)'
+                }}>
+                  {NUTRITION_DATA[nutritionMonth].generalGuideline}
+                </div>
+              </div>
+            </div>
+
+            {/* Três Momentos do Treino (Pré, Durante, Pós) */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+              
+              {/* Pré-Treino */}
+              <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(13, 21, 39, 0.3)' }}>
+                <h5 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--neon-orange)', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                  🍌 Pré-Treino (Abastecimento)
+                </h5>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0, flex: 1 }}>
+                  {NUTRITION_DATA[nutritionMonth].preWorkout}
+                </p>
+              </div>
+
+              {/* Durante o Treino */}
+              <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(13, 21, 39, 0.3)' }}>
+                <h5 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--neon-cyan)', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                  ⚡ Durante o Treino (Manutenção)
+                </h5>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0, flex: 1 }}>
+                  {NUTRITION_DATA[nutritionMonth].duringWorkout}
+                </p>
+              </div>
+
+              {/* Pós-Treino */}
+              <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(13, 21, 39, 0.3)' }}>
+                <h5 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--neon-green)', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                  🍗 Pós-Treino (Reconstrução)
+                </h5>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0, flex: 1 }}>
+                  {NUTRITION_DATA[nutritionMonth].postWorkout}
+                </p>
+              </div>
+
+            </div>
+
+            {/* Dica de Hidratação & Referências */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+              
+              {/* Card de Hidratação */}
+              <div className="premium-card" style={{ 
+                background: 'linear-gradient(135deg, rgba(0, 136, 255, 0.06) 0%, rgba(13, 21, 39, 0.4) 100%)',
+                borderColor: 'rgba(0, 136, 255, 0.25)',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '14px'
+              }}>
+                <div style={{ fontSize: '1.5rem', marginTop: '2px' }}>💧</div>
+                <div>
+                  <h5 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0088ff', margin: '0 0 4px 0' }}>Foco em Hidratação</h5>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.4', margin: 0 }}>
+                    {NUTRITION_DATA[nutritionMonth].hydrationTip}
+                  </p>
+                </div>
+              </div>
+
+              {/* Referências e Aviso Legal */}
+              <div className="premium-card" style={{ 
+                background: 'rgba(255, 255, 255, 0.01)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                gap: '12px'
+              }}>
+                <div>
+                  <h5 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 6px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Fonte Científica
+                  </h5>
+                  <a 
+                    href={NUTRITION_DATA[nutritionMonth].sourceUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ 
+                      fontSize: '0.85rem', 
+                      color: 'var(--neon-cyan)', 
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    {NUTRITION_DATA[nutritionMonth].source}
+                    <ArrowRight size={12} />
+                  </a>
+                </div>
+                
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '10px', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: '1.3' }}>
+                  <strong>Aviso de Isenção:</strong> As informações apresentadas são baseadas em diretrizes gerais de nutrição esportiva e destinam-se a fins educacionais. As necessidades metabólicas variam para cada indivíduo. Consulte um profissional de nutrição credenciado antes de alterar sua dieta.
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* 6. SÉRIES DE ALONGAMENTO */}
+        {activeTab === 'alongamento' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
+            {/* Header com Instruções Gerais */}
+            <div className="premium-card" style={{ 
+              background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(13, 21, 39, 0.8) 100%)',
+              border: '1px solid rgba(168, 85, 247, 0.25)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
+            }}>
+              <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+                <div style={{ 
+                  width: '45px', 
+                  height: '45px', 
+                  background: 'rgba(168, 85, 247, 0.15)', 
+                  borderRadius: '12px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  border: '1px solid rgba(168, 85, 247, 0.3)'
+                }}>
+                  <Accessibility style={{ color: 'rgb(168, 85, 247)' }} size={24} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff', fontFamily: 'var(--font-title)' }}>
+                    Biblioteca de Alongamento & Mobilidade
+                  </h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
+                    Séries de alongamentos estruturados para otimização da flexibilidade, redução de tensões e prevenção de lesões esportivas.
+                  </p>
+                </div>
+              </div>
+
+              {/* Seletor de Categoria */}
+              <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '16px' }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  Escolha o Foco do Alongamento:
+                </label>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {STRETCHING_DATA.map((cat) => {
+                    const isSelected = stretchingCategory === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setStretchingCategory(cat.id)}
+                        style={{
+                          background: isSelected ? 'rgba(168, 85, 247, 0.15)' : 'rgba(255, 255, 255, 0.02)',
+                          border: isSelected ? '1.5px solid rgb(168, 85, 247)' : '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: '8px',
+                          padding: '8px 16px',
+                          color: isSelected ? '#fff' : 'var(--text-secondary)',
+                          fontWeight: isSelected ? 700 : 500,
+                          fontSize: '0.85rem',
+                          cursor: 'pointer',
+                          transition: 'var(--transition-smooth)'
+                        }}
+                      >
+                        {cat.title}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Descrição da Categoria Selecionada */}
+            {(() => {
+              const cat = STRETCHING_DATA.find(c => c.id === stretchingCategory);
+              if (!cat) return null;
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div className="premium-card" style={{ background: 'rgba(255, 255, 255, 0.01)', padding: '16px 20px', borderLeft: '3px solid rgb(168, 85, 247)' }}>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>
+                      {cat.description}
+                    </p>
+                    <div style={{ marginTop: '10px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      Fonte Científica: <a href={cat.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--neon-cyan)', textDecoration: 'none' }}>{cat.source}</a>
+                    </div>
+                  </div>
+
+                  {/* Grid de Exercícios */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+                    {cat.exercises.map((ex) => (
+                      <div 
+                        key={ex.id} 
+                        className="premium-card" 
+                        style={{ 
+                          display: 'flex', 
+                          flexDirection: 'column', 
+                          gap: '14px', 
+                          background: 'rgba(13, 21, 39, 0.2)',
+                          transition: 'var(--transition-smooth)'
+                        }}
+                      >
+                        {/* Título e Músculo Alvo */}
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                          <span style={{ fontSize: '2rem' }}>{ex.imageEmoji || '🧘'}</span>
+                          <div>
+                            <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff', margin: 0 }}>{ex.name}</h4>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginTop: '2px' }}>
+                              Músculos Alvo: <strong style={{ color: 'var(--neon-cyan)' }}>{ex.target}</strong>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Tempo / Repetições */}
+                        <div style={{ 
+                          background: 'rgba(168, 85, 247, 0.06)', 
+                          border: '1px solid rgba(168, 85, 247, 0.15)', 
+                          padding: '6px 12px', 
+                          borderRadius: '6px', 
+                          fontSize: '0.8rem', 
+                          color: '#fff', 
+                          fontWeight: 600,
+                          alignSelf: 'flex-start'
+                        }}>
+                          ⏱️ {ex.duration}
+                        </div>
+
+                        {/* Passos */}
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', letterSpacing: '0.05em' }}>
+                            Como Executar:
+                          </span>
+                          <ol style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: '1.4', margin: 0, paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {ex.steps.map((step, idx) => (
+                              <li key={idx}>{step}</li>
+                            ))}
+                          </ol>
+                        </div>
+
+                        {/* Dica de Segurança */}
+                        <div style={{ 
+                          borderTop: '1px solid rgba(255, 255, 255, 0.05)', 
+                          paddingTop: '12px', 
+                          fontSize: '0.75rem', 
+                          color: 'var(--neon-orange)', 
+                          display: 'flex', 
+                          alignItems: 'flex-start', 
+                          gap: '6px' 
+                        }}>
+                          <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: '1px' }} />
+                          <span>
+                            <strong>Dica de Segurança:</strong> {ex.safetyTip}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Banner Geral de Segurança */}
+            <div className="premium-card" style={{ 
+              background: 'rgba(255, 107, 53, 0.04)', 
+              borderColor: 'rgba(255, 107, 53, 0.2)', 
+              display: 'flex', 
+              gap: '16px', 
+              alignItems: 'flex-start',
+              marginTop: '10px'
+            }}>
+              <AlertTriangle style={{ color: 'var(--neon-orange)', flexShrink: 0, marginTop: '2px' }} size={20} />
+              <div>
+                <h4 style={{ fontSize: '0.95rem', color: '#fff', fontWeight: 700, marginBottom: '4px' }}>
+                  Recomendações Gerais de Segurança (Clínica Mayo & Harvard Health)
+                </h4>
+                <ul style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: '1.4', paddingLeft: '16px', margin: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <li><strong>Nunca alongue músculos frios:</strong> Faça sempre um aquecimento leve de 5 a 10 minutos (caminhada, trote ou pedalada leve) antes de alongar.</li>
+                  <li><strong>Evite saltos ou rebotes (bouncing):</strong> O alongamento estático deve ser mantido de forma suave. Rebotes geram microlesões no tendão e ativam o reflexo de estiramento protetor (encurtando o músculo).</li>
+                  <li><strong>Tensão, não dor:</strong> Você deve sentir uma tensão leve a moderada na fibra. Se sentir dor aguda ou fisgada, reduza a amplitude imediatamente.</li>
+                  <li><strong>Mantenha respiração regular:</strong> Não prenda a breath (apneia). Inspire profundamente e expire relaxando durante o alongamento.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
       </main>
 
       {/* FOOTER PWA MOBILE NAV */}
-      <footer style={{ background: 'rgba(6, 9, 19, 0.9)', borderTop: '1px solid var(--border-color)', padding: '16px 20px', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-        <div className="footer-container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <span>© 2026 ULTRA COACH. Todos os direitos reservados.</span>
-          <div style={{ display: 'flex', gap: '16px' }}>
+      <footer style={{ background: 'rgba(6, 9, 19, 0.9)', borderTop: '1px solid var(--border-color)', padding: '20px', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+        <div className="footer-container" style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px', alignItems: 'center' }}>
+            <span>© 2026 ULTRA COACH. Todos os direitos reservados.</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Wifi size={12} style={{ color: 'var(--neon-green)' }} /> Strava API Integrada
             </span>
@@ -4499,6 +5375,9 @@ export default function Home() {
               <CheckCircle size={12} style={{ color: 'var(--neon-green)' }} /> PWA Instalável
             </span>
           </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 auto', maxWidth: '800px', lineHeight: '1.5', fontStyle: 'italic', opacity: 0.85 }}>
+            ⚠️ <strong>Aviso importante:</strong> O aplicativo é uma ferramenta de suporte ao treinamento e não substitui o acompanhamento personalizado de um profissional credenciado de educação física.
+          </p>
         </div>
       </footer>
 
@@ -4773,8 +5652,7 @@ export default function Home() {
                 </h4>
                 
                 {(() => {
-                  const hasLog = activityLogs?.find((l: any) => l.workout_id === selectedWorkout.id) ||
-                                 activityLogs?.find((l: any) => !l.workout_id && l.timestamp && l.timestamp.split('T')[0] === selectedWorkout.date);
+                  const hasLog = activityLogs?.find((l: any) => l.workout_id === selectedWorkout.id);
                   if (selectedWorkout.status === 'completed') {
                     if (hasLog) {
                       const analysis = getExecutionAnalysis(selectedWorkout, hasLog);
@@ -4838,6 +5716,44 @@ export default function Home() {
                               </p>
                             </div>
                           )}
+
+                          {hasLog.sync_source === 'Strava' && (
+                            <button
+                              onClick={async () => {
+                                if (confirm('Deseja realmente desvincular esta atividade do Strava deste treino planejado? O treino voltará ao status Pendente.')) {
+                                  await handleManualAssociation(selectedWorkout.id, hasLog.id, true);
+                                }
+                              }}
+                              className="glow-btn"
+                              style={{
+                                gridColumn: '1 / -1',
+                                marginTop: '16px',
+                                padding: '10px 16px',
+                                fontSize: '0.85rem',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                background: 'rgba(255, 59, 48, 0.1)',
+                                border: '1px solid rgba(255, 59, 48, 0.3)',
+                                color: '#ff3b30',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                transition: 'var(--transition-smooth)'
+                              }}
+                              onMouseOver={e => {
+                                e.currentTarget.style.background = '#ff3b30';
+                                e.currentTarget.style.color = '#fff';
+                              }}
+                              onMouseOut={e => {
+                                e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)';
+                                e.currentTarget.style.color = '#ff3b30';
+                              }}
+                            >
+                              <X size={14} /> Desvincular Atividade Strava
+                            </button>
+                          )}
                         </>
                       );
                     } else {
@@ -4898,6 +5814,96 @@ export default function Home() {
                         >
                           <CheckCircle size={14} /> Lançar Treino Manualmente
                         </button>
+
+                        {!isRest && (
+                          <div style={{
+                            marginTop: '16px',
+                            paddingTop: '16px',
+                            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px'
+                          }}>
+                            <h5 style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
+                              Vincular com Atividade Strava
+                            </h5>
+                            
+                            {(() => {
+                              const unlinkedLogs = activityLogs?.filter((l: any) => !l.workout_id) || [];
+                              if (unlinkedLogs.length === 0) {
+                                return (
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                    Nenhuma atividade do Strava pendente nesta semana.
+                                  </span>
+                                );
+                              }
+                              return (
+                                <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+                                  <select
+                                    id="strava-activity-select"
+                                    defaultValue=""
+                                    style={{
+                                      padding: '8px',
+                                      borderRadius: '6px',
+                                      background: 'rgba(3, 7, 18, 0.8)',
+                                      border: '1px solid var(--glass-border)',
+                                      color: '#fff',
+                                      fontSize: '0.85rem',
+                                      width: '100%',
+                                      outline: 'none'
+                                    }}
+                                  >
+                                    <option value="" disabled>Selecione uma atividade...</option>
+                                    {unlinkedLogs.map((l: any) => {
+                                      const formattedDate = (() => {
+                                        try {
+                                          const d = new Date(l.timestamp);
+                                          return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                                        } catch (e) {
+                                          return l.timestamp;
+                                        }
+                                      })();
+                                      return (
+                                        <option key={l.id} value={l.id}>
+                                          {getWorkoutIcon(l.type)} {l.type} - {formattedDate} - {formatDistance(l.distance_real)} km ({secondsToTime(l.duration_real)})
+                                        </option>
+                                      );
+                                    })}
+                                  </select>
+                                  <button
+                                    onClick={async () => {
+                                      const selectEl = document.getElementById('strava-activity-select') as HTMLSelectElement;
+                                      const val = selectEl?.value;
+                                      if (!val) {
+                                        alert('Por favor, selecione uma atividade.');
+                                        return;
+                                      }
+                                      await handleManualAssociation(selectedWorkout.id, parseInt(val, 10));
+                                    }}
+                                    className="glow-btn"
+                                    style={{
+                                      padding: '8px 12px',
+                                      fontSize: '0.8rem',
+                                      borderRadius: '6px',
+                                      background: 'linear-gradient(135deg, #fc4c02 0%, #e23e00 100%)',
+                                      border: 'none',
+                                      color: '#fff',
+                                      fontWeight: 700,
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      gap: '6px',
+                                      boxShadow: '0 0 10px rgba(252, 76, 2, 0.2)'
+                                    }}
+                                  >
+                                    <LinkIcon size={12} /> Vincular Atividade
+                                  </button>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        )}
                       </div>
                     );
                   }
