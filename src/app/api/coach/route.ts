@@ -16,7 +16,8 @@ function getFallbackCoachResponse(
   metrics: any, 
   weeklyWorkouts: any[],
   activityLogs: any[],
-  clientDate?: string
+  clientDate?: string,
+  isKeyMissing: boolean = true
 ): string {
   const msg = message.toLowerCase();
   
@@ -24,7 +25,10 @@ function getFallbackCoachResponse(
   const totalTssTarget = weeklyWorkouts.reduce((acc, w) => acc + w.tss_target, 0);
   const totalTssReal = activityLogs.reduce((acc, al) => acc + (al.tss_real || 0), 0);
   const completedCount = weeklyWorkouts.filter(w => w.status === 'completed').length;
-  let response = `[Fisiologista de Fallback Ativado - Chave Gemini API não detectada]\n\n`;
+  
+  let response = isKeyMissing 
+    ? `[Fisiologista de Fallback Ativado - Chave Gemini API não detectada]\n\n`
+    : '';
 
   const firstName = user.name.split(' ')[0];
 
@@ -113,7 +117,7 @@ export async function POST(req: Request) {
 
     // Se a API do Gemini não estiver configurada, disparar o fallback
     if (!ai) {
-      const fallbackReply = getFallbackCoachResponse(message, user, goal, metrics, workouts, activityLogs, clientDate);
+      const fallbackReply = getFallbackCoachResponse(message, user, goal, metrics, workouts, activityLogs, clientDate, true);
       return NextResponse.json({ reply: fallbackReply, dbUpdated: false });
     }
 
@@ -177,7 +181,7 @@ Diretrizes de Comportamento (Persona do Coach):
 
     try {
       const model = ai.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         systemInstruction: systemInstruction,
         tools: [
           {
@@ -336,7 +340,8 @@ Diretrizes de Comportamento (Persona do Coach):
         metrics, 
         workouts, 
         activityLogs, 
-        clientDate
+        clientDate,
+        false
       );
       
       replyText = `Opa, campeão! Tive um pico temporário de acessos aos meus servidores de IA agora, mas não esquente! Usando o meu motor local de fisiologia, aqui vai a minha orientação:\n\n${fallbackReply}`;
