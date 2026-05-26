@@ -102,6 +102,62 @@ const UltraLogoIcon = ({ color }: { color: string }) => (
   </svg>
 );
 
+// Componente de Confete para Comemorações (Troféus Coloridos)
+const ConfettiShower = () => {
+  const [pieces, setPieces] = useState<Array<{ id: number; left: number; delay: number; color: string; duration: number; size: number }>>([]);
+  
+  useEffect(() => {
+    const colors = ['#fc4c02', '#00f0ff', '#39ff14', '#a855f7', '#ff6b35', '#ffeb3b', '#e91e63'];
+    const newPieces = Array.from({ length: 50 }).map((_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      delay: Math.random() * 5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      duration: 4 + Math.random() * 4,
+      size: 18 + Math.random() * 12,
+    }));
+    setPieces(newPieces);
+  }, []);
+
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 9999, overflow: 'hidden' }}>
+      {pieces.map(p => (
+        <div 
+          key={p.id} 
+          style={{
+            position: 'absolute',
+            top: '-40px',
+            left: `${p.left}%`,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            opacity: 0.85,
+            filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.35))',
+            transform: 'rotate(0deg)',
+            animation: `fall ${p.duration}s linear ${p.delay}s infinite`,
+          }}
+        >
+          <UltraLogoIcon color={p.color} />
+        </div>
+      ))}
+      <style jsx global>{`
+        @keyframes fall {
+          0% {
+            top: -40px;
+            transform: translateX(0) rotate(0deg);
+          }
+          50% {
+            transform: translateX(20px) rotate(180deg);
+          }
+          100% {
+            top: 105vh;
+            transform: translateX(-20px) rotate(360deg);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
 export default function Home() {
   // Estados Globais da SPA - Inicialização segura para evitar Hydration Mismatch no Next.js
   const [userRole, setUserRole] = useState<string>('athlete');
@@ -1662,61 +1718,6 @@ export default function Home() {
 
 
 
-  // Componente de Confete para Comemorações (Troféus Coloridos)
-  const ConfettiShower = () => {
-    const [pieces, setPieces] = useState<Array<{ id: number; left: number; delay: number; color: string; duration: number; size: number }>>([]);
-    
-    useEffect(() => {
-      const colors = ['#fc4c02', '#00f0ff', '#39ff14', '#a855f7', '#ff6b35', '#ffeb3b', '#e91e63'];
-      const newPieces = Array.from({ length: 50 }).map((_, i) => ({
-        id: i,
-        left: Math.random() * 100,
-        delay: Math.random() * 5,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        duration: 4 + Math.random() * 4,
-        size: 18 + Math.random() * 12,
-      }));
-      setPieces(newPieces);
-    }, []);
-
-    return (
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 9999, overflow: 'hidden' }}>
-        {pieces.map(p => (
-          <div 
-            key={p.id} 
-            style={{
-              position: 'absolute',
-              top: '-40px',
-              left: `${p.left}%`,
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              opacity: 0.85,
-              filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.35))',
-              transform: 'rotate(0deg)',
-              animation: `fall ${p.duration}s linear ${p.delay}s infinite`,
-            }}
-          >
-            <UltraLogoIcon color={p.color} />
-          </div>
-        ))}
-        <style jsx global>{`
-          @keyframes fall {
-            0% {
-              top: -40px;
-              transform: translateX(0) rotate(0deg);
-            }
-            50% {
-              transform: translateX(20px) rotate(180deg);
-            }
-            100% {
-              top: 105vh;
-              transform: translateX(-20px) rotate(360deg);
-            }
-          }
-        `}</style>
-      </div>
-    );
-  };
 
   const showLoadingScreen = isCurrentlyLoading || (activeUser && userRole === 'athlete' && !minLoadingTimePassed);
 
@@ -3403,20 +3404,20 @@ export default function Home() {
               <div 
                 className="premium-card animate-slide-up" 
                 style={{ 
-                  background: plan?.library_id 
-                    ? 'linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(57, 255, 20, 0.03) 100%)' 
-                    : user?.coach_id
-                      ? 'linear-gradient(135deg, rgba(57, 255, 20, 0.06) 0%, rgba(13, 21, 39, 0.8) 100%)'
+                  background: user?.coach_id
+                    ? 'linear-gradient(135deg, rgba(57, 255, 20, 0.06) 0%, rgba(13, 21, 39, 0.8) 100%)'
+                    : plan?.library_id 
+                      ? 'linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(57, 255, 20, 0.03) 100%)' 
                       : 'linear-gradient(135deg, rgba(255, 107, 53, 0.08) 0%, rgba(13, 21, 39, 0.8) 100%)',
-                  border: plan?.library_id 
-                    ? '1px solid rgba(0, 240, 255, 0.25)' 
-                    : user?.coach_id
-                      ? '1px solid rgba(57, 255, 20, 0.2)'
+                  border: user?.coach_id
+                    ? '1px solid rgba(57, 255, 20, 0.2)'
+                    : plan?.library_id 
+                      ? '1px solid rgba(0, 240, 255, 0.25)' 
                       : '1px solid rgba(255, 107, 53, 0.25)',
-                  boxShadow: plan?.library_id 
-                    ? '0 8px 32px rgba(0, 240, 255, 0.08)' 
-                    : user?.coach_id
-                      ? '0 8px 32px rgba(57, 255, 20, 0.05)'
+                  boxShadow: user?.coach_id
+                    ? '0 8px 32px rgba(57, 255, 20, 0.05)'
+                    : plan?.library_id 
+                      ? '0 8px 32px rgba(0, 240, 255, 0.08)' 
                       : '0 8px 32px rgba(255, 107, 53, 0.08)',
                   padding: '24px',
                   borderRadius: '16px',
@@ -3430,41 +3431,39 @@ export default function Home() {
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flex: '1', minWidth: '280px' }}>
                   <div style={{ 
                     padding: '12px', 
-                    background: plan?.library_id 
-                      ? 'rgba(0, 240, 255, 0.1)' 
-                      : user?.coach_id
-                        ? 'rgba(57, 255, 20, 0.08)'
+                    background: user?.coach_id
+                      ? 'rgba(57, 255, 20, 0.08)'
+                      : plan?.library_id 
+                        ? 'rgba(0, 240, 255, 0.1)' 
                         : 'rgba(255, 107, 53, 0.1)', 
                     borderRadius: '12px',
-                    border: plan?.library_id 
-                      ? '1px solid rgba(0, 240, 255, 0.2)' 
-                      : user?.coach_id
-                        ? '1px solid rgba(57, 255, 20, 0.15)'
+                    border: user?.coach_id
+                      ? '1px solid rgba(57, 255, 20, 0.15)'
+                      : plan?.library_id 
+                        ? '1px solid rgba(0, 240, 255, 0.2)' 
                         : '1px solid rgba(255, 107, 53, 0.2)'
                   }}>
                     <Target style={{ 
-                      color: plan?.library_id 
-                        ? 'var(--neon-cyan)' 
-                        : user?.coach_id
-                          ? 'var(--neon-green)'
+                      color: user?.coach_id
+                        ? 'var(--neon-green)'
+                        : plan?.library_id 
+                          ? 'var(--neon-cyan)' 
                           : 'var(--neon-orange)' 
                     }} size={28} />
                   </div>
                   <div>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {plan?.library_id 
-                        ? 'Planilha Científica Ativa' 
-                        : user?.coach_id 
-                          ? 'Planilha da Assessoria Ativa' 
+                      {user?.coach_id 
+                        ? 'Planilha da Assessoria Ativa' 
+                        : plan?.library_id 
+                          ? 'Planilha Científica Ativa' 
                           : 'Atenção: Planilha Não Vinculada'}
                       <span style={{ 
                         fontSize: '0.75rem', 
-                        background: plan?.library_id 
+                        background: user?.coach_id || plan?.library_id 
                           ? 'rgba(57, 255, 20, 0.15)' 
-                          : user?.coach_id
-                            ? 'rgba(57, 255, 20, 0.15)'
-                            : 'rgba(255, 107, 53, 0.15)', 
-                        color: plan?.library_id || user?.coach_id ? 'var(--neon-green)' : 'var(--neon-orange)', 
+                          : 'rgba(255, 107, 53, 0.15)', 
+                        color: user?.coach_id || plan?.library_id ? 'var(--neon-green)' : 'var(--neon-orange)', 
                         padding: '2px 8px', 
                         borderRadius: '4px',
                         fontWeight: 700
