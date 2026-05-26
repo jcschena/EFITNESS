@@ -3548,7 +3548,7 @@ export default function Home() {
             {!viewingLibraryPlan ? (
               <div>
                 {/* Cabeçalho da Biblioteca */}
-                <div className="premium-card" style={{ background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, rgba(57, 255, 20, 0.02) 100%)', padding: '28px', border: '1px solid rgba(0, 240, 255, 0.15)', borderRadius: '16px', marginBottom: '24px' }}>
+                <div className="premium-card" style={{ background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, rgba(57, 255, 20, 0.02) 100%)', padding: '28px', border: '1px solid rgba(0, 240, 255, 0.15)', borderRadius: '16px', marginBottom: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{ display: 'flex', padding: '12px', background: 'rgba(0, 240, 255, 0.1)', borderRadius: '12px', border: '1px solid rgba(0, 240, 255, 0.2)' }}>
                       <BookOpen style={{ color: 'var(--neon-cyan)' }} size={28} />
@@ -3558,6 +3558,23 @@ export default function Home() {
                       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '4px 0 0 0' }}>Importe planilhas via link da internet ou monte seu próprio ciclo de treinos estruturado.</p>
                     </div>
                   </div>
+                </div>
+
+                {/* Aviso sobre Origem dos Exemplos */}
+                <div style={{ 
+                  background: 'rgba(234, 179, 8, 0.05)', 
+                  border: '1px solid rgba(234, 179, 8, 0.15)', 
+                  borderRadius: '12px', 
+                  padding: '14px 18px', 
+                  marginBottom: '24px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '12px' 
+                }}>
+                  <Info size={18} style={{ color: 'var(--neon-orange)', flexShrink: 0 }} />
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                    <strong>Exemplos de Treino:</strong> As planilhas pré-cadastradas abaixo são modelos de referência retirados de links públicos da internet (como programas de Hal Higdon, Jack Daniels, Joe Friel, etc.). Elas estão disponibilizadas aqui exclusivamente como exemplos didáticos para inspirar sua rotina de treinamento.
+                  </p>
                 </div>
 
                 {/* Painel de Importação e Criação */}

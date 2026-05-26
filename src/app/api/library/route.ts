@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import crypto from 'crypto';
+import { TRAINING_LIBRARY } from '@/lib/training-library';
 
 function parseCsvPlan(csvText: string): any {
   const lines = csvText.split(/\r?\n/);
@@ -178,7 +179,32 @@ export async function GET(req: Request) {
       workouts: JSON.parse(p.workouts_json)
     }));
 
-    return NextResponse.json({ success: true, plans: parsedPlans });
+    // Carregar e estruturar planilhas estáticas de exemplos
+    const staticPlans = Object.keys(TRAINING_LIBRARY).map(key => {
+      const plan = TRAINING_LIBRARY[key];
+      return {
+        id: plan.id,
+        user_id: null,
+        name: plan.name,
+        author: plan.author,
+        source: plan.source,
+        sport: plan.sport,
+        weeks: plan.weeks,
+        level: plan.level,
+        description: plan.description,
+        workouts: plan.generateWeeks(100) // 100% esforço por padrão para visualização/criação
+      };
+    });
+
+    // Mesclar priorizando itens do banco de dados em caso de colisão de ID
+    const staticPlanIds = new Set(staticPlans.map(p => p.id));
+    const filteredDbPlans = parsedPlans.filter(p => !staticPlanIds.has(p.id));
+    const mergedPlans = [...staticPlans, ...filteredDbPlans];
+
+    // Ordenar pelo nome
+    mergedPlans.sort((a, b) => a.name.localeCompare(b.name));
+
+    return NextResponse.json({ success: true, plans: mergedPlans });
   } catch (error: any) {
     console.error('Erro ao buscar planilhas da biblioteca:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
