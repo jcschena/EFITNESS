@@ -68,7 +68,7 @@ export async function GET(req: Request) {
     const todayStr = new Date().toISOString().split('T')[0];
     await db.run(`
       INSERT INTO coach_notifs (user_id, date, title, content)
-      VALUES (?, ?, 'Conexão com o Strava Estabelecida!', 'Show de bola! Conectamos sua conta com sucesso. Agora, a cada corrida, pedalada ou natação que você salvar no Strava, eu recebo os dados aqui e calculo sua carga TSS instantaneamente. Vamos pra cima!')
+      VALUES (?, ?, 'Conexão com o Strava Estabelecida!', 'Show de bola! Conectamos sua conta com sucesso. Agora, a cada corrida, pedalada ou natação que você salvar no Strava, o Assistente Fisiológico recebe os dados aqui e calcula sua carga TSS instantaneamente. Vamos pra cima!')
     `, userId, todayStr);
 
     // Redirecionar de volta para a página principal (onde a SPA recarregará o estado)

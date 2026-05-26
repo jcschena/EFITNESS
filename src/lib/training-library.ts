@@ -702,3 +702,70 @@ export const TRAINING_LIBRARY: Record<string, LibraryPlan> = {
     }
   }
 };
+
+// Encontra a melhor planilha na biblioteca baseado no esporte, nível e distância da prova
+export function getBestMatchingPlan(sport: string, level: string, distance?: number): LibraryPlan {
+  const cleanSport = (sport || '').trim().toLowerCase();
+  const cleanLevel = (level || 'intermediario').trim().toLowerCase();
+  const dist = distance || 0;
+
+  if (cleanSport.includes('corrida') || cleanSport.includes('run')) {
+    if (cleanLevel === 'sedentario' || cleanLevel === 'iniciante') {
+      return TRAINING_LIBRARY['run_couch_to_5k'];
+    }
+    if (dist > 21) {
+      return TRAINING_LIBRARY['run_jack_daniels_marathon'];
+    }
+    return TRAINING_LIBRARY['run_hal_higdon_10k'];
+  }
+
+  if (cleanSport.includes('ciclismo') || cleanSport.includes('bike')) {
+    if (cleanLevel === 'sedentario' || cleanLevel === 'iniciante') {
+      return TRAINING_LIBRARY['bike_beginner_base'];
+    }
+    if (cleanLevel === 'elite' || cleanLevel === 'avancado') {
+      return TRAINING_LIBRARY['bike_hunter_allen_base'];
+    }
+    return TRAINING_LIBRARY['bike_joe_friel_gran_fondo'];
+  }
+
+  if (cleanSport.includes('natac') || cleanSport.includes('nataç') || cleanSport.includes('swim')) {
+    if (cleanLevel === 'sedentario' || cleanLevel === 'iniciante') {
+      return TRAINING_LIBRARY['swim_beginner_1000m'];
+    }
+    if (cleanLevel === 'elite' || cleanLevel === 'avancado') {
+      return TRAINING_LIBRARY['swim_dan_daly_openwater'];
+    }
+    return TRAINING_LIBRARY['swim_terry_laughlin_1500m'];
+  }
+
+  if (cleanSport.includes('triathlon') || cleanSport.includes('triatlon')) {
+    if (cleanLevel === 'sedentario' || cleanLevel === 'iniciante') {
+      return TRAINING_LIBRARY['tri_beginner_sprint'];
+    }
+    if (dist > 150 || dist === 226) {
+      return TRAINING_LIBRARY['tri_ironman_full_8020'];
+    }
+    if (dist > 60 || dist === 113) {
+      return TRAINING_LIBRARY['tri_matt_fitzgerald_703'];
+    }
+    return TRAINING_LIBRARY['tri_joe_friel_olympic'];
+  }
+
+  if (cleanSport.includes('ultramaratona') || cleanSport.includes('ultra')) {
+    if (dist <= 55) {
+      return TRAINING_LIBRARY['ultra_beginner_50k'];
+    }
+    if (dist <= 90) {
+      return TRAINING_LIBRARY['ultra_krissy_moehl_50m'];
+    }
+    return TRAINING_LIBRARY['ultra_hal_koerner_100k'];
+  }
+
+  // Fallback para qualquer outro esporte
+  if (cleanLevel === 'sedentario' || cleanLevel === 'iniciante') {
+    return TRAINING_LIBRARY['run_couch_to_5k'];
+  }
+  return TRAINING_LIBRARY['run_hal_higdon_100k'] || TRAINING_LIBRARY['run_hal_higdon_10k'];
+}
+

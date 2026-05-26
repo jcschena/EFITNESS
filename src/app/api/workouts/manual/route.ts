@@ -22,6 +22,7 @@ export async function POST(req: Request) {
       avgPower,
       cadency,
       elevationGain,
+      syncSource,
     } = payload;
 
     const uId = parseInt(userId || '1', 10);
@@ -34,6 +35,7 @@ export async function POST(req: Request) {
     const elev = elevationGain ? parseFloat(elevationGain) : null;
     const pace = paceReal || '0:00/km';
     let tssReal = payload.tssReal ? parseInt(payload.tssReal, 10) : 0;
+    const source = syncSource || 'Manual';
 
     // Buscar perfil do usuário para cálculo de TSS
     const user = await db.get('SELECT * FROM users WHERE id = ?', uId);
@@ -96,9 +98,10 @@ export async function POST(req: Request) {
       `INSERT INTO activity_logs (
         workout_id, user_id, sync_source, timestamp, type, distance_real, duration_real, 
         pace_real, avg_hr, max_hr, avg_power, cadency, elevation_gain, tss_real
-      ) VALUES (?, ?, 'Manual', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       finalWorkoutId,
       uId,
+      source,
       timestamp,
       type,
       distReal,

@@ -1,0 +1,1276 @@
+{
+  "id": "ultra_krissy_moehl_50m",
+  "name": "Planilha de Ultramaratona: 50 Milhas (80K)",
+  "author": "Krissy Moehl",
+  "source": "Livro \"Running Your First Ultra\" (krissymoehl.com)",
+  "sport": "Ultramaratona",
+  "weeks": 16,
+  "level": "avancado",
+  "description": "Volume acumulado severo de corrida em trilha com treinos longos em dias consecutivos (Back-to-Back) aos sábados e domingos para ensinar o corpo a correr sob severa fadiga muscular.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 6.1,
+        "dur": 2196,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 31
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 7.7,
+        "dur": 2657,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 57
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 4.6,
+        "dur": 1794,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 21,
+        "dur": 7560,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 115
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 12.8,
+        "dur": 4992,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 84
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 6.2,
+        "dur": 2232,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 31
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 7.8,
+        "dur": 2691,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 59
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 4.7,
+        "dur": 1833,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 22,
+        "dur": 7920,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 120
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 13.6,
+        "dur": 5304,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 88
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 6.4,
+        "dur": 2304,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 32
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 8,
+        "dur": 2760,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 60
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 4.8,
+        "dur": 1872,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 23,
+        "dur": 8280,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 125
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 14.4,
+        "dur": 5616,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 92
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 6.5,
+        "dur": 2340,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 32
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 8.1,
+        "dur": 2795,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 61
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 4.9,
+        "dur": 1911,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 24,
+        "dur": 8640,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 130
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 15.2,
+        "dur": 5928,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 96
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 6.6,
+        "dur": 2376,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 33
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 8.3,
+        "dur": 2864,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 62
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 4.9,
+        "dur": 1911,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 21
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 25,
+        "dur": 9000,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 135
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 16,
+        "dur": 6240,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 100
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 6.7,
+        "dur": 2412,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 34
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 8.4,
+        "dur": 2898,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 63
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 5,
+        "dur": 1950,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 21
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 26,
+        "dur": 9360,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 140
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 16.8,
+        "dur": 6552,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 104
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 6.8,
+        "dur": 2448,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 34
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 8.6,
+        "dur": 2967,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 64
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 5.1,
+        "dur": 1989,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 21
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 27,
+        "dur": 9720,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 145
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 17.6,
+        "dur": 6864,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 108
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 7,
+        "dur": 2520,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 35
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 8.7,
+        "dur": 3001,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 65
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 5.2,
+        "dur": 2028,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 22
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 28,
+        "dur": 10080,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 150
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 18.4,
+        "dur": 7176,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 112
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 7.1,
+        "dur": 2556,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 35
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 8.8,
+        "dur": 3036,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 66
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 5.3,
+        "dur": 2067,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 22
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 29,
+        "dur": 10440,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 155
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 19.2,
+        "dur": 7488,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 116
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 7.2,
+        "dur": 2592,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 36
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 9,
+        "dur": 3105,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 68
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 5.4,
+        "dur": 2106,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 30,
+        "dur": 10800,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 160
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 20,
+        "dur": 7800,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 120
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 7.3,
+        "dur": 2628,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 37
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 9.2,
+        "dur": 3174,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 69
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 5.5,
+        "dur": 2145,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 31,
+        "dur": 11160,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 165
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 20.8,
+        "dur": 8112,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 124
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 7.4,
+        "dur": 2664,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 37
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 9.3,
+        "dur": 3209,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 70
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 5.6,
+        "dur": 2184,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 32,
+        "dur": 11520,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 170
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 21.6,
+        "dur": 8424,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 128
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 5.2,
+        "dur": 1872,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 6.5,
+        "dur": 2243,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 49
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 3.9,
+        "dur": 1521,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 16
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 33,
+        "dur": 11880,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 175
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 22.4,
+        "dur": 8736,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 132
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 5.2,
+        "dur": 1872,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 6.5,
+        "dur": 2243,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 49
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 3.9,
+        "dur": 1521,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 16
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 34,
+        "dur": 12240,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 180
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 23.2,
+        "dur": 9048,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 136
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 5.2,
+        "dur": 1872,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 6.5,
+        "dur": 2243,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 49
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 3.9,
+        "dur": 1521,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 16
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo 1: Bloco Consecutivo de Sábado",
+        "desc": "Primeiro dia do treino longo consecutivo, focado em rodagem de endurance.",
+        "dist": 35,
+        "dur": 12600,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 185
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo 2: Bloco Consecutivo de Domingo",
+        "desc": "Segundo dia do longo consecutivo. Correndo com pernas fadigadas para simular o final da prova.",
+        "dist": 24,
+        "dur": 9360,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 140
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso absoluto após o bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 / Fortalecimento",
+        "desc": "Corrida confortável em trilha leve ou estrada de terra.",
+        "dist": 3.2,
+        "dur": 1152,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 16
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Subidas Fortes Z4 (Hill Repeats)",
+        "desc": "Principal: 6x 400m de subida íngreme com descida confortável de trote.",
+        "dist": 4,
+        "dur": 1380,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 30
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Mobilidade Específica",
+        "desc": "Foco excêntrico de quadríceps, panturrilhas e core para aguentar descidas.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida de Soltura Z1",
+        "desc": "Corrida muito leve para restabelecimento muscular.",
+        "dist": 2.4,
+        "dur": 936,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Trote Véspera",
+        "desc": "Curto.",
+        "dist": 5,
+        "dur": 1800,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 190
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "🎯 PROVA ALVO: 50 MILHAS (80K) 🏁",
+        "desc": "O grande desafio em trilha! Corra com paciência, ande subidas íngremes e hidrate-se!",
+        "dist": 80,
+        "dur": 32400,
+        "pace": "6:45/km",
+        "power": 0,
+        "tss": 450
+      }
+    ]
+  ]
+}

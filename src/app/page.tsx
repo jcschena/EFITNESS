@@ -36,12 +36,17 @@ import {
 import dynamic from 'next/dynamic';
 import { SPORTS_CONFIG, getSportConfig } from '@/lib/sports';
 import { NUTRITION_DATA, STRETCHING_DATA } from '@/lib/nutrition-stretching';
-import { TRAINING_LIBRARY, getWeeksAfterCut } from '@/lib/training-library';
-import { BookOpen, Award, Settings, Eye, HelpCircle } from 'lucide-react';
+import { TRAINING_LIBRARY, getWeeksAfterCut, getBestMatchingPlan, calibrateWorkout } from '@/lib/training-library';
+import { BookOpen, Award, Settings, Eye, HelpCircle, Download } from 'lucide-react';
 
 
 const BarChart = dynamic(
   () => import('react-chartjs-2').then((mod) => mod.Bar),
+  { ssr: false }
+);
+
+const GpsTracker = dynamic(
+  () => import('@/components/GpsTracker'),
   { ssr: false }
 );
 import {
@@ -152,6 +157,35 @@ export default function Home() {
   const [selectedPreviewWeek, setSelectedPreviewWeek] = useState<number>(1);
 
   const [selectedWorkout, setSelectedWorkout] = useState<any>(null);
+
+  // Estados para importação e criação de planilhas
+  const [libraryPlans, setLibraryPlans] = useState<any[]>([]);
+  const [libraryLoading, setLibraryLoading] = useState<boolean>(false);
+  const [importUrl, setImportUrl] = useState<string>('');
+  const [isImporting, setIsImporting] = useState<boolean>(false);
+  const [showCreatePlanModal, setShowCreatePlanModal] = useState<boolean>(false);
+  const [selectedBuilderWeek, setSelectedBuilderWeek] = useState<number>(1);
+  const [customPlanForm, setCustomPlanForm] = useState<any>({
+    name: '',
+    author: '',
+    sport: 'Corrida',
+    level: 'intermediario',
+    description: '',
+    weeks: 1,
+    workouts: [
+      Array.from({ length: 7 }, (_, i) => ({
+        day: i + 1,
+        type: 'Descanso',
+        title: 'Descanso fisiológico',
+        desc: 'Dia livre para recuperação ativa e alongamento.',
+        dist: 0,
+        dur: 0,
+        pace: 'N/A',
+        power: 0,
+        tss: 0
+      }))
+    ]
+  });
   
   // Estados para as abas de Nutrição e Alongamento
   const [nutritionMonth, setNutritionMonth] = useState<number>(() => new Date().getMonth());
@@ -179,12 +213,6 @@ export default function Home() {
     weeklyHours: '',
     stravaConnected: false
   });
-
-  // Estados do Chat
-  const [chatInput, setChatInput] = useState<string>('');
-  const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'coach'; text: string }>>([]);
-  const [chatLoading, setChatLoading] = useState<boolean>(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Estados de Lançamento Manual de Treino
   const [showManualLogModal, setShowManualLogModal] = useState<boolean>(false);
@@ -688,6 +716,168 @@ export default function Home() {
     }
   };
 
+  const fetchLibraryPlans = async () => {
+    try {
+      setLibraryLoading(true);
+      const res = await fetch('/api/library');
+      if (res.ok) {
+        const data = await res.json();
+        setLibraryPlans(data.plans || []);
+      }
+    } catch (err) {
+      console.error('Erro ao buscar biblioteca:', err);
+    } finally {
+      setLibraryLoading(false);
+    }
+  };
+
+  const handleImportPlan = async () => {
+    if (!importUrl) {
+      alert('Por favor, insira o link da planilha.');
+      return;
+    }
+    try {
+      setIsImporting(true);
+      const res = await fetch('/api/library', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'import',
+          url: importUrl,
+          userId: activeUser
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert('Planilha buscada e carregada com sucesso na sua biblioteca!');
+        setImportUrl('');
+        await fetchLibraryPlans();
+      } else {
+        alert('Erro ao importar: ' + (data.error || 'Erro desconhecido'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Falha na conexão ao importar a planilha.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleBuilderWeeksChange = (newWeeks: number) => {
+    const currentWorkouts = [...customPlanForm.workouts];
+    if (newWeeks > currentWorkouts.length) {
+      for (let i = currentWorkouts.length; i < newWeeks; i++) {
+        currentWorkouts.push(
+          Array.from({ length: 7 }, (_, dayIdx) => ({
+            day: dayIdx + 1,
+            type: 'Descanso',
+            title: 'Descanso fisiológico',
+            desc: 'Dia livre para recuperação ativa e alongamento.',
+            dist: 0,
+            dur: 0,
+            pace: 'N/A',
+            power: 0,
+            tss: 0
+          }))
+        );
+      }
+    } else if (newWeeks < currentWorkouts.length) {
+      currentWorkouts.splice(newWeeks);
+    }
+    setCustomPlanForm({
+      ...customPlanForm,
+      weeks: newWeeks,
+      workouts: currentWorkouts
+    });
+    setSelectedBuilderWeek(Math.min(selectedBuilderWeek, newWeeks));
+  };
+
+  const handleCopyBuilderWeek = (fromWeek: number, toWeek: number) => {
+    const workoutsCopy = JSON.parse(JSON.stringify(customPlanForm.workouts));
+    workoutsCopy[toWeek - 1] = workoutsCopy[fromWeek - 1].map((w: any) => ({
+      ...w,
+      day: w.day
+    }));
+    setCustomPlanForm({
+      ...customPlanForm,
+      workouts: workoutsCopy
+    });
+    alert(`Semana ${fromWeek} copiada com sucesso para a Semana ${toWeek}!`);
+  };
+
+  const handleSaveCustomPlan = async () => {
+    if (!customPlanForm.name) {
+      alert('Por favor, informe o nome da planilha.');
+      return;
+    }
+    if (!customPlanForm.sport) {
+      alert('Por favor, informe o esporte.');
+      return;
+    }
+    try {
+      setApplyPlanLoading(true);
+      const res = await fetch('/api/library', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create',
+          userId: activeUser,
+          plan: customPlanForm
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert('Planilha customizada salva com sucesso na sua biblioteca!');
+        setShowCreatePlanModal(false);
+        setCustomPlanForm({
+          name: '',
+          author: '',
+          sport: 'Corrida',
+          level: 'intermediario',
+          description: '',
+          weeks: 1,
+          workouts: [
+            Array.from({ length: 7 }, (_, i) => ({
+              day: i + 1,
+              type: 'Descanso',
+              title: 'Descanso fisiológico',
+              desc: 'Dia livre para recuperação ativa e alongamento.',
+              dist: 0,
+              dur: 0,
+              pace: 'N/A',
+              power: 0,
+              tss: 0
+            }))
+          ]
+        });
+        setSelectedBuilderWeek(1);
+        await fetchLibraryPlans();
+      } else {
+        alert('Erro ao salvar planilha: ' + (data.error || 'Erro desconhecido'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Falha na conexão ao salvar a planilha.');
+    } finally {
+      setApplyPlanLoading(false);
+    }
+  };
+
+  const handleSelectLibraryPlan = (libPlan: any, effortPct = 100, cutChoice: any = null, currentWeek = 1) => {
+    if (libPlan.workouts && typeof libPlan.generateWeeks !== 'function') {
+      const workoutsData = libPlan.workouts;
+      libPlan.generateWeeks = (effortPctVal: number) => {
+        return workoutsData.map((week: any[]) =>
+          week.map(w => calibrateWorkout(w, effortPctVal))
+        );
+      };
+    }
+    setViewingLibraryPlan(libPlan);
+    setEffortPctCalibration(effortPct);
+    setCutChoiceSelection(cutChoice || (goal?.date_target ? 'ambos' : 'none'));
+    setSelectedPreviewWeek(currentWeek);
+  };
+
   // Carregar dados do usuário ativo
   const fetchDashboard = async (userId: number) => {
     try {
@@ -697,24 +887,8 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
         setDashboardData(data);
-        // Inicializar histórico de chat se vazio
-        if (chatMessages.length === 0 && data.user) {
-          const firstName = data.user.name.split(' ')[0];
-          let welcomeText = `Olá, ${firstName}! Sou o seu treinador virtual ULTRA COACH. Analisei seus dados de onboarding e estruturei sua planilha de treinos semanal. Sempre que você treinar e subir sua atividade no Strava, eu recebo os dados aqui e recalculo sua carga TSS instantaneamente. Como posso te orientar hoje?`;
-          
-          if (data.user.id === 1) {
-            welcomeText = `Saudações, Tiago! Analisei suas métricas recentes de periodização. Sua planilha de treinamento rumo ao seu objetivo de Ironman está montada. Vi que seu TSB está equilibrado, mas fique atento ao treino longo de sábado. Como posso te orientar hoje?`;
-          } else if (data.user.id === 2) {
-            welcomeText = `Olá, Ana! Estou muito empolgado em te guiar nessa jornada de saída do sedentarismo. Montei uma semana de transição muito segura, alternando caminhada e trote leve para preservar suas articulações. Qualquer dúvida sobre ritmos ou desconforto, é só perguntar!`;
-          }
-          
-          setChatMessages([
-            { 
-              sender: 'coach', 
-              text: welcomeText
-            }
-          ]);
-        }
+        await fetchLibraryPlans();
+
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Erro ao buscar dados do dashboard: ${errData.error || 'Erro interno no servidor'}`);
@@ -923,6 +1097,11 @@ export default function Home() {
     weekly_target_hours: '',
     username: '',
     password: '',
+    gender: '',
+    height: '',
+    resting_hr: '',
+    max_hr: '',
+    observations: '',
     goal_type: 'Corrida',
     goal_distance: '',
     goal_date_target: '',
@@ -1073,9 +1252,7 @@ export default function Home() {
     prevWeeklyPlanCompleted.current = !!completedAll;
   }, [dashboardData?.workouts]);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages, chatLoading]);
+
 
   // Atualizar relógio em tempo real no cliente
   useEffect(() => {
@@ -1099,6 +1276,11 @@ export default function Home() {
         weekly_target_hours: String(dashboardData.user.weekly_target_hours || ''),
         username: dashboardData.user.username || '',
         password: dashboardData.user.password || '',
+        gender: dashboardData.user.gender || '',
+        height: String(dashboardData.user.height || ''),
+        resting_hr: String(dashboardData.user.resting_hr || ''),
+        max_hr: String(dashboardData.user.max_hr || ''),
+        observations: dashboardData.user.observations || '',
         goal_type: dashboardData.goal?.type || 'Corrida',
         goal_distance: String(dashboardData.goal?.distance || ''),
         goal_date_target: dashboardData.goal?.date_target || '',
@@ -1361,7 +1543,7 @@ export default function Home() {
       });
       if (res.ok) {
         const data = await res.json();
-        setChatMessages([]); // Limpar chat antigo
+
         if (onboardForm.stravaConnected) {
           window.location.href = `/api/strava/auth?userId=${data.userId}`;
         } else {
@@ -1401,59 +1583,7 @@ export default function Home() {
     });
   };
 
-  // Enviar Mensagem no Chat
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatInput.trim() || chatLoading) return;
 
-    const userMsg = chatInput;
-    setChatMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
-    setChatInput('');
-    setChatLoading(true);
-
-    try {
-      const clientDate = new Date().toLocaleDateString('en-CA');
-      const res = await fetch('/api/coach', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: activeUser,
-          message: userMsg,
-          chatHistory: chatMessages.slice(-6), // enviar últimas mensagens para manter contexto
-          clientDate
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setChatMessages(prev => [...prev, { sender: 'coach', text: data.reply }]);
-        
-        // Se o coach alterou o banco de dados de treinos, atualiza os dados na tela
-        if (data.dbUpdated && activeUser) {
-          await fetchDashboard(activeUser);
-        }
-      } else {
-        const errData = await res.json().catch(() => ({}));
-        setChatMessages(prev => [...prev, { 
-          sender: 'coach', 
-          text: `Desculpe, campeão! Tive um probleminha técnico para me conectar aos meus servidores de IA agora (Erro: ${errData.error || 'Erro ' + res.status}). Poderia tentar me enviar a mensagem novamente em alguns segundos?` 
-        }]);
-      }
-    } catch (err: any) {
-      console.error('Erro ao conversar com o coach:', err);
-      setChatMessages(prev => [...prev, { 
-        sender: 'coach', 
-        text: `Opa, meu velho! Tive uma falha de conexão de rede ao tentar me comunicar com a IA (${err.message || 'Erro de rede'}). Dá uma olhada na sua internet e tenta de novo!` 
-      }]);
-    } finally {
-      setChatLoading(false);
-    }
-  };
-
-
-  // Sugestões rápidas de chat
-  const handleQuickQuestion = (question: string) => {
-    setChatInput(question);
-  };
 
   // Componente de Confete para Comemorações (Troféus Coloridos)
   const ConfettiShower = () => {
@@ -1892,6 +2022,7 @@ export default function Home() {
 
   // SE JÁ EXISTE UM USUÁRIO ATIVO CARREGADO E COM DADOS DO DASHBOARD
   const { user, goal, plan, workouts, activityLogs, notifications, metrics, lastSyncedActivity, celebration, calendarUrl } = dashboardData || {};
+  const recommendedPlan = goal ? getBestMatchingPlan(goal.type, user?.level || 'intermediario', goal.distance) : null;
 
   const todayDateStr = currentTime ? currentTime.toLocaleDateString('en-CA') : new Date().toLocaleDateString('en-CA');
   const todayWorkout = workouts?.find((w: any) => w.date === todayDateStr);
@@ -2148,7 +2279,7 @@ export default function Home() {
                 onClick={() => {
                   setActiveUser(null);
                   setDashboardData(null);
-                  setChatMessages([]);
+
                   setUsernameInput('');
                   setPasswordInput('');
                 }}
@@ -2585,14 +2716,14 @@ export default function Home() {
           </section>
         )}
 
-        {/* NOTIFICAÇÃO DE ADAPTAÇÃO DA IA */}
+        {/* NOTIFICAÇÃO DE ADAPTAÇÃO FISIOLÓGICA */}
         {notifications && notifications.length > 0 && (
           <div className="animate-fade-in" style={{ background: 'rgba(255, 107, 53, 0.06)', border: '1px solid rgba(255, 107, 53, 0.2)', borderRadius: '12px', padding: '16px 20px', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
             <AlertTriangle style={{ color: 'var(--neon-orange)', flexShrink: 0, marginTop: '2px' }} size={20} />
             <div>
               <h4 style={{ fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {notifications[0].title}
-                <span style={{ fontSize: '0.7rem', padding: '1px 6px', background: 'rgba(255, 107, 53, 0.15)', color: 'var(--neon-orange)', borderRadius: '4px', fontWeight: 600 }}>IA Coach</span>
+                <span style={{ fontSize: '0.7rem', padding: '1px 6px', background: 'rgba(255, 107, 53, 0.15)', color: 'var(--neon-orange)', borderRadius: '4px', fontWeight: 600 }}>Assistente Fisiológico</span>
               </h4>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
                 {notifications[0].content}
@@ -2742,6 +2873,29 @@ export default function Home() {
 
           <button 
             className="tab-btn" 
+            onClick={() => setActiveTab('gravar')}
+            style={{ 
+              background: 'transparent', 
+              border: 'none', 
+              borderBottom: activeTab === 'gravar' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              color: activeTab === 'gravar' ? '#fff' : 'var(--text-secondary)', 
+              fontWeight: activeTab === 'gravar' ? 700 : 500,
+              padding: '10px 16px',
+              cursor: 'pointer',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'var(--transition-smooth)'
+            }}
+          >
+            <Compass size={18} style={{ color: activeTab === 'gravar' ? 'var(--neon-cyan)' : 'inherit' }} />
+            Gravar Treino
+            <span style={{ fontSize: '0.65rem', background: 'var(--neon-green)', padding: '1px 5px', color: '#030712', borderRadius: '4px', fontWeight: 700 }}>GPS</span>
+          </button>
+
+          <button 
+            className="tab-btn" 
             onClick={() => setActiveTab('perfil')}
             style={{ 
               background: 'transparent', 
@@ -2769,6 +2923,130 @@ export default function Home() {
         {activeTab === 'planilha' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
             
+            {/* Banner de Orientação da Prova Alvo / Biblioteca */}
+            {goal?.date_target && (
+              <div 
+                className="premium-card animate-slide-up" 
+                style={{ 
+                  background: plan?.library_id 
+                    ? 'linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(57, 255, 20, 0.03) 100%)' 
+                    : 'linear-gradient(135deg, rgba(255, 107, 53, 0.08) 0%, rgba(13, 21, 39, 0.8) 100%)',
+                  border: plan?.library_id 
+                    ? '1px solid rgba(0, 240, 255, 0.25)' 
+                    : '1px solid rgba(255, 107, 53, 0.25)',
+                  boxShadow: plan?.library_id 
+                    ? '0 8px 32px rgba(0, 240, 255, 0.08)' 
+                    : '0 8px 32px rgba(255, 107, 53, 0.08)',
+                  padding: '24px',
+                  borderRadius: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '20px'
+                }}
+              >
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flex: '1', minWidth: '280px' }}>
+                  <div style={{ 
+                    padding: '12px', 
+                    background: plan?.library_id ? 'rgba(0, 240, 255, 0.1)' : 'rgba(255, 107, 53, 0.1)', 
+                    borderRadius: '12px',
+                    border: plan?.library_id ? '1px solid rgba(0, 240, 255, 0.2)' : '1px solid rgba(255, 107, 53, 0.2)'
+                  }}>
+                    <Target style={{ color: plan?.library_id ? 'var(--neon-cyan)' : 'var(--neon-orange)' }} size={28} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {plan?.library_id ? 'Planilha Científica Ativa' : 'Atenção: Planilha Não Vinculada'}
+                      <span style={{ 
+                        fontSize: '0.75rem', 
+                        background: plan?.library_id ? 'rgba(57, 255, 20, 0.15)' : 'rgba(255, 107, 53, 0.15)', 
+                        color: plan?.library_id ? 'var(--neon-green)' : 'var(--neon-orange)', 
+                        padding: '2px 8px', 
+                        borderRadius: '4px',
+                        fontWeight: 700
+                      }}>
+                        PROVA ALVO
+                      </span>
+                    </h3>
+                    
+                    {plan?.library_id ? (
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
+                        Seus treinos são orientados pela planilha periodizada da biblioteca: <strong style={{ color: '#fff' }}>{plan?.name}</strong>. 
+                        A periodização está sincronizada com a sua prova de <strong>{goal.type} ({goal.distance} km)</strong> marcada para o dia <strong>{new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}</strong>.
+                      </p>
+                    ) : (
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
+                        Você estabeleceu uma prova alvo de <strong>{goal.type} ({goal.distance} km)</strong> para o dia <strong>{new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}</strong>. 
+                        Para garantir o melhor rendimento físico, <strong>sempre sugerimos utilizar uma planilha periodizada da nossa biblioteca</strong>. 
+                        {recommendedPlan && (
+                          <span style={{ display: 'block', marginTop: '6px', color: '#fff' }}>
+                            👉 Recomendação: <strong style={{ color: 'var(--neon-green)' }}>{recommendedPlan.name}</strong> por {recommendedPlan.author}.
+                          </span>
+                        )}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  {plan?.library_id ? (
+                    <button
+                      onClick={() => {
+                        const libPlan = libraryPlans.find(p => p.id === plan.library_id) || TRAINING_LIBRARY[plan.library_id];
+                        if (libPlan) {
+                          handleSelectLibraryPlan(libPlan, plan.effort_pct || 100, plan.cut_choice || 'none', plan.current_week || 1);
+                        }
+                        setActiveTab('coach');
+                      }}
+                      className="glow-btn"
+                      style={{ padding: '10px 20px', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}
+                    >
+                      <Sliders size={16} />
+                      Calibrar Esforço
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          if (recommendedPlan) {
+                            setViewingLibraryPlan(recommendedPlan);
+                            setEffortPctCalibration(100);
+                            setCutChoiceSelection('ambos');
+                            setSelectedPreviewWeek(1);
+                            setActiveTab('coach');
+                          }
+                        }}
+                        className="glow-btn"
+                        style={{ padding: '10px 20px', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}
+                      >
+                        <Check size={16} />
+                        Aplicar Recomendada
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedSportFilter(goal.type.includes('Natac') || goal.type.includes('Nataç') ? 'Natação' : goal.type);
+                          setActiveTab('coach');
+                        }}
+                        style={{ 
+                          padding: '10px 20px', 
+                          fontSize: '0.85rem', 
+                          fontWeight: 650, 
+                          background: 'rgba(255,255,255,0.03)', 
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          borderRadius: '10px',
+                          color: '#fff',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Ver Todas
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Gráfico Comparativo & Meta do Usuário */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
               
@@ -2928,7 +3206,7 @@ export default function Home() {
               <div className="section-header-responsive" style={{ marginBottom: '16px' }}>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', margin: 0, flexWrap: 'wrap' }}>
                   Planilha Semanal
-                  <span style={{ fontSize: '0.8rem', fontWeight: 400, color: 'var(--text-secondary)' }}>({plan?.name})</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 400, color: 'var(--text-secondary)' }}>({plan?.name || 'Modo Livre - Treinos Realizados'})</span>
                 </h3>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                   {user?.strava_connected === 1 && (
@@ -2979,8 +3257,30 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Modo Livre Warning */}
+              {!plan && (
+                <div className="premium-card animate-slide-up" style={{ 
+                  background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, rgba(13, 21, 39, 0.8) 100%)',
+                  border: '1px solid rgba(0, 240, 255, 0.2)',
+                  padding: '16px 20px',
+                  borderRadius: '12px',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <span style={{ fontSize: '1.2rem' }}>🏃‍♂️</span>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '0.9rem', color: '#fff', fontWeight: 700 }}>Modo Livre</h4>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                      Você não possui nenhuma planilha ativa da biblioteca. Abaixo estão exibidos os treinos que você realizou esta semana (sincronizados ou manuais). Escolha ou importe uma planilha na aba <strong>Treinador IA</strong> para ter treinos periodizados.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Barra de Progresso Semanal */}
-              {workouts && workouts.length > 0 && (
+              {workouts && workouts.length > 0 && plan && (
                 <div className="premium-card" style={{ 
                   padding: '16px 20px', 
                   marginBottom: '16px',
@@ -3255,9 +3555,99 @@ export default function Home() {
                     </div>
                     <div>
                       <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fff', margin: 0, letterSpacing: '0.02em' }}>Biblioteca de Planilhas Periodizadas</h2>
-                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '4px 0 0 0' }}>Planilhas clássicas encontradas na internet, com fontes e autores reais, estruturadas cientificamente.</p>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '4px 0 0 0' }}>Importe planilhas via link da internet ou monte seu próprio ciclo de treinos estruturado.</p>
                     </div>
                   </div>
+                </div>
+
+                {/* Painel de Importação e Criação */}
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: '2fr 1fr', 
+                  gap: '20px', 
+                  marginBottom: '24px' 
+                }} className="responsive-grid">
+                  
+                  {/* Bloco Importar */}
+                  <div className="premium-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Download size={18} style={{ color: 'var(--neon-cyan)' }} />
+                      Importar Planilha via Link
+                    </h3>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.4' }}>
+                      Cole um link JSON contendo a estrutura da planilha. Você pode testar copiando um dos seguintes links locais:
+                    </p>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--neon-cyan)', background: 'rgba(0, 240, 255, 0.05)', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(0, 240, 255, 0.1)', fontFamily: 'monospace' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Exemplos para copiar:</span><br/>
+                      • <code>/planilhas/run_hal_higdon_10k.json</code> (Corrida)<br/>
+                      • <code>/planilhas/bike_joe_friel_gran_fondo.json</code> (Ciclismo)<br/>
+                      • <code>/planilhas/tri_joe_friel_olympic.json</code> (Triathlon)
+                    </div>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+                      <input 
+                        type="text" 
+                        placeholder="Cole o link da planilha aqui..." 
+                        value={importUrl}
+                        onChange={(e) => setImportUrl(e.target.value)}
+                        style={{
+                          flex: 1,
+                          padding: '10px 14px',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          background: 'rgba(13, 21, 39, 0.6)',
+                          color: '#fff',
+                          outline: 'none',
+                          fontSize: '0.85rem'
+                        }}
+                      />
+                      <button 
+                        onClick={handleImportPlan}
+                        disabled={isImporting}
+                        className="glow-btn"
+                        style={{
+                          padding: '10px 20px',
+                          fontSize: '0.85rem',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {isImporting ? 'Buscando...' : 'Buscar e Carregar'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Bloco Criar Customizada */}
+                  <div className="premium-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: '12px' }}>
+                    <div style={{ padding: '10px', background: 'rgba(57, 255, 20, 0.1)', borderRadius: '50%', border: '1px solid rgba(57, 255, 20, 0.2)' }}>
+                      <Plus size={24} style={{ color: 'var(--neon-green)' }} />
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: '#fff' }}>Montar Planilha</h3>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>Monte sua planilha personalizada para uma semana ou ciclo completo.</p>
+                    </div>
+                    <button 
+                      onClick={() => setShowCreatePlanModal(true)}
+                      className="glow-btn"
+                      style={{
+                        padding: '10px 20px',
+                        fontSize: '0.85rem',
+                        borderRadius: '8px',
+                        background: 'linear-gradient(90deg, var(--neon-green) 0%, #39ff14 100%)',
+                        border: 'none',
+                        color: '#030712',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        width: '100%'
+                      }}
+                    >
+                      Criar Minha Planilha
+                    </button>
+                  </div>
+
                 </div>
 
                 {/* Filtro de Esportes */}
@@ -3296,51 +3686,68 @@ export default function Home() {
 
                 {/* Grid de Planilhas */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
-                  {Object.values(TRAINING_LIBRARY)
-                    .filter(plan => {
-                      if (selectedSportFilter === 'Natação') return plan.sport === 'Natacao';
-                      return plan.sport === selectedSportFilter;
-                    })
-                    .map((plan) => {
-                      const levelLabel = plan.level === 'iniciante' ? 'Iniciante' : plan.level === 'intermediario' ? 'Intermediário' : 'Avançado';
-                      const levelColor = plan.level === 'iniciante' ? 'var(--neon-green)' : plan.level === 'intermediario' ? 'var(--neon-cyan)' : 'var(--neon-orange)';
-                      
-                      return (
-                        <div key={plan.id} className="premium-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', border: '1px solid rgba(255,255,255,0.06)', transition: 'all 0.3s ease' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: levelColor, background: `rgba(255,255,255,0.03)`, padding: '2px 8px', borderRadius: '4px', border: `1px solid rgba(255,255,255,0.05)` }}>
-                              {levelLabel}
-                            </span>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                              ⏱️ {plan.weeks} Semanas
-                            </span>
-                          </div>
-                          
-                          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', margin: '0 0 8px 0', lineHeight: '1.3' }}>{plan.name}</h3>
-                          
-                          <div style={{ marginBottom: '14px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                            Autor: <strong style={{ color: 'var(--text-primary)' }}>{plan.author}</strong> <br />
-                            Fonte: <em style={{ color: 'var(--neon-cyan)' }}>{plan.source}</em>
-                          </div>
+                  {libraryLoading ? (
+                    <div style={{ gridColumn: '1 / -1', padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                      Carregando biblioteca...
+                    </div>
+                  ) : libraryPlans.filter(plan => {
+                    if (selectedSportFilter === 'Natação') return plan.sport === 'Natacao';
+                    return plan.sport === selectedSportFilter;
+                  }).length === 0 ? (
+                    <div style={{
+                      gridColumn: '1 / -1',
+                      padding: '40px',
+                      textAlign: 'center',
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: '1px dashed rgba(255, 255, 255, 0.15)',
+                      borderRadius: '16px',
+                      color: 'var(--text-secondary)'
+                    }}>
+                      <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Nenhuma planilha carregada para {selectedSportFilter}.</p>
+                      <p style={{ margin: '8px 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>Utilize a seção de importação via link acima ou crie sua própria planilha customizada.</p>
+                    </div>
+                  ) : (
+                    libraryPlans
+                      .filter(plan => {
+                        if (selectedSportFilter === 'Natação') return plan.sport === 'Natacao';
+                        return plan.sport === selectedSportFilter;
+                      })
+                      .map((plan) => {
+                        const levelLabel = plan.level === 'iniciante' ? 'Iniciante' : plan.level === 'intermediario' ? 'Intermediário' : 'Avançado';
+                        const levelColor = plan.level === 'iniciante' ? 'var(--neon-green)' : plan.level === 'intermediario' ? 'var(--neon-cyan)' : 'var(--neon-orange)';
+                        
+                        return (
+                          <div key={plan.id} className="premium-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', border: '1px solid rgba(255,255,255,0.06)', transition: 'all 0.3s ease' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                              <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: levelColor, background: `rgba(255,255,255,0.03)`, padding: '2px 8px', borderRadius: '4px', border: `1px solid rgba(255,255,255,0.05)` }}>
+                                {levelLabel}
+                              </span>
+                              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                                ⏱️ {plan.weeks} Semanas
+                              </span>
+                            </div>
+                            
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', margin: '0 0 8px 0', lineHeight: '1.3' }}>{plan.name}</h3>
+                            
+                            <div style={{ marginBottom: '14px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                              Autor: <strong style={{ color: 'var(--text-primary)' }}>{plan.author}</strong> <br />
+                              Fonte: <em style={{ color: 'var(--neon-cyan)', wordBreak: 'break-all' }}>{plan.source}</em>
+                            </div>
 
-                          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0 0 20px 0', lineHeight: '1.5', flexGrow: 1 }}>{plan.description}</p>
-                          
-                          <button
-                            onClick={() => {
-                              setViewingLibraryPlan(plan);
-                              setEffortPctCalibration(100);
-                              setCutChoiceSelection(goal?.date_target ? 'ambos' : 'none');
-                              setSelectedPreviewWeek(1);
-                            }}
-                            className="glow-btn"
-                            style={{ width: '100%', padding: '12px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                          >
-                            <Eye size={16} />
-                            Visualizar e Aplicar
-                          </button>
-                        </div>
-                      );
-                    })}
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0 0 20px 0', lineHeight: '1.5', flexGrow: 1 }}>{plan.description}</p>
+                            
+                            <button
+                              onClick={() => handleSelectLibraryPlan(plan)}
+                              className="glow-btn"
+                              style={{ width: '100%', padding: '12px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                            >
+                              <Eye size={16} />
+                              Visualizar e Aplicar
+                            </button>
+                          </div>
+                        );
+                      })
+                  )}
                 </div>
               </div>
             ) : (
@@ -4569,6 +4976,29 @@ export default function Home() {
                         />
                       </div>
                       <div>
+                        <label htmlFor="profile-gender" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Sexo / Gênero</label>
+                        <select 
+                          id="profile-gender"
+                          className="glass-input" 
+                          value={profileForm.gender} 
+                          onChange={e => setProfileForm({ ...profileForm, gender: e.target.value })} 
+                          disabled={profileSaving}
+                          style={{
+                            background: 'rgba(3, 7, 18, 0.6)',
+                            color: '#fff',
+                            border: '1px solid var(--border-color)'
+                          }}
+                        >
+                          <option value="" style={{ background: '#0d1527', color: '#fff' }}>Selecione...</option>
+                          <option value="Masculino" style={{ background: '#0d1527', color: '#fff' }}>Masculino</option>
+                          <option value="Feminino" style={{ background: '#0d1527', color: '#fff' }}>Feminino</option>
+                          <option value="Outro" style={{ background: '#0d1527', color: '#fff' }}>Outro</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="form-grid-2">
+                      <div>
                         <label htmlFor="profile-weight" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Peso (kg)</label>
                         <input 
                           id="profile-weight"
@@ -4579,6 +5009,19 @@ export default function Home() {
                           value={profileForm.weight} 
                           onChange={e => setProfileForm({ ...profileForm, weight: e.target.value })} 
                           required 
+                          disabled={profileSaving}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="profile-height" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Altura (m)</label>
+                        <input 
+                          id="profile-height"
+                          type="number" 
+                          step="0.01"
+                          className="glass-input" 
+                          placeholder="Ex: 1.75"
+                          value={profileForm.height} 
+                          onChange={e => setProfileForm({ ...profileForm, height: e.target.value })} 
                           disabled={profileSaving}
                         />
                       </div>
@@ -4703,18 +5146,61 @@ export default function Home() {
                       </div>
                     </div>
 
-                    {/* Meta Semanal de Horas */}
+                    {/* Meta Semanal de Horas e FCs */}
+                    <div className="form-grid-2">
+                      <div>
+                        <label htmlFor="profile-hours" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Meta de Horas Semanais</label>
+                        <input 
+                          id="profile-hours"
+                          type="number" 
+                          className="glass-input" 
+                          placeholder="Ex: 6"
+                          value={profileForm.weekly_target_hours} 
+                          onChange={e => setProfileForm({ ...profileForm, weekly_target_hours: e.target.value })} 
+                          required 
+                          disabled={profileSaving}
+                        />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div>
+                          <label htmlFor="profile-resting-hr" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>FC Repouso (bpm)</label>
+                          <input 
+                            id="profile-resting-hr"
+                            type="number" 
+                            className="glass-input" 
+                            placeholder="Ex: 50"
+                            value={profileForm.resting_hr} 
+                            onChange={e => setProfileForm({ ...profileForm, resting_hr: e.target.value })} 
+                            disabled={profileSaving}
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="profile-max-hr" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>FC Máxima (bpm)</label>
+                          <input 
+                            id="profile-max-hr"
+                            type="number" 
+                            className="glass-input" 
+                            placeholder="Ex: 185"
+                            value={profileForm.max_hr} 
+                            onChange={e => setProfileForm({ ...profileForm, max_hr: e.target.value })} 
+                            disabled={profileSaving}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Observações e Histórico */}
                     <div>
-                      <label htmlFor="profile-hours" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Meta de Horas Semanais</label>
-                      <input 
-                        id="profile-hours"
-                        type="number" 
+                      <label htmlFor="profile-observations" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Observações, Lesões ou Restrições Clínicas</label>
+                      <textarea 
+                        id="profile-observations"
                         className="glass-input" 
-                        placeholder="Ex: 6"
-                        value={profileForm.weekly_target_hours} 
-                        onChange={e => setProfileForm({ ...profileForm, weekly_target_hours: e.target.value })} 
-                        required 
+                        placeholder="Ex: Histórico de condromalácia patelar leve no joelho esquerdo. Sem outras restrições. Prefiro correr de manhã."
+                        value={profileForm.observations} 
+                        onChange={e => setProfileForm({ ...profileForm, observations: e.target.value })} 
                         disabled={profileSaving}
+                        rows={3}
+                        style={{ resize: 'vertical', minHeight: '80px', fontFamily: 'inherit' }}
                       />
                     </div>
                   </div>
@@ -5358,6 +5844,22 @@ export default function Home() {
                 </ul>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* 7. GRAVAR TREINO COM GPS */}
+        {activeTab === 'gravar' && (
+          <div className="animate-fade-in">
+            <GpsTracker 
+              userId={activeUser!} 
+              onWorkoutSaved={async () => {
+                setActiveTab('planilha');
+                if (activeUser) {
+                  await fetchDashboard(activeUser);
+                }
+              }}
+              onCancel={() => setActiveTab('planilha')}
+            />
           </div>
         )}
 
@@ -6644,6 +7146,384 @@ export default function Home() {
             </div>
 
           </form>
+        </div>
+      )}
+
+      {/* MODAL DE CRIAÇÃO DE PLANILHA CUSTOMIZADA */}
+      {showCreatePlanModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(3, 7, 18, 0.85)',
+          backdropFilter: 'blur(12px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000,
+          padding: '20px',
+          overflowY: 'auto'
+        }} className="animate-fade-in">
+          <div className="premium-card animate-scale-in" style={{
+            width: '100%',
+            maxWidth: '900px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: '32px',
+            border: '1px solid rgba(57, 255, 20, 0.25)',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px'
+          }}>
+            {/* Cabeçalho */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ padding: '8px', background: 'rgba(57, 255, 20, 0.1)', borderRadius: '8px' }}>
+                  <Dumbbell style={{ color: 'var(--neon-green)' }} size={20} />
+                </div>
+                <div>
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', margin: 0 }}>Montar Minha Própria Planilha</h2>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>Crie e salve uma planilha estruturada na sua biblioteca de treinos.</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowCreatePlanModal(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Formulário Geral */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Nome da Planilha *</label>
+                <input
+                  type="text"
+                  placeholder="Ex: Planilha de Corrida Rumo aos 5k"
+                  value={customPlanForm.name}
+                  onChange={(e) => setCustomPlanForm({ ...customPlanForm, name: e.target.value })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', outline: 'none', fontSize: '0.85rem' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Autor *</label>
+                <input
+                  type="text"
+                  placeholder="Ex: Seu Nome ou Treinador"
+                  value={customPlanForm.author}
+                  onChange={(e) => setCustomPlanForm({ ...customPlanForm, author: e.target.value })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', outline: 'none', fontSize: '0.85rem' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Esporte principal *</label>
+                <select
+                  value={customPlanForm.sport}
+                  onChange={(e) => setCustomPlanForm({ ...customPlanForm, sport: e.target.value })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', outline: 'none', fontSize: '0.85rem' }}
+                >
+                  <option value="Corrida">Corrida</option>
+                  <option value="Ciclismo">Ciclismo</option>
+                  <option value="Natacao">Natação</option>
+                  <option value="Triathlon">Triathlon</option>
+                  <option value="Ultramaratona">Ultramaratona</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Nível da Planilha</label>
+                <select
+                  value={customPlanForm.level}
+                  onChange={(e) => setCustomPlanForm({ ...customPlanForm, level: e.target.value })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', outline: 'none', fontSize: '0.85rem' }}
+                >
+                  <option value="iniciante">Iniciante</option>
+                  <option value="intermediario">Intermediário</option>
+                  <option value="avancado">Avançado</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Duração (Semanas) *</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="16"
+                  value={customPlanForm.weeks}
+                  onChange={(e) => handleBuilderWeeksChange(parseInt(e.target.value, 10) || 1)}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', outline: 'none', fontSize: '0.85rem' }}
+                />
+              </div>
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Descrição / Detalhes</label>
+                <input
+                  type="text"
+                  placeholder="Descreva o foco desta planilha"
+                  value={customPlanForm.description}
+                  onChange={(e) => setCustomPlanForm({ ...customPlanForm, description: e.target.value })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', outline: 'none', fontSize: '0.85rem' }}
+                />
+              </div>
+            </div>
+
+            {/* Navegador de Semanas do Builder */}
+            {customPlanForm.weeks > 1 && (
+              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '10px' }} className="hide-scrollbar">
+                {Array.from({ length: customPlanForm.weeks }).map((_, idx) => {
+                  const wNum = idx + 1;
+                  const isSelected = selectedBuilderWeek === wNum;
+                  return (
+                    <button
+                      key={wNum}
+                      type="button"
+                      onClick={() => setSelectedBuilderWeek(wNum)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                        background: isSelected ? 'var(--neon-green)' : 'rgba(255,255,255,0.02)',
+                        border: isSelected ? '1px solid var(--neon-green)' : '1px solid rgba(255,255,255,0.06)',
+                        color: isSelected ? '#030712' : 'var(--text-secondary)',
+                        fontWeight: isSelected ? 700 : 500,
+                        fontSize: '0.8rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Semana {wNum}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Ferramentas de Cópia Rápida */}
+            {customPlanForm.weeks > 1 && (
+              <div style={{ display: 'flex', gap: '12px', background: 'rgba(255, 255, 255, 0.02)', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                  ⚙️ <strong>Ações Rápidas:</strong> Copiar treinos de S{selectedBuilderWeek} para outra semana:
+                </span>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <select
+                    style={{ padding: '4px 8px', borderRadius: '4px', background: 'rgba(13,21,39,0.8)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.78rem' }}
+                    defaultValue=""
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      if (val) {
+                        handleCopyBuilderWeek(selectedBuilderWeek, val);
+                        e.target.value = "";
+                      }
+                    }}
+                  >
+                    <option value="">Selecione a semana destino...</option>
+                    {Array.from({ length: customPlanForm.weeks })
+                      .map((_, i) => i + 1)
+                      .filter(w => w !== selectedBuilderWeek)
+                      .map(w => (
+                        <option key={w} value={w}>Semana {w}</option>
+                      ))
+                    }
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Lista de Treinos da Semana Selecionada no Builder */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '6px' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', margin: 0 }}>
+                Treinos da Semana {selectedBuilderWeek}
+              </h3>
+              
+              {customPlanForm.workouts[selectedBuilderWeek - 1]?.map((w: any, dayIdx: number) => {
+                const dayNames = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+                
+                return (
+                  <div key={dayIdx} style={{
+                    padding: '16px',
+                    background: 'rgba(255, 255, 255, 0.01)',
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--neon-cyan)' }}>
+                        {dayNames[dayIdx]} (Dia {dayIdx + 1})
+                      </span>
+                      
+                      {/* Tipo do Treino */}
+                      <select
+                        value={w.type}
+                        onChange={(e) => {
+                          const updated = [...customPlanForm.workouts];
+                          updated[selectedBuilderWeek - 1][dayIdx].type = e.target.value;
+                          if (e.target.value === 'Descanso') {
+                            updated[selectedBuilderWeek - 1][dayIdx].title = 'Descanso fisiológico';
+                            updated[selectedBuilderWeek - 1][dayIdx].desc = 'Dia livre para recuperação ativa e alongamento.';
+                            updated[selectedBuilderWeek - 1][dayIdx].dist = 0;
+                            updated[selectedBuilderWeek - 1][dayIdx].dur = 0;
+                            updated[selectedBuilderWeek - 1][dayIdx].pace = 'N/A';
+                            updated[selectedBuilderWeek - 1][dayIdx].power = 0;
+                            updated[selectedBuilderWeek - 1][dayIdx].tss = 0;
+                          } else if (e.target.value === 'Forca') {
+                            updated[selectedBuilderWeek - 1][dayIdx].title = 'Fortalecimento Geral';
+                            updated[selectedBuilderWeek - 1][dayIdx].desc = 'Foco em estabilidade de core e mobilidade.';
+                            updated[selectedBuilderWeek - 1][dayIdx].dist = 0;
+                            updated[selectedBuilderWeek - 1][dayIdx].dur = 1800;
+                            updated[selectedBuilderWeek - 1][dayIdx].pace = 'N/A';
+                            updated[selectedBuilderWeek - 1][dayIdx].power = 0;
+                            updated[selectedBuilderWeek - 1][dayIdx].tss = 15;
+                          } else {
+                            updated[selectedBuilderWeek - 1][dayIdx].title = '';
+                            updated[selectedBuilderWeek - 1][dayIdx].desc = '';
+                            updated[selectedBuilderWeek - 1][dayIdx].dist = 10;
+                            updated[selectedBuilderWeek - 1][dayIdx].dur = 3600;
+                            updated[selectedBuilderWeek - 1][dayIdx].pace = e.target.value === 'Ciclismo' ? '30 km/h' : '5:00/km';
+                            updated[selectedBuilderWeek - 1][dayIdx].power = 0;
+                            updated[selectedBuilderWeek - 1][dayIdx].tss = 60;
+                          }
+                          setCustomPlanForm({ ...customPlanForm, workouts: updated });
+                        }}
+                        style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.8)', color: '#fff', fontSize: '0.8rem', outline: 'none' }}
+                      >
+                        <option value="Corrida">🏃‍♂️ Corrida</option>
+                        <option value="Ciclismo">🚴‍♂️ Ciclismo</option>
+                        <option value="Natacao">🏊‍♂️ Natação</option>
+                        <option value="Forca">💪 Força</option>
+                        <option value="Descanso">🛌 Descanso</option>
+                      </select>
+                    </div>
+
+                    {w.type !== 'Descanso' ? (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                        <div style={{ gridColumn: 'span 2' }}>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Título do Treino</label>
+                          <input
+                            type="text"
+                            placeholder="Ex: Trote Leve Z2"
+                            value={w.title}
+                            onChange={(e) => {
+                              const updated = [...customPlanForm.workouts];
+                              updated[selectedBuilderWeek - 1][dayIdx].title = e.target.value;
+                              setCustomPlanForm({ ...customPlanForm, workouts: updated });
+                            }}
+                            style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', fontSize: '0.8rem' }}
+                          />
+                        </div>
+                        <div style={{ gridColumn: 'span 2' }}>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Descrição do Treino</label>
+                          <input
+                            type="text"
+                            placeholder="Ex: Corrida em ritmo confortável conversacional"
+                            value={w.desc}
+                            onChange={(e) => {
+                              const updated = [...customPlanForm.workouts];
+                              updated[selectedBuilderWeek - 1][dayIdx].desc = e.target.value;
+                              setCustomPlanForm({ ...customPlanForm, workouts: updated });
+                            }}
+                            style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', fontSize: '0.8rem' }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Distância (km)</label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            value={w.dist}
+                            onChange={(e) => {
+                              const updated = [...customPlanForm.workouts];
+                              updated[selectedBuilderWeek - 1][dayIdx].dist = parseFloat(e.target.value) || 0;
+                              setCustomPlanForm({ ...customPlanForm, workouts: updated });
+                            }}
+                            style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', fontSize: '0.8rem' }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Duração (minutos)</label>
+                          <input
+                            type="number"
+                            value={Math.round(w.dur / 60)}
+                            onChange={(e) => {
+                              const updated = [...customPlanForm.workouts];
+                              updated[selectedBuilderWeek - 1][dayIdx].dur = (parseInt(e.target.value, 10) || 0) * 60;
+                              setCustomPlanForm({ ...customPlanForm, workouts: updated });
+                            }}
+                            style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', fontSize: '0.8rem' }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Pace Prescrito</label>
+                          <input
+                            type="text"
+                            placeholder="Ex: 5:30/km ou 30 km/h"
+                            value={w.pace}
+                            onChange={(e) => {
+                              const updated = [...customPlanForm.workouts];
+                              updated[selectedBuilderWeek - 1][dayIdx].pace = e.target.value;
+                              setCustomPlanForm({ ...customPlanForm, workouts: updated });
+                            }}
+                            style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', fontSize: '0.8rem' }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Potência (Watts)</label>
+                          <input
+                            type="number"
+                            value={w.power}
+                            onChange={(e) => {
+                              const updated = [...customPlanForm.workouts];
+                              updated[selectedBuilderWeek - 1][dayIdx].power = parseInt(e.target.value, 10) || 0;
+                              setCustomPlanForm({ ...customPlanForm, workouts: updated });
+                            }}
+                            style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', fontSize: '0.8rem' }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Carga TSS Estimada</label>
+                          <input
+                            type="number"
+                            value={w.tss}
+                            onChange={(e) => {
+                              const updated = [...customPlanForm.workouts];
+                              updated[selectedBuilderWeek - 1][dayIdx].tss = parseInt(e.target.value, 10) || 0;
+                              setCustomPlanForm({ ...customPlanForm, workouts: updated });
+                            }}
+                            style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(13, 21, 39, 0.6)', color: '#fff', fontSize: '0.8rem' }}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                        🛌 Dia de descanso configurado. Nenhuma métrica requerida.
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Rodapé */}
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={() => setShowCreatePlanModal(false)}
+                style={{ padding: '10px 20px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', fontSize: '0.85rem', cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveCustomPlan}
+                disabled={applyPlanLoading}
+                className="glow-btn"
+                style={{ padding: '10px 24px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700 }}
+              >
+                {applyPlanLoading ? 'Salvando...' : 'Salvar na Biblioteca'}
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
 

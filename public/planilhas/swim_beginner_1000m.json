@@ -1,0 +1,486 @@
+{
+  "id": "swim_beginner_1000m",
+  "name": "Planilha de Natação: Do Zero aos 1000m",
+  "author": "Ruth Kazez",
+  "source": "Zero to 1500m (ruthkazez.com)",
+  "sport": "Natacao",
+  "weeks": 6,
+  "level": "iniciante",
+  "description": "Progrida de pequenas séries na piscina até nadar 1000 metros de forma contínua com técnicas de respiração bilateral e relaxamento na água.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Educativo de Respiração e Técnica",
+        "desc": "Principal: 6x 50m (25m perna com prancha / 25m crawl focado na respiração bilateral).",
+        "dist": 0.4,
+        "dur": 600,
+        "pace": "2:30/100m",
+        "power": 0,
+        "tss": 12
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Intervalado Curto de Resistência",
+        "desc": "Principal: 8x 25m crawl com foco no deslize e 30s de descanso entre as séries.",
+        "dist": 0.3,
+        "dur": 435,
+        "pace": "2:25/100m",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso ou alongamento leve de braços.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Série Principal de Volume",
+        "desc": "Principal: Séries progressivas de 100m (crawl constante mantendo batida de perna suave).",
+        "dist": 0.5,
+        "dur": 700,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 14
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Giro Longo de Piscina",
+        "desc": "Nadada contínua leve para ganhar confiança aeróbica.",
+        "dist": 0.6,
+        "dur": 840,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 16
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Educativo de Respiração e Técnica",
+        "desc": "Principal: 6x 50m (25m perna com prancha / 25m crawl focado na respiração bilateral).",
+        "dist": 0.4,
+        "dur": 600,
+        "pace": "2:30/100m",
+        "power": 0,
+        "tss": 13
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Intervalado Curto de Resistência",
+        "desc": "Principal: 8x 25m crawl com foco no deslize e 30s de descanso entre as séries.",
+        "dist": 0.3,
+        "dur": 435,
+        "pace": "2:25/100m",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso ou alongamento leve de braços.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Série Principal de Volume",
+        "desc": "Principal: Séries progressivas de 100m (crawl constante mantendo batida de perna suave).",
+        "dist": 0.5,
+        "dur": 700,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Giro Longo de Piscina",
+        "desc": "Nadada contínua leve para ganhar confiança aeróbica.",
+        "dist": 0.6,
+        "dur": 840,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 17
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Educativo de Respiração e Técnica",
+        "desc": "Principal: 6x 50m (25m perna com prancha / 25m crawl focado na respiração bilateral).",
+        "dist": 0.5,
+        "dur": 750,
+        "pace": "2:30/100m",
+        "power": 0,
+        "tss": 14
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Intervalado Curto de Resistência",
+        "desc": "Principal: 8x 25m crawl com foco no deslize e 30s de descanso entre as séries.",
+        "dist": 0.4,
+        "dur": 580,
+        "pace": "2:25/100m",
+        "power": 0,
+        "tss": 11
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso ou alongamento leve de braços.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Série Principal de Volume",
+        "desc": "Principal: Séries progressivas de 100m (crawl constante mantendo batida de perna suave).",
+        "dist": 0.5,
+        "dur": 700,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 16
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Giro Longo de Piscina",
+        "desc": "Nadada contínua leve para ganhar confiança aeróbica.",
+        "dist": 0.6,
+        "dur": 840,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 18
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Educativo de Respiração e Técnica",
+        "desc": "Principal: 6x 50m (25m perna com prancha / 25m crawl focado na respiração bilateral).",
+        "dist": 0.5,
+        "dur": 750,
+        "pace": "2:30/100m",
+        "power": 0,
+        "tss": 14
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Intervalado Curto de Resistência",
+        "desc": "Principal: 8x 25m crawl com foco no deslize e 30s de descanso entre as séries.",
+        "dist": 0.4,
+        "dur": 580,
+        "pace": "2:25/100m",
+        "power": 0,
+        "tss": 11
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso ou alongamento leve de braços.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Série Principal de Volume",
+        "desc": "Principal: Séries progressivas de 100m (crawl constante mantendo batida de perna suave).",
+        "dist": 0.6,
+        "dur": 840,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 17
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Giro Longo de Piscina",
+        "desc": "Nadada contínua leve para ganhar confiança aeróbica.",
+        "dist": 0.7,
+        "dur": 980,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 19
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Educativo de Respiração e Técnica",
+        "desc": "Principal: 6x 50m (25m perna com prancha / 25m crawl focado na respiração bilateral).",
+        "dist": 0.5,
+        "dur": 750,
+        "pace": "2:30/100m",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Intervalado Curto de Resistência",
+        "desc": "Principal: 8x 25m crawl com foco no deslize e 30s de descanso entre as séries.",
+        "dist": 0.4,
+        "dur": 580,
+        "pace": "2:25/100m",
+        "power": 0,
+        "tss": 12
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso ou alongamento leve de braços.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Série Principal de Volume",
+        "desc": "Principal: Séries progressivas de 100m (crawl constante mantendo batida de perna suave).",
+        "dist": 0.6,
+        "dur": 840,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Giro Longo de Piscina",
+        "desc": "Nadada contínua leve para ganhar confiança aeróbica.",
+        "dist": 0.7,
+        "dur": 980,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 20
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Educativo de Respiração e Técnica",
+        "desc": "Principal: 6x 50m (25m perna com prancha / 25m crawl focado na respiração bilateral).",
+        "dist": 0.5,
+        "dur": 750,
+        "pace": "2:30/100m",
+        "power": 0,
+        "tss": 16
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Intervalado Curto de Resistência",
+        "desc": "Principal: 8x 25m crawl com foco no deslize e 30s de descanso entre as séries.",
+        "dist": 0.4,
+        "dur": 580,
+        "pace": "2:25/100m",
+        "power": 0,
+        "tss": 13
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso ou alongamento leve de braços.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Série Principal de Volume",
+        "desc": "Principal: Séries progressivas de 100m (crawl constante mantendo batida de perna suave).",
+        "dist": 0.6,
+        "dur": 840,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "🎯 DESAFIO: 1000M CONTÍNUOS 🏁",
+        "desc": "Nade 1000m de forma contínua com técnica e calma!",
+        "dist": 1,
+        "dur": 1350,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 35
+      }
+    ]
+  ]
+}

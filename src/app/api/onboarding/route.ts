@@ -93,7 +93,7 @@ export async function POST(req: Request) {
     // Criar notificação de boas-vindas personalizada
     await db.run(`
       INSERT INTO coach_notifs (user_id, date, title, content)
-      VALUES (?, ?, 'Planilha Gerada com Sucesso!', 'Parabéns, ${name}! Analisei seus dados de onboarding e estruturei seu microciclo de treinos focando em seu objetivo de ${goalType} (${goalDistance} km). Conecte seu Strava para que eu possa avaliar suas métricas de execução e calibrar seus limites dinamicamente.')
+      VALUES (?, ?, 'Planilha Gerada com Sucesso!', 'Parabéns, ${name}! Analisei seus dados de onboarding e estruturei seu microciclo de treinos focando em seu objetivo de ${goalType} (${goalDistance} km). Conecte seu Strava para que o Assistente Fisiológico possa avaliar suas métricas de execução e calibrar seus limites dinamicamente.')
     `, userId, formatDate(new Date()));
 
     return NextResponse.json({

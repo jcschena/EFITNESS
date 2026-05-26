@@ -1,0 +1,644 @@
+{
+  "id": "run_couch_to_5k",
+  "name": "Planilha de Corrida: Do Sofá aos 5K",
+  "author": "CoolRunning",
+  "source": "Couch to 5K (c25k.com)",
+  "sport": "Corrida",
+  "weeks": 8,
+  "level": "iniciante",
+  "description": "Desenvolvida para iniciantes saírem do sedentarismo de forma segura. Alterna intervalos de caminhada e trote leve para construir a base aeróbica.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico ou caminhada leve.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote e Caminhada (Microciclo 1)",
+        "desc": "Principal: Aquecimento de 5 min caminhada. Repita intervalos de trote leve e caminhada ativa.",
+        "dist": 2.3,
+        "dur": 897,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 17
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote e Caminhada de Progressão",
+        "desc": "Principal: Sessão intervalada curta focada em consistência de ritmo.",
+        "dist": 2.3,
+        "dur": 897,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 17
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento de Base",
+        "desc": "Exercícios funcionais leves (agachamento peso corporal, prancha e panturrilha).",
+        "dist": 0,
+        "dur": 900,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 8
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão de Longo Transição Z2",
+        "desc": "Corrida/Caminhada mais longa da semana. Foco no volume de tempo.",
+        "dist": 2.8,
+        "dur": 1134,
+        "pace": "6:45/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e comemore a semana concluída.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico ou caminhada leve.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote e Caminhada (Microciclo 2)",
+        "desc": "Principal: Aquecimento de 5 min caminhada. Repita intervalos de trote leve e caminhada ativa.",
+        "dist": 2.6,
+        "dur": 1014,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote e Caminhada de Progressão",
+        "desc": "Principal: Sessão intervalada curta focada em consistência de ritmo.",
+        "dist": 2.6,
+        "dur": 1014,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento de Base",
+        "desc": "Exercícios funcionais leves (agachamento peso corporal, prancha e panturrilha).",
+        "dist": 0,
+        "dur": 900,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 8
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão de Longo Transição Z2",
+        "desc": "Corrida/Caminhada mais longa da semana. Foco no volume de tempo.",
+        "dist": 3.1,
+        "dur": 1256,
+        "pace": "6:45/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e comemore a semana concluída.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico ou caminhada leve.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote e Caminhada (Microciclo 3)",
+        "desc": "Principal: Aquecimento de 5 min caminhada. Repita intervalos de trote leve e caminhada ativa.",
+        "dist": 2.9,
+        "dur": 1131,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 21
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote e Caminhada de Progressão",
+        "desc": "Principal: Sessão intervalada curta focada em consistência de ritmo.",
+        "dist": 2.9,
+        "dur": 1131,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 21
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento de Base",
+        "desc": "Exercícios funcionais leves (agachamento peso corporal, prancha e panturrilha).",
+        "dist": 0,
+        "dur": 900,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 8
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão de Longo Transição Z2",
+        "desc": "Corrida/Caminhada mais longa da semana. Foco no volume de tempo.",
+        "dist": 3.4,
+        "dur": 1377,
+        "pace": "6:45/km",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e comemore a semana concluída.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico ou caminhada leve.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote e Caminhada (Microciclo 4)",
+        "desc": "Principal: Aquecimento de 5 min caminhada. Repita intervalos de trote leve e caminhada ativa.",
+        "dist": 3.2,
+        "dur": 1248,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote e Caminhada de Progressão",
+        "desc": "Principal: Sessão intervalada curta focada em consistência de ritmo.",
+        "dist": 3.2,
+        "dur": 1248,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento de Base",
+        "desc": "Exercícios funcionais leves (agachamento peso corporal, prancha e panturrilha).",
+        "dist": 0,
+        "dur": 900,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 8
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão de Longo Transição Z2",
+        "desc": "Corrida/Caminhada mais longa da semana. Foco no volume de tempo.",
+        "dist": 3.7,
+        "dur": 1499,
+        "pace": "6:45/km",
+        "power": 0,
+        "tss": 32
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e comemore a semana concluída.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico ou caminhada leve.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote e Caminhada (Microciclo 5)",
+        "desc": "Principal: Aquecimento de 5 min caminhada. Repita intervalos de trote leve e caminhada ativa.",
+        "dist": 3.5,
+        "dur": 1365,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 25
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote e Caminhada de Progressão",
+        "desc": "Principal: Sessão intervalada curta focada em consistência de ritmo.",
+        "dist": 3.5,
+        "dur": 1365,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 25
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento de Base",
+        "desc": "Exercícios funcionais leves (agachamento peso corporal, prancha e panturrilha).",
+        "dist": 0,
+        "dur": 900,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 8
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão de Longo Transição Z2",
+        "desc": "Corrida/Caminhada mais longa da semana. Foco no volume de tempo.",
+        "dist": 4,
+        "dur": 1620,
+        "pace": "6:45/km",
+        "power": 0,
+        "tss": 35
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e comemore a semana concluída.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico ou caminhada leve.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote e Caminhada (Microciclo 6)",
+        "desc": "Principal: Aquecimento de 5 min caminhada. Repita intervalos de trote leve e caminhada ativa.",
+        "dist": 3.8,
+        "dur": 1482,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote e Caminhada de Progressão",
+        "desc": "Principal: Sessão intervalada curta focada em consistência de ritmo.",
+        "dist": 3.8,
+        "dur": 1482,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento de Base",
+        "desc": "Exercícios funcionais leves (agachamento peso corporal, prancha e panturrilha).",
+        "dist": 0,
+        "dur": 900,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 8
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão de Longo Transição Z2",
+        "desc": "Corrida/Caminhada mais longa da semana. Foco no volume de tempo.",
+        "dist": 4.3,
+        "dur": 1742,
+        "pace": "6:45/km",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e comemore a semana concluída.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico ou caminhada leve.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote e Caminhada (Microciclo 7)",
+        "desc": "Principal: Aquecimento de 5 min caminhada. Repita intervalos de trote leve e caminhada ativa.",
+        "dist": 4.1,
+        "dur": 1599,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote e Caminhada de Progressão",
+        "desc": "Principal: Sessão intervalada curta focada em consistência de ritmo.",
+        "dist": 4.1,
+        "dur": 1599,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento de Base",
+        "desc": "Exercícios funcionais leves (agachamento peso corporal, prancha e panturrilha).",
+        "dist": 0,
+        "dur": 900,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 8
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão de Longo Transição Z2",
+        "desc": "Corrida/Caminhada mais longa da semana. Foco no volume de tempo.",
+        "dist": 4.6,
+        "dur": 1863,
+        "pace": "6:45/km",
+        "power": 0,
+        "tss": 41
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e comemore a semana concluída.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico ou caminhada leve.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote e Caminhada (Microciclo 8)",
+        "desc": "Principal: Aquecimento de 5 min caminhada. Repita intervalos de trote leve e caminhada ativa.",
+        "dist": 4.4,
+        "dur": 1716,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 31
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote e Caminhada de Progressão",
+        "desc": "Principal: Sessão intervalada curta focada em consistência de ritmo.",
+        "dist": 4.4,
+        "dur": 1716,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 31
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento de Base",
+        "desc": "Exercícios funcionais leves (agachamento peso corporal, prancha e panturrilha).",
+        "dist": 0,
+        "dur": 900,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 8
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "🎯 DESAFIO 5K CONTÍNUO 🏁",
+        "desc": "Chegou o dia! Tente correr os 5km contínuos no seu próprio ritmo confortável!",
+        "dist": 5,
+        "dur": 1950,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 50
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e comemore a semana concluída.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ]
+  ]
+}

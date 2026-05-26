@@ -1,0 +1,486 @@
+{
+  "id": "bike_hunter_allen_base",
+  "name": "Planilha de Ciclismo: Base Aeróbica com Potência",
+  "author": "Hunter Allen",
+  "source": "Peaks Coaching Group (peakscoachinggroup.com)",
+  "sport": "Ciclismo",
+  "weeks": 6,
+  "level": "avancado",
+  "description": "Periodização científica baseada no FTP (Potência) para aumento do limiar de potência (FTP) e capacidade mitocondrial. Ideal para quem usa medidor de potência.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total pós-longo do final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Sweet Spot Training (SST Z3.5)",
+        "desc": "Principal: 2x 15 min a 90% do FTP. Carga de estresse aeróbico de alta eficiência.",
+        "dist": 31.2,
+        "dur": 3623,
+        "pace": "31.0 km/h",
+        "power": 210,
+        "tss": 71
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalos de Vo2 Máx (Z5)",
+        "desc": "Principal: 5x 3 min a 115% do FTP com 3 min de recuperação.",
+        "dist": 26.7,
+        "dur": 3204,
+        "pace": "30.0 km/h",
+        "power": 245,
+        "tss": 80
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Giro super leve na bike de contrarrelógio ou estrada para soltura.",
+        "dist": 17.8,
+        "dur": 2563,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 18
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento & Core Estabilidade",
+        "desc": "Treino de core e força funcional.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo com Potência Aeróbia (Tempo Z3)",
+        "desc": "Principal: Rodagem com blocos longos em Zona 3 (Tempo).",
+        "dist": 66,
+        "dur": 7425,
+        "pace": "32.0 km/h",
+        "power": 190,
+        "tss": 122
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total pós-longo do final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Sweet Spot Training (SST Z3.5)",
+        "desc": "Principal: 2x 15 min a 90% do FTP. Carga de estresse aeróbico de alta eficiência.",
+        "dist": 32.5,
+        "dur": 3774,
+        "pace": "31.0 km/h",
+        "power": 210,
+        "tss": 74
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalos de Vo2 Máx (Z5)",
+        "desc": "Principal: 5x 3 min a 115% do FTP com 3 min de recuperação.",
+        "dist": 27.9,
+        "dur": 3348,
+        "pace": "30.0 km/h",
+        "power": 245,
+        "tss": 84
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Giro super leve na bike de contrarrelógio ou estrada para soltura.",
+        "dist": 18.6,
+        "dur": 2678,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 19
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento & Core Estabilidade",
+        "desc": "Treino de core e força funcional.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo com Potência Aeróbia (Tempo Z3)",
+        "desc": "Principal: Rodagem com blocos longos em Zona 3 (Tempo).",
+        "dist": 72,
+        "dur": 8100,
+        "pace": "32.0 km/h",
+        "power": 190,
+        "tss": 134
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total pós-longo do final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Sweet Spot Training (SST Z3.5)",
+        "desc": "Principal: 2x 15 min a 90% do FTP. Carga de estresse aeróbico de alta eficiência.",
+        "dist": 33.9,
+        "dur": 3937,
+        "pace": "31.0 km/h",
+        "power": 210,
+        "tss": 78
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalos de Vo2 Máx (Z5)",
+        "desc": "Principal: 5x 3 min a 115% do FTP com 3 min de recuperação.",
+        "dist": 29.1,
+        "dur": 3492,
+        "pace": "30.0 km/h",
+        "power": 245,
+        "tss": 87
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Giro super leve na bike de contrarrelógio ou estrada para soltura.",
+        "dist": 19.4,
+        "dur": 2794,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 19
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento & Core Estabilidade",
+        "desc": "Treino de core e força funcional.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo com Potência Aeróbia (Tempo Z3)",
+        "desc": "Principal: Rodagem com blocos longos em Zona 3 (Tempo).",
+        "dist": 78,
+        "dur": 8775,
+        "pace": "32.0 km/h",
+        "power": 190,
+        "tss": 146
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total pós-longo do final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Sweet Spot Training (SST Z3.5)",
+        "desc": "Principal: 2x 15 min a 90% do FTP. Carga de estresse aeróbico de alta eficiência.",
+        "dist": 35.4,
+        "dur": 4111,
+        "pace": "31.0 km/h",
+        "power": 210,
+        "tss": 81
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalos de Vo2 Máx (Z5)",
+        "desc": "Principal: 5x 3 min a 115% do FTP com 3 min de recuperação.",
+        "dist": 30.3,
+        "dur": 3636,
+        "pace": "30.0 km/h",
+        "power": 245,
+        "tss": 91
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Giro super leve na bike de contrarrelógio ou estrada para soltura.",
+        "dist": 20.2,
+        "dur": 2909,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento & Core Estabilidade",
+        "desc": "Treino de core e força funcional.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo com Potência Aeróbia (Tempo Z3)",
+        "desc": "Principal: Rodagem com blocos longos em Zona 3 (Tempo).",
+        "dist": 84,
+        "dur": 9450,
+        "pace": "32.0 km/h",
+        "power": 190,
+        "tss": 158
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total pós-longo do final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Sweet Spot Training (SST Z3.5)",
+        "desc": "Principal: 2x 15 min a 90% do FTP. Carga de estresse aeróbico de alta eficiência.",
+        "dist": 26.3,
+        "dur": 3054,
+        "pace": "31.0 km/h",
+        "power": 210,
+        "tss": 60
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalos de Vo2 Máx (Z5)",
+        "desc": "Principal: 5x 3 min a 115% do FTP com 3 min de recuperação.",
+        "dist": 22.5,
+        "dur": 2700,
+        "pace": "30.0 km/h",
+        "power": 245,
+        "tss": 68
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Giro super leve na bike de contrarrelógio ou estrada para soltura.",
+        "dist": 15,
+        "dur": 2160,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento & Core Estabilidade",
+        "desc": "Treino de core e força funcional.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo com Potência Aeróbia (Tempo Z3)",
+        "desc": "Principal: Rodagem com blocos longos em Zona 3 (Tempo).",
+        "dist": 90,
+        "dur": 10125,
+        "pace": "32.0 km/h",
+        "power": 190,
+        "tss": 170
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total pós-longo do final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Sweet Spot Training (SST Z3.5)",
+        "desc": "Principal: 2x 15 min a 90% do FTP. Carga de estresse aeróbico de alta eficiência.",
+        "dist": 17.5,
+        "dur": 2032,
+        "pace": "31.0 km/h",
+        "power": 210,
+        "tss": 40
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalos de Vo2 Máx (Z5)",
+        "desc": "Principal: 5x 3 min a 115% do FTP com 3 min de recuperação.",
+        "dist": 15,
+        "dur": 1800,
+        "pace": "30.0 km/h",
+        "power": 245,
+        "tss": 45
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Giro super leve na bike de contrarrelógio ou estrada para soltura.",
+        "dist": 10,
+        "dur": 1440,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 10
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento & Core Estabilidade",
+        "desc": "Treino de core e força funcional.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Giro Ativação",
+        "desc": "Giro leve pré-prova.",
+        "dist": 20,
+        "dur": 2250,
+        "pace": "32.0 km/h",
+        "power": 190,
+        "tss": 182
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "🎯 PROVA ALVO / DESAFIO DE CICLISMO 🏁",
+        "desc": "Dia do seu objetivo de ciclismo. Mande ver na potência calibrada!",
+        "dist": 100,
+        "dur": 11502,
+        "pace": "31.3 km/h",
+        "power": 200,
+        "tss": 210
+      }
+    ]
+  ]
+}

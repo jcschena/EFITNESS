@@ -2,13 +2,20 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ULTRA - Treinamento Inteligente",
+  title: "ULTRA COACH - Treinamento Inteligente",
   description: "Treinador Virtual Inteligente de Carga e Periodização Esportiva. Conecte seu Garmin e otimize seus treinos com ciência.",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/icon-192.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "ULTRA",
+    title: "ULTRA COACH",
   },
   other: {
     "mobile-web-app-capable": "yes",

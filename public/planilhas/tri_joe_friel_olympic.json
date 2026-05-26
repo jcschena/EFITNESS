@@ -1,0 +1,908 @@
+{
+  "id": "tri_joe_friel_olympic",
+  "name": "Planilha de Triathlon: Olímpico - Fase de Pico",
+  "author": "Joe Friel",
+  "source": "Livro \"The Triathlete's Training Bible\"",
+  "sport": "Triathlon",
+  "weeks": 8,
+  "level": "intermediario",
+  "description": "Planilha periodizada de pico focando nas transições e ritmos competitivos do triathlon olímpico (1.5k natação, 40k bike, 10k corrida).",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica e Ritmo",
+        "desc": "Principal: 10x 100m progressivo focando em braçada fluida.",
+        "dist": 1.3,
+        "dur": 1716,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Z3 / Transição",
+        "desc": "Pedal estável em ritmo moderado para adaptação metabólica.",
+        "dist": 26.4,
+        "dur": 3168,
+        "pace": "30.0 km/h",
+        "power": 160,
+        "tss": 48
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Corrida de Transição T1",
+        "desc": "Trote curto logo após a bike para simular a sensação da transição.",
+        "dist": 2.6,
+        "dur": 897,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Tiros de Limiar Sweet Spot",
+        "desc": "Principal: 2x 15 min no Sweet Spot com cadência em 90 rpm.",
+        "dist": 30.8,
+        "dur": 3577,
+        "pace": "31.0 km/h",
+        "power": 175,
+        "tss": 62
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Trote bem fácil em grama ou pista para soltura das articulações.",
+        "dist": 3.5,
+        "dur": 1260,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação de Endurance Z2",
+        "desc": "Série de natação de volume aeróbico contínuo.",
+        "dist": 1.8,
+        "dur": 2376,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 35
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal de Sábado + Corrida de Transição (T2)",
+        "desc": "Treino clássico de Brick (Bike + Corrida imediata).",
+        "dist": 39.6,
+        "dur": 4752,
+        "pace": "30.0 km/h",
+        "power": 165,
+        "tss": 70
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida de Transição T2",
+        "desc": "Corra imediatamente após descer da bicicleta.",
+        "dist": 3.5,
+        "dur": 1155,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Repouso total para começar a próxima semana com força.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica e Ritmo",
+        "desc": "Principal: 10x 100m progressivo focando em braçada fluida.",
+        "dist": 1.4,
+        "dur": 1848,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Z3 / Transição",
+        "desc": "Pedal estável em ritmo moderado para adaptação metabólica.",
+        "dist": 27.3,
+        "dur": 3276,
+        "pace": "30.0 km/h",
+        "power": 160,
+        "tss": 50
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Corrida de Transição T1",
+        "desc": "Trote curto logo após a bike para simular a sensação da transição.",
+        "dist": 2.7,
+        "dur": 932,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Tiros de Limiar Sweet Spot",
+        "desc": "Principal: 2x 15 min no Sweet Spot com cadência em 90 rpm.",
+        "dist": 31.8,
+        "dur": 3693,
+        "pace": "31.0 km/h",
+        "power": 175,
+        "tss": 64
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Trote bem fácil em grama ou pista para soltura das articulações.",
+        "dist": 3.6,
+        "dur": 1296,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação de Endurance Z2",
+        "desc": "Série de natação de volume aeróbico contínuo.",
+        "dist": 1.8,
+        "dur": 2376,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 36
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal de Sábado + Corrida de Transição (T2)",
+        "desc": "Treino clássico de Brick (Bike + Corrida imediata).",
+        "dist": 40.9,
+        "dur": 4908,
+        "pace": "30.0 km/h",
+        "power": 165,
+        "tss": 73
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida de Transição T2",
+        "desc": "Corra imediatamente após descer da bicicleta.",
+        "dist": 3.6,
+        "dur": 1188,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Repouso total para começar a próxima semana com força.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica e Ritmo",
+        "desc": "Principal: 10x 100m progressivo focando em braçada fluida.",
+        "dist": 1.4,
+        "dur": 1848,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 28
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Z3 / Transição",
+        "desc": "Pedal estável em ritmo moderado para adaptação metabólica.",
+        "dist": 28.2,
+        "dur": 3384,
+        "pace": "30.0 km/h",
+        "power": 160,
+        "tss": 52
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Corrida de Transição T1",
+        "desc": "Trote curto logo após a bike para simular a sensação da transição.",
+        "dist": 2.8,
+        "dur": 966,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Tiros de Limiar Sweet Spot",
+        "desc": "Principal: 2x 15 min no Sweet Spot com cadência em 90 rpm.",
+        "dist": 32.9,
+        "dur": 3821,
+        "pace": "31.0 km/h",
+        "power": 175,
+        "tss": 66
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Trote bem fácil em grama ou pista para soltura das articulações.",
+        "dist": 3.8,
+        "dur": 1368,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação de Endurance Z2",
+        "desc": "Série de natação de volume aeróbico contínuo.",
+        "dist": 1.9,
+        "dur": 2508,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal de Sábado + Corrida de Transição (T2)",
+        "desc": "Treino clássico de Brick (Bike + Corrida imediata).",
+        "dist": 42.3,
+        "dur": 5076,
+        "pace": "30.0 km/h",
+        "power": 165,
+        "tss": 75
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida de Transição T2",
+        "desc": "Corra imediatamente após descer da bicicleta.",
+        "dist": 3.8,
+        "dur": 1254,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 28
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Repouso total para começar a próxima semana com força.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica e Ritmo",
+        "desc": "Principal: 10x 100m progressivo focando em braçada fluida.",
+        "dist": 1.5,
+        "dur": 1980,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Z3 / Transição",
+        "desc": "Pedal estável em ritmo moderado para adaptação metabólica.",
+        "dist": 29.1,
+        "dur": 3492,
+        "pace": "30.0 km/h",
+        "power": 160,
+        "tss": 53
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Corrida de Transição T1",
+        "desc": "Trote curto logo após a bike para simular a sensação da transição.",
+        "dist": 2.9,
+        "dur": 1001,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Tiros de Limiar Sweet Spot",
+        "desc": "Principal: 2x 15 min no Sweet Spot com cadência em 90 rpm.",
+        "dist": 33.9,
+        "dur": 3937,
+        "pace": "31.0 km/h",
+        "power": 175,
+        "tss": 68
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Trote bem fácil em grama ou pista para soltura das articulações.",
+        "dist": 3.9,
+        "dur": 1404,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação de Endurance Z2",
+        "desc": "Série de natação de volume aeróbico contínuo.",
+        "dist": 1.9,
+        "dur": 2508,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 39
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal de Sábado + Corrida de Transição (T2)",
+        "desc": "Treino clássico de Brick (Bike + Corrida imediata).",
+        "dist": 43.6,
+        "dur": 5232,
+        "pace": "30.0 km/h",
+        "power": 165,
+        "tss": 78
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida de Transição T2",
+        "desc": "Corra imediatamente após descer da bicicleta.",
+        "dist": 3.9,
+        "dur": 1287,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Repouso total para começar a próxima semana com força.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica e Ritmo",
+        "desc": "Principal: 10x 100m progressivo focando em braçada fluida.",
+        "dist": 1.5,
+        "dur": 1980,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 30
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Z3 / Transição",
+        "desc": "Pedal estável em ritmo moderado para adaptação metabólica.",
+        "dist": 30,
+        "dur": 3600,
+        "pace": "30.0 km/h",
+        "power": 160,
+        "tss": 55
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Corrida de Transição T1",
+        "desc": "Trote curto logo após a bike para simular a sensação da transição.",
+        "dist": 3,
+        "dur": 1035,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Tiros de Limiar Sweet Spot",
+        "desc": "Principal: 2x 15 min no Sweet Spot com cadência em 90 rpm.",
+        "dist": 35,
+        "dur": 4065,
+        "pace": "31.0 km/h",
+        "power": 175,
+        "tss": 70
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Trote bem fácil em grama ou pista para soltura das articulações.",
+        "dist": 4,
+        "dur": 1440,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação de Endurance Z2",
+        "desc": "Série de natação de volume aeróbico contínuo.",
+        "dist": 2,
+        "dur": 2640,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 40
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal de Sábado + Corrida de Transição (T2)",
+        "desc": "Treino clássico de Brick (Bike + Corrida imediata).",
+        "dist": 45,
+        "dur": 5400,
+        "pace": "30.0 km/h",
+        "power": 165,
+        "tss": 80
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida de Transição T2",
+        "desc": "Corra imediatamente após descer da bicicleta.",
+        "dist": 4,
+        "dur": 1320,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 30
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Repouso total para começar a próxima semana com força.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica e Ritmo",
+        "desc": "Principal: 10x 100m progressivo focando em braçada fluida.",
+        "dist": 1.5,
+        "dur": 1980,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 31
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Z3 / Transição",
+        "desc": "Pedal estável em ritmo moderado para adaptação metabólica.",
+        "dist": 30.9,
+        "dur": 3708,
+        "pace": "30.0 km/h",
+        "power": 160,
+        "tss": 57
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Corrida de Transição T1",
+        "desc": "Trote curto logo após a bike para simular a sensação da transição.",
+        "dist": 3.1,
+        "dur": 1070,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 21
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Tiros de Limiar Sweet Spot",
+        "desc": "Principal: 2x 15 min no Sweet Spot com cadência em 90 rpm.",
+        "dist": 36.1,
+        "dur": 4192,
+        "pace": "31.0 km/h",
+        "power": 175,
+        "tss": 72
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Trote bem fácil em grama ou pista para soltura das articulações.",
+        "dist": 4.1,
+        "dur": 1476,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 21
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação de Endurance Z2",
+        "desc": "Série de natação de volume aeróbico contínuo.",
+        "dist": 2.1,
+        "dur": 2772,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 41
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal de Sábado + Corrida de Transição (T2)",
+        "desc": "Treino clássico de Brick (Bike + Corrida imediata).",
+        "dist": 46.4,
+        "dur": 5568,
+        "pace": "30.0 km/h",
+        "power": 165,
+        "tss": 82
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida de Transição T2",
+        "desc": "Corra imediatamente após descer da bicicleta.",
+        "dist": 4.1,
+        "dur": 1353,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 31
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Repouso total para começar a próxima semana com força.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica e Ritmo",
+        "desc": "Principal: 10x 100m progressivo focando em braçada fluida.",
+        "dist": 1.1,
+        "dur": 1452,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Z3 / Transição",
+        "desc": "Pedal estável em ritmo moderado para adaptação metabólica.",
+        "dist": 22.5,
+        "dur": 2700,
+        "pace": "30.0 km/h",
+        "power": 160,
+        "tss": 41
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Corrida de Transição T1",
+        "desc": "Trote curto logo após a bike para simular a sensação da transição.",
+        "dist": 2.3,
+        "dur": 793,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Tiros de Limiar Sweet Spot",
+        "desc": "Principal: 2x 15 min no Sweet Spot com cadência em 90 rpm.",
+        "dist": 26.3,
+        "dur": 3054,
+        "pace": "31.0 km/h",
+        "power": 175,
+        "tss": 53
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Trote bem fácil em grama ou pista para soltura das articulações.",
+        "dist": 3,
+        "dur": 1080,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação de Endurance Z2",
+        "desc": "Série de natação de volume aeróbico contínuo.",
+        "dist": 1.5,
+        "dur": 1980,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 30
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal de Sábado + Corrida de Transição (T2)",
+        "desc": "Treino clássico de Brick (Bike + Corrida imediata).",
+        "dist": 33.8,
+        "dur": 4056,
+        "pace": "30.0 km/h",
+        "power": 165,
+        "tss": 60
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida de Transição T2",
+        "desc": "Corra imediatamente após descer da bicicleta.",
+        "dist": 3,
+        "dur": 990,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Repouso total para começar a próxima semana com força.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica e Ritmo",
+        "desc": "Principal: 10x 100m progressivo focando em braçada fluida.",
+        "dist": 0.8,
+        "dur": 1056,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Z3 / Transição",
+        "desc": "Pedal estável em ritmo moderado para adaptação metabólica.",
+        "dist": 15,
+        "dur": 1800,
+        "pace": "30.0 km/h",
+        "power": 160,
+        "tss": 28
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Corrida de Transição T1",
+        "desc": "Trote curto logo após a bike para simular a sensação da transição.",
+        "dist": 1.5,
+        "dur": 518,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Tiros de Limiar Sweet Spot",
+        "desc": "Principal: 2x 15 min no Sweet Spot com cadência em 90 rpm.",
+        "dist": 17.5,
+        "dur": 2032,
+        "pace": "31.0 km/h",
+        "power": 175,
+        "tss": 35
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Trote bem fácil em grama ou pista para soltura das articulações.",
+        "dist": 2,
+        "dur": 720,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação de Endurance Z2",
+        "desc": "Série de natação de volume aeróbico contínuo.",
+        "dist": 1,
+        "dur": 1320,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Giro Ativação",
+        "desc": "Pedal curto.",
+        "dist": 15,
+        "dur": 1800,
+        "pace": "30.0 km/h",
+        "power": 165,
+        "tss": 40
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Trote Curto",
+        "desc": "Trote rápido.",
+        "dist": 2,
+        "dur": 660,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "🎯 PROVA ALVO: TRIATHLON OLÍMPICO 🏁",
+        "desc": "Dia de conquistar o seu objetivo! Faça a transição com calma e foco!",
+        "dist": 51.5,
+        "dur": 9500,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 180
+      }
+    ]
+  ]
+}

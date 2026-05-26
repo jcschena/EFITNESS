@@ -20,7 +20,30 @@ export async function POST(req: Request) {
     }
 
     // 2. Validar Planilha da Biblioteca
-    const libraryPlan = TRAINING_LIBRARY[libraryId];
+    let libraryPlan: any = null;
+    const dbPlan = await db.get('SELECT * FROM library_plans WHERE id = ?', libraryId);
+    if (dbPlan) {
+      const workoutsData = JSON.parse(dbPlan.workouts_json);
+      const { calibrateWorkout } = await import('@/lib/training-library');
+      libraryPlan = {
+        id: dbPlan.id,
+        name: dbPlan.name,
+        author: dbPlan.author,
+        source: dbPlan.source,
+        sport: dbPlan.sport,
+        weeks: dbPlan.weeks,
+        level: dbPlan.level,
+        description: dbPlan.description,
+        generateWeeks: (effortPct: number) => {
+          return workoutsData.map((week: any[]) =>
+            week.map(w => calibrateWorkout(w, effortPct))
+          );
+        }
+      };
+    } else {
+      libraryPlan = TRAINING_LIBRARY[libraryId];
+    }
+
     if (!libraryPlan) {
       return NextResponse.json({ error: 'Planilha não encontrada na biblioteca' }, { status: 400 });
     }

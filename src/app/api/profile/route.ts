@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDb, getWeekDates, formatDate, generateWorkoutsForPlan } from '@/lib/db';
+import { getBestMatchingPlan, getWeeksAfterCut } from '@/lib/training-library';
 
 export async function POST(req: Request) {
   try {
@@ -21,6 +22,11 @@ export async function POST(req: Request) {
       weekly_target_hours,
       username,
       password,
+      gender,
+      height,
+      resting_hr,
+      max_hr,
+      observations,
       // Campos de meta
       goal_type,
       goal_distance,
@@ -63,6 +69,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'O ritmo de limiar deve estar no formato MM:SS (ex: 5:15)' }, { status: 400 });
     }
 
+    const parsedHeight = height && String(height).trim() !== '' ? parseFloat(height) : null;
+    const parsedRestingHr = resting_hr && String(resting_hr).trim() !== '' ? parseInt(resting_hr, 10) : null;
+    const parsedMaxHr = max_hr && String(max_hr).trim() !== '' ? parseInt(max_hr, 10) : null;
+
+    if (parsedHeight !== null && (isNaN(parsedHeight) || parsedHeight <= 0)) {
+      return NextResponse.json({ success: false, error: 'A altura deve ser um número positivo válido' }, { status: 400 });
+    }
+    if (parsedRestingHr !== null && (isNaN(parsedRestingHr) || parsedRestingHr <= 0)) {
+      return NextResponse.json({ success: false, error: 'A frequência cardíaca em repouso deve ser um número válido' }, { status: 400 });
+    }
+    if (parsedMaxHr !== null && (isNaN(parsedMaxHr) || parsedMaxHr <= 0)) {
+      return NextResponse.json({ success: false, error: 'A frequência cardíaca máxima deve ser um número válido' }, { status: 400 });
+    }
+
     // 2. Verificar se o usuário existe
     const user = await db.get('SELECT * FROM users WHERE id = ?', userId);
     if (!user) {
@@ -103,7 +123,12 @@ export async function POST(req: Request) {
           threshold_pace = ?,
           weekly_target_hours = ?,
           username = ?,
-          password = ?
+          password = ?,
+          gender = ?,
+          height = ?,
+          resting_hr = ?,
+          max_hr = ?,
+          observations = ?
       WHERE id = ?
     `, 
       name.trim(),
@@ -116,6 +141,11 @@ export async function POST(req: Request) {
       parsedHours,
       username.trim(),
       password,
+      gender || null,
+      parsedHeight,
+      parsedRestingHr,
+      parsedMaxHr,
+      observations || null,
       userId
     );
 
@@ -171,37 +201,128 @@ export async function POST(req: Request) {
           // Deletar workouts da planilha ativa
           await db.run('DELETE FROM workouts WHERE plan_id = ?', activePlan.id);
 
-          // Gerar novos workouts baseados no novo objetivo e nível
-          const newWorkouts = generateWorkoutsForPlan(goal_type, level);
-          const weekDates = getWeekDates();
+          // Verificar se temos uma data de prova alvo
+          const targetDateStr = goal_date_target || (existingGoal ? existingGoal.date_target : null);
+          const distanceVal = parseFloat(String(goal_distance || (existingGoal ? existingGoal.distance : 0)).replace(',', '.'));
 
-          for (const w of newWorkouts) {
+          if (targetDateStr) {
+            // Aplicar planilha periodizada da biblioteca!
+            const recommendedPlan = getBestMatchingPlan(goal_type, level, distanceVal);
+
+            // Calcular datas da semana corrente
+            const systemToday = new Date();
+            const day = systemToday.getDay();
+            const diff = systemToday.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(systemToday);
+            monday.setDate(diff);
+            const startOfWeekStr = formatDate(monday);
+            
+            // Calcular semanas disponíveis
+            const targetDate = new Date(targetDateStr + 'T12:00:00');
+            const mondayDate = new Date(startOfWeekStr + 'T12:00:00');
+            const diffTime = targetDate.getTime() - mondayDate.getTime();
+            const weeksAvailable = Math.ceil(diffTime / (7 * 24 * 60 * 60 * 1000));
+            
+            let totalWeeks = recommendedPlan.weeks;
+            let actualWeeksToUse = recommendedPlan.weeks;
+            let finalCutChoice = 'none';
+            
+            const originalWeekIndices = Array.from({ length: totalWeeks }, (_, i) => i);
+            let selectedWeekIndices = [...originalWeekIndices];
+            
+            if (weeksAvailable > 0 && weeksAvailable < totalWeeks) {
+              actualWeeksToUse = weeksAvailable;
+              finalCutChoice = 'ambos';
+              selectedWeekIndices = getWeeksAfterCut(originalWeekIndices, weeksAvailable, 'ambos');
+            }
+
+            const planName = `${recommendedPlan.name} (${recommendedPlan.author}) - Calibrada a 100%`;
+
+            // Atualizar o plano ativo para ser o da biblioteca
             await db.run(`
-              INSERT INTO workouts (plan_id, day_of_week, date, type, distance_target, duration_target, pace_target, power_target, tss_target, title, description, status)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-            `, activePlan.id, w.day, formatDate(weekDates[w.day - 1]), w.type, w.dist, w.dur, w.pace, w.power, w.tss, w.title, w.desc);
+              UPDATE training_plans
+              SET name = ?,
+                  library_id = ?,
+                  effort_pct = 100,
+                  cut_choice = ?,
+                  current_week = 1,
+                  total_weeks = ?,
+                  start_cycle_date = ?
+              WHERE id = ?
+            `, planName, recommendedPlan.id, finalCutChoice, actualWeeksToUse, startOfWeekStr, activePlan.id);
+
+            // Gerar e inserir os treinos da Semana 1 do novo plano
+            const originalWeeksData = recommendedPlan.generateWeeks(100);
+            const firstWeekIndex = selectedWeekIndices[0] ?? 0;
+            const firstWeekWorkouts = originalWeeksData[firstWeekIndex] || [];
+            const weekDates = getWeekDates(startOfWeekStr);
+
+            for (const w of firstWeekWorkouts) {
+              const workoutDate = formatDate(weekDates[w.day - 1]);
+              await db.run(`
+                INSERT INTO workouts (
+                  plan_id, day_of_week, date, type, distance_target, 
+                  duration_target, pace_target, power_target, tss_target, title, description, status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+              `,
+                activePlan.id,
+                w.day,
+                workoutDate,
+                w.type,
+                w.dist,
+                w.dur,
+                w.pace,
+                typeof w.power === 'number' ? w.power : 0,
+                w.tss,
+                w.title,
+                w.desc
+              );
+            }
+
+            const weekCountMsg = actualWeeksToUse === totalWeeks 
+              ? `completa de ${totalWeeks} semanas`
+              : `ajustada para ${actualWeeksToUse} semanas (corte: ${finalCutChoice === 'ambos' ? 'misto' : finalCutChoice})`;
+
+            // Notificação de recalibração com planilha da biblioteca
+            const todayYmd = formatDate(new Date());
+            await db.run(`
+              INSERT INTO coach_notifs (user_id, date, title, content, read)
+              VALUES (?, ?, 'Planilha Recalibrada! 🔄', ?, 0)
+            `, userId, todayYmd, `Identifiquei a mudança de ${levelChanged ? 'Nível' : ''}${levelChanged && goalTypeChanged ? ' e ' : ''}${goalTypeChanged ? 'Objetivo' : ''}. Recalibrei sua planilha para a planilha periodizada "${recommendedPlan.name}" de ${recommendedPlan.author} da nossa biblioteca. Ela foi ${weekCountMsg} e calibrada a 100% de esforço para a sua prova de ${goal_type}.`);
+          } else {
+            // Caso legado sem prova alvo
+            // Gerar novos workouts baseados no novo objetivo e nível
+            const newWorkouts = generateWorkoutsForPlan(goal_type, level);
+            const weekDates = getWeekDates();
+
+            for (const w of newWorkouts) {
+              await db.run(`
+                INSERT INTO workouts (plan_id, day_of_week, date, type, distance_target, duration_target, pace_target, power_target, tss_target, title, description, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+              `, activePlan.id, w.day, formatDate(weekDates[w.day - 1]), w.type, w.dist, w.dur, w.pace, w.power, w.tss, w.title, w.desc);
+            }
+
+            // Atualizar o nome do plano de treino ativo para o novo nível
+            let newPlanName = `Planilha Inicial Personalizada - Nível ${level.toUpperCase()}`;
+            const weekRegex = /(Semana\s+)(\d+)/i;
+            const match = activePlan.name?.match(weekRegex);
+            if (match) {
+              newPlanName = `${newPlanName} - ${match[0]}`;
+            }
+
+            await db.run(
+              'UPDATE training_plans SET name = ? WHERE id = ?',
+              newPlanName,
+              activePlan.id
+            );
+
+            // Notificação de recalibração
+            const todayYmd = formatDate(new Date());
+            await db.run(`
+              INSERT INTO coach_notifs (user_id, date, title, content, read)
+              VALUES (?, ?, 'Planilha Recalibrada! 🔄', ?, 0)
+            `, userId, todayYmd, `Identifiquei a mudança de ${levelChanged ? 'Nível' : ''}${levelChanged && goalTypeChanged ? ' e ' : ''}${goalTypeChanged ? 'Objetivo Esportivo' : ''}. Recalibrei sua planilha para a modalidade de ${goal_type} (${level === 'elite' ? 'Elite' : level === 'intermediario' ? 'Intermediário' : 'Iniciante'}) para alinhar com suas novas metas.`);
           }
-
-          // Atualizar o nome do plano de treino ativo para o novo nível
-          let newPlanName = `Planilha Inicial Personalizada - Nível ${level.toUpperCase()}`;
-          const weekRegex = /(Semana\s+)(\d+)/i;
-          const match = activePlan.name?.match(weekRegex);
-          if (match) {
-            newPlanName = `${newPlanName} - ${match[0]}`;
-          }
-
-          await db.run(
-            'UPDATE training_plans SET name = ? WHERE id = ?',
-            newPlanName,
-            activePlan.id
-          );
-
-          // Notificação de recalibração
-          const todayYmd = formatDate(new Date());
-          await db.run(`
-            INSERT INTO coach_notifs (user_id, date, title, content, read)
-            VALUES (?, ?, 'Planilha Recalibrada! 🔄', ?, 0)
-          `, userId, todayYmd, `Identifiquei a mudança de ${levelChanged ? 'Nível' : ''}${levelChanged && goalTypeChanged ? ' e ' : ''}${goalTypeChanged ? 'Objetivo Esportivo' : ''}. Recalibrei sua planilha para a modalidade de ${goal_type} (${level === 'elite' ? 'Elite' : level === 'intermediario' ? 'Intermediário' : 'Iniciante'}) para alinhar com suas novas metas.`);
         }
       }
 

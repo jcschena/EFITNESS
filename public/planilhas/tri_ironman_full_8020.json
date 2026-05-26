@@ -1,0 +1,1452 @@
+{
+  "id": "tri_ironman_full_8020",
+  "name": "Planilha de Triathlon: Ironman Full 80/20",
+  "author": "Matt Fitzgerald",
+  "source": "80/20 Endurance (8020endurance.com)",
+  "sport": "Triathlon",
+  "weeks": 16,
+  "level": "avancado",
+  "description": "Metodologia 80/20 aplicada à distância rainha do Triathlon. Maximiza o volume aeróbico e reduz a fadiga neuromuscular excessiva.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.7,
+        "dur": 2040,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 34
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 34.4,
+        "dur": 4128,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 57
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 7.7,
+        "dur": 2541,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 54
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.1,
+        "dur": 2520,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 46
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 79.5,
+        "dur": 9144,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 137
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 4.6,
+        "dur": 1518,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 31
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.7,
+        "dur": 2040,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 35
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 35.1,
+        "dur": 4212,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 59
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 7.8,
+        "dur": 2574,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 55
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.2,
+        "dur": 2640,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 47
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 84,
+        "dur": 9661,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 144
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 4.7,
+        "dur": 1551,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 31
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.7,
+        "dur": 2040,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 36
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 35.8,
+        "dur": 4296,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 60
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 8,
+        "dur": 2640,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 56
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.2,
+        "dur": 2640,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 48
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 88.5,
+        "dur": 10179,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 151
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 4.8,
+        "dur": 1584,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 32
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.8,
+        "dur": 2160,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 36
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 36.5,
+        "dur": 4380,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 61
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 8.1,
+        "dur": 2673,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 57
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.3,
+        "dur": 2760,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 49
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 93,
+        "dur": 10696,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 158
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 4.9,
+        "dur": 1617,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 32
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.8,
+        "dur": 2160,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 37
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 37.1,
+        "dur": 4452,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 62
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 8.3,
+        "dur": 2739,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 58
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.3,
+        "dur": 2760,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 50
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 97.5,
+        "dur": 11214,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 165
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 4.9,
+        "dur": 1617,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 33
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.8,
+        "dur": 2160,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 37.8,
+        "dur": 4536,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 63
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 8.4,
+        "dur": 2772,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 59
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.4,
+        "dur": 2880,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 50
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 102,
+        "dur": 11732,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 172
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 5,
+        "dur": 1650,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 34
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.9,
+        "dur": 2280,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 38.5,
+        "dur": 4620,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 64
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 8.6,
+        "dur": 2838,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 60
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.4,
+        "dur": 2880,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 51
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 106.5,
+        "dur": 12249,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 179
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 5.1,
+        "dur": 1683,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 34
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.9,
+        "dur": 2280,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 39
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 39.1,
+        "dur": 4692,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 65
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 8.7,
+        "dur": 2871,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 61
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.4,
+        "dur": 2880,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 52
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 111,
+        "dur": 12767,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 186
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 5.2,
+        "dur": 1716,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 35
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.9,
+        "dur": 2280,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 40
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 39.8,
+        "dur": 4776,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 66
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 8.8,
+        "dur": 2904,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 62
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.5,
+        "dur": 3000,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 53
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 115.5,
+        "dur": 13284,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 193
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 5.3,
+        "dur": 1749,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 35
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 2,
+        "dur": 2400,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 41
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 40.5,
+        "dur": 4860,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 68
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 9,
+        "dur": 2970,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 63
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.5,
+        "dur": 3000,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 54
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 120,
+        "dur": 13802,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 200
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 5.4,
+        "dur": 1782,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 36
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 2,
+        "dur": 2400,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 41
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 41.2,
+        "dur": 4944,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 69
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 9.2,
+        "dur": 3036,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 64
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.6,
+        "dur": 3120,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 55
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 124.5,
+        "dur": 14319,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 207
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 5.5,
+        "dur": 1815,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 37
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 2,
+        "dur": 2400,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 42
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 41.8,
+        "dur": 5016,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 70
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 9.3,
+        "dur": 3069,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 65
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.6,
+        "dur": 3120,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 56
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 129,
+        "dur": 14837,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 214
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 5.6,
+        "dur": 1848,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 37
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 2.1,
+        "dur": 2520,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 43
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 42.5,
+        "dur": 5100,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 71
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 9.5,
+        "dur": 3135,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 66
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.6,
+        "dur": 3120,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 57
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 133.5,
+        "dur": 15355,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 221
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 5.7,
+        "dur": 1881,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.4,
+        "dur": 1680,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 29.3,
+        "dur": 3516,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 49
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 6.5,
+        "dur": 2145,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 46
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 1.8,
+        "dur": 2160,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 39
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 138,
+        "dur": 15872,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 228
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 3.9,
+        "dur": 1287,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 1.4,
+        "dur": 1680,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 29.3,
+        "dur": 3516,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 49
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 6.5,
+        "dur": 2145,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 46
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 1.8,
+        "dur": 2160,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 39
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Longão + Transição T2",
+        "desc": "Pedal de endurance longo em Zona 2 seguido de corrida leve.",
+        "dist": 142.5,
+        "dur": 16390,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 235
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Corrida Transição Brick Z2",
+        "desc": "Corrida leve imediata pós-pedal.",
+        "dist": 3.9,
+        "dur": 1287,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação 80/20: Técnica e Limiar",
+        "desc": "Educativos e séries de limiar intervaladas com descanso curto.",
+        "dist": 0.9,
+        "dur": 1080,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo 80/20: Giro Aeróbico Z2",
+        "desc": "Pedal em intensidade baixa (Zona 2) para maximizar capacidade aeróbica.",
+        "dist": 18,
+        "dur": 2160,
+        "pace": "30.0 km/h",
+        "power": 170,
+        "tss": 30
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida 80/20: Intervalado Z3/Z4",
+        "desc": "Principal: Séries de ritmo (Tempo Run) em Zona 3/4 controlada.",
+        "dist": 4,
+        "dur": 1320,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 28
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Funcional",
+        "desc": "Prevenção de lesões e fortalecimento de pernas e core.",
+        "dist": 0,
+        "dur": 2100,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação 80/20: Endurance Longo Z2",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 1.1,
+        "dur": 1320,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 24
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Giro Curto",
+        "desc": "Soltura.",
+        "dist": 15,
+        "dur": 1725,
+        "pace": "31.3 km/h",
+        "power": 175,
+        "tss": 242
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Trote",
+        "desc": "Trote.",
+        "dist": 2,
+        "dur": 660,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 16
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "🎯 PROVA ALVO: IRONMAN FULL (226K) 🏁",
+        "desc": "Encare os 226km no seu ritmo 80/20 calibrado! Sucesso!",
+        "dist": 226,
+        "dur": 41400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 580
+      }
+    ]
+  ]
+}

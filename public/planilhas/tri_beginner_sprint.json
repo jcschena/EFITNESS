@@ -1,0 +1,732 @@
+{
+  "id": "tri_beginner_sprint",
+  "name": "Planilha de Triathlon: Meu Primeiro Sprint",
+  "author": "Triathlete Magazine",
+  "source": "Triathlete.com",
+  "sport": "Triathlon",
+  "weeks": 8,
+  "level": "iniciante",
+  "description": "Programe-se para terminar seu primeiro Triathlon Sprint (750m natação, 20km ciclismo, 5km corrida). Foco em transições e treinos leves de adaptação.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica crawl",
+        "desc": "Educativos de braçada e pernada constante na piscina.",
+        "dist": 0.7,
+        "dur": 980,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 12
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo Giro Z2",
+        "desc": "Pedal em cadência confortável e controle de esforço aeróbico.",
+        "dist": 12.5,
+        "dur": 1800,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 21
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica completa.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida Trote / Caminhada Z2",
+        "desc": "Intercalar corrida leve e caminhada de forma estruturada.",
+        "dist": 2.5,
+        "dur": 950,
+        "pace": "6:20/km",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação Resistência Leve",
+        "desc": "Série de endurance contínua com repousos confortáveis na borda.",
+        "dist": 0.8,
+        "dur": 1080,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo e Corrida (Treino de Transição)",
+        "desc": "Pedalar e correr logo em seguida para simular a transição T2.",
+        "dist": 14.9,
+        "dur": 2087,
+        "pace": "25.7 km/h",
+        "power": 115,
+        "tss": 25
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Transição T2 (Corrida)",
+        "desc": "Correr imediatamente após descer da bicicleta.",
+        "dist": 1.7,
+        "dur": 629,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação de final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica crawl",
+        "desc": "Educativos de braçada e pernada constante na piscina.",
+        "dist": 0.7,
+        "dur": 980,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 13
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo Giro Z2",
+        "desc": "Pedal em cadência confortável e controle de esforço aeróbico.",
+        "dist": 12.9,
+        "dur": 1858,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 22
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica completa.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida Trote / Caminhada Z2",
+        "desc": "Intercalar corrida leve e caminhada de forma estruturada.",
+        "dist": 2.6,
+        "dur": 988,
+        "pace": "6:20/km",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação Resistência Leve",
+        "desc": "Série de endurance contínua com repousos confortáveis na borda.",
+        "dist": 0.9,
+        "dur": 1215,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo e Corrida (Treino de Transição)",
+        "desc": "Pedalar e correr logo em seguida para simular a transição T2.",
+        "dist": 15.5,
+        "dur": 2171,
+        "pace": "25.7 km/h",
+        "power": 115,
+        "tss": 26
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Transição T2 (Corrida)",
+        "desc": "Correr imediatamente após descer da bicicleta.",
+        "dist": 1.7,
+        "dur": 629,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação de final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica crawl",
+        "desc": "Educativos de braçada e pernada constante na piscina.",
+        "dist": 0.7,
+        "dur": 980,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 13
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo Giro Z2",
+        "desc": "Pedal em cadência confortável e controle de esforço aeróbico.",
+        "dist": 13.3,
+        "dur": 1915,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 22
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica completa.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida Trote / Caminhada Z2",
+        "desc": "Intercalar corrida leve e caminhada de forma estruturada.",
+        "dist": 2.7,
+        "dur": 1026,
+        "pace": "6:20/km",
+        "power": 0,
+        "tss": 16
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação Resistência Leve",
+        "desc": "Série de endurance contínua com repousos confortáveis na borda.",
+        "dist": 0.9,
+        "dur": 1215,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo e Corrida (Treino de Transição)",
+        "desc": "Pedalar e correr logo em seguida para simular a transição T2.",
+        "dist": 16,
+        "dur": 2241,
+        "pace": "25.7 km/h",
+        "power": 115,
+        "tss": 27
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Transição T2 (Corrida)",
+        "desc": "Correr imediatamente após descer da bicicleta.",
+        "dist": 1.8,
+        "dur": 666,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 11
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação de final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica crawl",
+        "desc": "Educativos de braçada e pernada constante na piscina.",
+        "dist": 0.7,
+        "dur": 980,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 14
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo Giro Z2",
+        "desc": "Pedal em cadência confortável e controle de esforço aeróbico.",
+        "dist": 13.8,
+        "dur": 1987,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 23
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica completa.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida Trote / Caminhada Z2",
+        "desc": "Intercalar corrida leve e caminhada de forma estruturada.",
+        "dist": 2.8,
+        "dur": 1064,
+        "pace": "6:20/km",
+        "power": 0,
+        "tss": 17
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação Resistência Leve",
+        "desc": "Série de endurance contínua com repousos confortáveis na borda.",
+        "dist": 0.9,
+        "dur": 1215,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo e Corrida (Treino de Transição)",
+        "desc": "Pedalar e correr logo em seguida para simular a transição T2.",
+        "dist": 16.6,
+        "dur": 2325,
+        "pace": "25.7 km/h",
+        "power": 115,
+        "tss": 28
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Transição T2 (Corrida)",
+        "desc": "Correr imediatamente após descer da bicicleta.",
+        "dist": 1.8,
+        "dur": 666,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 11
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação de final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica crawl",
+        "desc": "Educativos de braçada e pernada constante na piscina.",
+        "dist": 0.8,
+        "dur": 1120,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 14
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo Giro Z2",
+        "desc": "Pedal em cadência confortável e controle de esforço aeróbico.",
+        "dist": 14.3,
+        "dur": 2059,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 24
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica completa.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida Trote / Caminhada Z2",
+        "desc": "Intercalar corrida leve e caminhada de forma estruturada.",
+        "dist": 2.9,
+        "dur": 1102,
+        "pace": "6:20/km",
+        "power": 0,
+        "tss": 17
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação Resistência Leve",
+        "desc": "Série de endurance contínua com repousos confortáveis na borda.",
+        "dist": 1,
+        "dur": 1350,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 21
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo e Corrida (Treino de Transição)",
+        "desc": "Pedalar e correr logo em seguida para simular a transição T2.",
+        "dist": 17.1,
+        "dur": 2395,
+        "pace": "25.7 km/h",
+        "power": 115,
+        "tss": 29
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Transição T2 (Corrida)",
+        "desc": "Correr imediatamente após descer da bicicleta.",
+        "dist": 1.9,
+        "dur": 703,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 11
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação de final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica crawl",
+        "desc": "Educativos de braçada e pernada constante na piscina.",
+        "dist": 0.8,
+        "dur": 1120,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo Giro Z2",
+        "desc": "Pedal em cadência confortável e controle de esforço aeróbico.",
+        "dist": 14.7,
+        "dur": 2117,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 25
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica completa.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida Trote / Caminhada Z2",
+        "desc": "Intercalar corrida leve e caminhada de forma estruturada.",
+        "dist": 2.9,
+        "dur": 1102,
+        "pace": "6:20/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação Resistência Leve",
+        "desc": "Série de endurance contínua com repousos confortáveis na borda.",
+        "dist": 1,
+        "dur": 1350,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 22
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo e Corrida (Treino de Transição)",
+        "desc": "Pedalar e correr logo em seguida para simular a transição T2.",
+        "dist": 17.6,
+        "dur": 2465,
+        "pace": "25.7 km/h",
+        "power": 115,
+        "tss": 29
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Transição T2 (Corrida)",
+        "desc": "Correr imediatamente após descer da bicicleta.",
+        "dist": 2,
+        "dur": 740,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 12
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação de final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica crawl",
+        "desc": "Educativos de braçada e pernada constante na piscina.",
+        "dist": 0.6,
+        "dur": 840,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 11
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo Giro Z2",
+        "desc": "Pedal em cadência confortável e controle de esforço aeróbico.",
+        "dist": 11.3,
+        "dur": 1627,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 19
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica completa.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida Trote / Caminhada Z2",
+        "desc": "Intercalar corrida leve e caminhada de forma estruturada.",
+        "dist": 2.3,
+        "dur": 874,
+        "pace": "6:20/km",
+        "power": 0,
+        "tss": 14
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação Resistência Leve",
+        "desc": "Série de endurance contínua com repousos confortáveis na borda.",
+        "dist": 0.8,
+        "dur": 1080,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 17
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Ciclismo e Corrida (Treino de Transição)",
+        "desc": "Pedalar e correr logo em seguida para simular a transição T2.",
+        "dist": 13.5,
+        "dur": 1891,
+        "pace": "25.7 km/h",
+        "power": 115,
+        "tss": 23
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Transição T2 (Corrida)",
+        "desc": "Correr imediatamente após descer da bicicleta.",
+        "dist": 1.5,
+        "dur": 555,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 9
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação de final de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Natação Técnica crawl",
+        "desc": "Educativos de braçada e pernada constante na piscina.",
+        "dist": 0.4,
+        "dur": 560,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 8
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Ciclismo Giro Z2",
+        "desc": "Pedal em cadência confortável e controle de esforço aeróbico.",
+        "dist": 7.5,
+        "dur": 1080,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 13
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica completa.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida Trote / Caminhada Z2",
+        "desc": "Intercalar corrida leve e caminhada de forma estruturada.",
+        "dist": 1.5,
+        "dur": 570,
+        "pace": "6:20/km",
+        "power": 0,
+        "tss": 9
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Natação Resistência Leve",
+        "desc": "Série de endurance contínua com repousos confortáveis na borda.",
+        "dist": 0.5,
+        "dur": 675,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 11
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Giro de Véspera",
+        "desc": "Giro super curto de ativação.",
+        "dist": 8,
+        "dur": 1121,
+        "pace": "25.7 km/h",
+        "power": 115,
+        "tss": 15
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Trote Ativação",
+        "desc": "Trote rápido.",
+        "dist": 1,
+        "dur": 370,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 6
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "🎯 PROVA ALVO: TRIATHLON SPRINT 🏁",
+        "desc": "Chegou o dia! Complete os 750m nado, 20km bike e 5km corrida com sorriso no rosto!",
+        "dist": 25.75,
+        "dur": 5400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 110
+      }
+    ]
+  ]
+}

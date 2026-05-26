@@ -105,7 +105,7 @@ export async function POST(req: Request) {
             // Criar notificação de boas-vindas
             await db.run(`
               INSERT INTO coach_notifs (user_id, date, title, content)
-              VALUES (?, ?, 'Bem-vindo ao ULTRA!', 'Olá, João Claudio! Analisei seus dados e configurei sua planilha semanal de treinos dinâmicos. Use o Strava para que eu acompanhe sua evolução e faça ajustes automáticos!')
+              VALUES (?, ?, 'Bem-vindo ao ULTRA!', 'Olá, João Claudio! Analisei seus dados e configurei sua planilha semanal de treinos dinâmicos. Use o Strava para que o Assistente Fisiológico acompanhe sua evolução e faça os ajustes automáticos de carga!')
             `, createdId, formatDate(new Date()));
 
             user = await db.get("SELECT * FROM users WHERE id = ?", createdId);

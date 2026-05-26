@@ -1,0 +1,960 @@
+{
+  "id": "run_jack_daniels_marathon",
+  "name": "Planilha de Maratona: Fórmula de Daniels 2Q",
+  "author": "Jack Daniels",
+  "source": "Livro \"Daniels' Running Formula\"",
+  "sport": "Corrida",
+  "weeks": 12,
+  "level": "avancado",
+  "description": "Fórmula científica baseada em VDOT com duas sessões de qualidade por semana (Q1 e Q2). Prescrição exata de Limiar e Ritmo de Maratona.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 9.2,
+        "dur": 2760,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 69
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 7.4,
+        "dur": 2553,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 37
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 5.5,
+        "dur": 1980,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 15,
+        "dur": 4800,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 96
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 9.4,
+        "dur": 2820,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 71
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 7.5,
+        "dur": 2588,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 5.6,
+        "dur": 2016,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 24
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 16,
+        "dur": 5120,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 102
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 9.6,
+        "dur": 2880,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 72
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 7.7,
+        "dur": 2657,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 5.8,
+        "dur": 2088,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 24
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 17,
+        "dur": 5440,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 108
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 9.8,
+        "dur": 2940,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 74
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 7.8,
+        "dur": 2691,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 39
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 5.9,
+        "dur": 2124,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 25
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 18,
+        "dur": 5760,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 114
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 10,
+        "dur": 3000,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 75
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 8,
+        "dur": 2760,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 40
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 6,
+        "dur": 2160,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 25
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 19,
+        "dur": 6080,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 120
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 10.2,
+        "dur": 3060,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 77
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 8.2,
+        "dur": 2829,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 41
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 6.1,
+        "dur": 2196,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 20,
+        "dur": 6400,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 126
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 10.4,
+        "dur": 3120,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 78
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 8.3,
+        "dur": 2864,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 42
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 6.2,
+        "dur": 2232,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 21,
+        "dur": 6720,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 132
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 10.6,
+        "dur": 3180,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 80
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 8.5,
+        "dur": 2933,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 42
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 6.4,
+        "dur": 2304,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 22,
+        "dur": 7040,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 138
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 10.8,
+        "dur": 3240,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 81
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 8.6,
+        "dur": 2967,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 43
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 6.5,
+        "dur": 2340,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 23,
+        "dur": 7360,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 144
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 7,
+        "dur": 2100,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 53
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 5.6,
+        "dur": 1932,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 28
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 4.2,
+        "dur": 1512,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 24,
+        "dur": 7680,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 150
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 7,
+        "dur": 2100,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 53
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 5.6,
+        "dur": 1932,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 28
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 4.2,
+        "dur": 1512,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Sessão Q2: Longão com Ritmo de Maratona (M-Pace)",
+        "desc": "Principal: Corrida contínua acumulando volume aeróbico severo.",
+        "dist": 25,
+        "dur": 8000,
+        "pace": "5:20/km",
+        "power": 0,
+        "tss": 156
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recupere-se e alimente-se bem para a próxima semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação fisiológica total pós-qualidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Sessão Q1: Repetições de Ritmo de Limiar (T-Pace)",
+        "desc": "Principal: 3x 2km em ritmo de limiar aeróbico com 2 min de trote entre eles.",
+        "dist": 4.5,
+        "dur": 1350,
+        "pace": "5:00/km",
+        "power": 0,
+        "tss": 34
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Corrida de Rodagem Leve (E-Pace)",
+        "desc": "Trote regenerativo em Zona 2 para restabelecer fluxo sanguíneo.",
+        "dist": 3.6,
+        "dur": 1242,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento Específico",
+        "desc": "Foco em estabilidade de quadril, panturrilhas e core.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Corrida Regenerativa super leve",
+        "desc": "Trote muito fácil de soltura mecânica.",
+        "dist": 2.7,
+        "dur": 972,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 11
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Trote Curto Pré-Prova",
+        "desc": "Trote rápido de véspera.",
+        "dist": 4,
+        "dur": 1440,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 162
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "🎯 PROVA ALVO: MARATONA (42.2K) 🏁",
+        "desc": "O dia da glória! Administre seu ritmo de maratona (M-pace) e complete a prova!",
+        "dist": 42.2,
+        "dur": 14348,
+        "pace": "5:40/km",
+        "power": 0,
+        "tss": 320
+      }
+    ]
+  ]
+}

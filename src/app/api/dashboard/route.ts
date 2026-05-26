@@ -37,6 +37,7 @@ export async function GET(req: Request) {
     const activePlan = await db.get('SELECT * FROM training_plans WHERE user_id = ? AND active = 1', userId);
     
     let workouts: any[] = [];
+    let activityLogs: any[] = [];
     if (activePlan) {
       // Alinhamento automático de datas para a semana corrente
       let today = clientDate ? new Date(clientDate + 'T12:00:00') : new Date();
@@ -68,7 +69,29 @@ export async function GET(req: Request) {
       
       if (activePlan.start_date !== startOfWeekStr || activePlan.end_date !== endOfWeekStr) {
         if (activePlan.library_id) {
-          const libraryPlan = TRAINING_LIBRARY[activePlan.library_id];
+          let libraryPlan: any = null;
+          const dbPlan = await db.get('SELECT * FROM library_plans WHERE id = ?', activePlan.library_id);
+          if (dbPlan) {
+            const workoutsData = JSON.parse(dbPlan.workouts_json);
+            const { calibrateWorkout } = await import('@/lib/training-library');
+            libraryPlan = {
+              id: dbPlan.id,
+              name: dbPlan.name,
+              author: dbPlan.author,
+              source: dbPlan.source,
+              sport: dbPlan.sport,
+              weeks: dbPlan.weeks,
+              level: dbPlan.level,
+              description: dbPlan.description,
+              generateWeeks: (effortPct: number) => {
+                return workoutsData.map((week: any[]) =>
+                  week.map(w => calibrateWorkout(w, effortPct))
+                );
+              }
+            };
+          } else {
+            libraryPlan = TRAINING_LIBRARY[activePlan.library_id];
+          }
           if (libraryPlan) {
             const nextWeekNum = (activePlan.current_week || 1) + 1;
             const totalWeeks = activePlan.total_weeks || libraryPlan.weeks;
@@ -535,7 +558,7 @@ export async function GET(req: Request) {
             notifContent = `Sua planilha para a semana de ${nextWeekStartFormatted} a ${nextWeekEndFormatted} ("${newPlanName}") está pronta. Com base na proximidade da sua prova alvo "${raceName}" (${targetDateOnlyFormatted}), entramos na **${phaseName}**. Apliquei o fator de ajuste de ${factor > 1 ? '+' : ''}${Math.round((factor - 1) * 100)}% em volume/TSS para otimizar suas adaptações fisiológicas!`;
           }
         } else {
-          notifContent = `Sua planilha de treinos para a semana de ${nextWeekStartFormatted} a ${nextWeekEndFormatted} ("${newPlanName}") foi atualizada e está pronta! Como seu coach, apliquei uma progressão de periodização esportiva clássica: aumentei em 10% as distâncias, durações e o TSS planejado de cada sessão para garantir sua evolução constante e supercompensação fisiológica. Bons treinos, foco na consistência! 🚀`;
+          notifContent = `Sua planilha de treinos para a semana de ${nextWeekStartFormatted} a ${nextWeekEndFormatted} ("${newPlanName}") foi atualizada e está pronta! Como seu assistente fisiológico, apliquei uma progressão de periodização esportiva clássica: aumentei em 10% as distâncias, durações e o TSS planejado de cada sessão para garantir sua evolução constante e supercompensação fisiológica. Bons treinos, foco na consistência! 🚀`;
         }
         
         // Verificar se já existe notificação com o mesmo conteúdo/título para este usuário
@@ -565,10 +588,61 @@ export async function GET(req: Request) {
 
       // Obter treinos da planilha ativa
       workouts = await db.all('SELECT * FROM workouts WHERE plan_id = ? ORDER BY day_of_week ASC, id ASC', activePlan.id);
+    } else {
+      // Se nenhuma planilha estiver ativa, buscar os treinos reais que o atleta fez na semana
+      let today = clientDate ? new Date(clientDate + 'T12:00:00') : new Date();
+      const day = today.getDay();
+      const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(today);
+      monday.setDate(diff);
+      
+      const formatYmd = (date: Date) => {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      };
+      
+      const startOfWeekStr = formatYmd(monday);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const endOfWeekStr = formatYmd(sunday);
+
+      // Buscar logs de atividades da semana
+      activityLogs = await db.all(`
+        SELECT * FROM activity_logs 
+        WHERE user_id = ? AND timestamp >= ? AND timestamp <= ?
+        ORDER BY timestamp ASC
+      `, userId, startOfWeekStr + 'T00:00:00', endOfWeekStr + 'T23:59:59');
+
+      // Mapear logs para treinos fakes com status 'completed'
+      workouts = activityLogs.map((log: any) => {
+        const logDate = new Date(log.timestamp);
+        let dayOfWeek = logDate.getDay();
+        if (dayOfWeek === 0) dayOfWeek = 7; // Domingo vira 7
+
+        // Forçar a vinculação temporária de ID para que a interface encontre
+        log.workout_id = log.id;
+
+        return {
+          id: log.id,
+          plan_id: 0,
+          day_of_week: dayOfWeek,
+          date: log.timestamp.split('T')[0],
+          type: log.type,
+          distance_target: log.distance_real,
+          duration_target: log.duration_real,
+          pace_target: log.pace_real,
+          power_target: log.avg_power || 0,
+          tss_target: log.tss_real,
+          title: log.sync_source === 'Strava' ? `Atividade Strava: ${log.type}` : `Treino Manual: ${log.type}`,
+          description: `Atividade registrada via ${log.sync_source || 'Strava'}.`,
+          status: 'completed'
+        };
+      });
     }
 
     // 4. Obter Logs de Atividades realizados na semana (todos, vinculados ou extras, estendidos em 48h)
-    let activityLogs: any[] = [];
     if (activePlan && workouts.length > 0) {
       const workoutIds = workouts.map(w => w.id).join(',');
       

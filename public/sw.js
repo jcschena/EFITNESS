@@ -1,4 +1,4 @@
-const CACHE_NAME = 'apex-coach-cache-v1';
+const CACHE_NAME = 'ultra-coach-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',

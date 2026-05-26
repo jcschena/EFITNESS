@@ -1,0 +1,960 @@
+{
+  "id": "bike_joe_friel_gran_fondo",
+  "name": "Planilha de Ciclismo: Gran Fondo 100 Milhas",
+  "author": "Joe Friel",
+  "source": "Livro \"The Cyclist's Training Bible\"",
+  "sport": "Ciclismo",
+  "weeks": 12,
+  "level": "intermediario",
+  "description": "Planilha focada no aumento do limiar de lactato e volume de endurance na bicicleta. Estruturada em mesociclos clássicos de Joe Friel.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 21.8,
+        "dur": 2803,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 30
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 26.1,
+        "dur": 3240,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 57
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 17.4,
+        "dur": 2506,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 17
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 55,
+        "dur": 6600,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 110
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 22.3,
+        "dur": 2867,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 31
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 26.7,
+        "dur": 3314,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 58
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 17.8,
+        "dur": 2563,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 60,
+        "dur": 7200,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 120
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 22.7,
+        "dur": 2919,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 32
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 27.3,
+        "dur": 3389,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 59
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 18.2,
+        "dur": 2621,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 65,
+        "dur": 7800,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 130
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 23.3,
+        "dur": 2996,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 33
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 27.9,
+        "dur": 3463,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 60
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 18.6,
+        "dur": 2678,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 19
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 70,
+        "dur": 8400,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 140
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 23.8,
+        "dur": 3060,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 33
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 28.5,
+        "dur": 3538,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 62
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 19,
+        "dur": 2736,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 19
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 75,
+        "dur": 9000,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 150
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 24.3,
+        "dur": 3124,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 34
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 29.1,
+        "dur": 3612,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 63
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 19.4,
+        "dur": 2794,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 19
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 80,
+        "dur": 9600,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 160
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 24.8,
+        "dur": 3189,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 35
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 29.7,
+        "dur": 3687,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 64
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 19.8,
+        "dur": 2851,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 20
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 85,
+        "dur": 10200,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 170
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 25.3,
+        "dur": 3253,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 35
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 30.3,
+        "dur": 3761,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 66
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 20.2,
+        "dur": 2909,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 20
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 90,
+        "dur": 10800,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 180
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 25.8,
+        "dur": 3317,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 36
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 30.9,
+        "dur": 3836,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 67
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 20.6,
+        "dur": 2966,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 21
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 95,
+        "dur": 11400,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 190
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 17.5,
+        "dur": 2250,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 25
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 21,
+        "dur": 2607,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 46
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 14,
+        "dur": 2016,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 14
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 100,
+        "dur": 12000,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 200
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 17.5,
+        "dur": 2250,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 25
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 21,
+        "dur": 2607,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 46
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 14,
+        "dur": 2016,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 14
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Fim de Semana (Endurance Z2)",
+        "desc": "Acumulando resistência aeróbica e testando nutrição de prova.",
+        "dist": 105,
+        "dur": 12600,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 210
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Recuperação semanal.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso total para as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Treino de Cadência e Giro Leve Z2",
+        "desc": "Giro ágil com cadência entre 90-100 rpm para eficiência mecânica.",
+        "dist": 11.3,
+        "dur": 1453,
+        "pace": "28.0 km/h",
+        "power": 140,
+        "tss": 16
+      },
+      {
+        "day": 3,
+        "type": "Ciclismo",
+        "title": "Intervalado de Subida (Força de Torque Z4)",
+        "desc": "Principal: 3x 5 min em subida com cadência baixa (55-65 rpm) forçando potência.",
+        "dist": 13.5,
+        "dur": 1676,
+        "pace": "29.0 km/h",
+        "power": 185,
+        "tss": 29
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Membros Inferiores",
+        "desc": "Agachamentos excêntricos, pranchas e mobilidade.",
+        "dist": 0,
+        "dur": 2400,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Ciclismo",
+        "title": "Giro Regenerativo Ativo Z1",
+        "desc": "Pedal de soltura total em asfalto plano e cadência confortável.",
+        "dist": 9,
+        "dur": 1296,
+        "pace": "25.0 km/h",
+        "power": 110,
+        "tss": 9
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Giro de Véspera",
+        "desc": "Giro curto para manter tônus muscular.",
+        "dist": 15,
+        "dur": 1800,
+        "pace": "30.0 km/h",
+        "power": 155,
+        "tss": 220
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "🎯 PROVA ALVO: GRAN FONDO (160K) 🏁",
+        "desc": "A grande prova de endurance! Hidrate-se e distribua o esforço uniformemente.",
+        "dist": 160,
+        "dur": 19794,
+        "pace": "29.1 km/h",
+        "power": 165,
+        "tss": 280
+      }
+    ]
+  ]
+}

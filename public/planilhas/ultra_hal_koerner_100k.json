@@ -1,0 +1,1276 @@
+{
+  "id": "ultra_hal_koerner_100k",
+  "name": "Planilha de Ultramaratona: 100K Trail Run",
+  "author": "Hal Koerner",
+  "source": "Livro \"Hal Koerner's Field Guide to Ultrarunning\"",
+  "sport": "Ultramaratona",
+  "weeks": 16,
+  "level": "avancado",
+  "description": "Treinamento de ultra-distância focado em desnível acumulado, corridas longas em trilha extrema e estratégias nutricionais/psicológicas para completar 100km.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 7.2,
+        "dur": 2808,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 32
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 8.6,
+        "dur": 2838,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 61
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 5.7,
+        "dur": 2223,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 22
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 26.2,
+        "dur": 10480,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 136
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 16,
+        "dur": 6400,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 100
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 7.4,
+        "dur": 2886,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 33
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 8.8,
+        "dur": 2904,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 63
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 5.9,
+        "dur": 2301,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 22
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 27.4,
+        "dur": 10960,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 142
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 17,
+        "dur": 6800,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 105
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 7.5,
+        "dur": 2925,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 34
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 9,
+        "dur": 2970,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 64
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 6,
+        "dur": 2340,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 28.6,
+        "dur": 11440,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 148
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 18,
+        "dur": 7200,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 110
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 7.7,
+        "dur": 3003,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 35
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 9.3,
+        "dur": 3069,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 66
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 6.2,
+        "dur": 2418,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 29.8,
+        "dur": 11920,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 154
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 19,
+        "dur": 7600,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 115
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 7.9,
+        "dur": 3081,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 36
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 9.5,
+        "dur": 3135,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 67
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 6.3,
+        "dur": 2457,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 24
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 31,
+        "dur": 12400,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 160
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 20,
+        "dur": 8000,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 120
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 8.1,
+        "dur": 3159,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 36
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 9.7,
+        "dur": 3201,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 69
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 6.5,
+        "dur": 2535,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 24
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 32.2,
+        "dur": 12880,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 166
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 21,
+        "dur": 8400,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 125
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 8.3,
+        "dur": 3237,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 37
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 9.9,
+        "dur": 3267,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 70
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 6.6,
+        "dur": 2574,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 25
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 33.4,
+        "dur": 13360,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 172
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 22,
+        "dur": 8800,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 130
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 8.4,
+        "dur": 3276,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 10.1,
+        "dur": 3333,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 72
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 6.8,
+        "dur": 2652,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 25
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 34.6,
+        "dur": 13840,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 178
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 23,
+        "dur": 9200,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 135
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 8.6,
+        "dur": 3354,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 39
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 10.3,
+        "dur": 3399,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 73
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 6.9,
+        "dur": 2691,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 35.8,
+        "dur": 14320,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 184
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 24,
+        "dur": 9600,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 140
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 8.8,
+        "dur": 3432,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 40
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 10.6,
+        "dur": 3498,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 75
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 7,
+        "dur": 2730,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 37,
+        "dur": 14800,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 190
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 25,
+        "dur": 10000,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 145
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 9,
+        "dur": 3510,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 40
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 10.8,
+        "dur": 3564,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 76
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 7.2,
+        "dur": 2808,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 38.2,
+        "dur": 15280,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 196
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 26,
+        "dur": 10400,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 150
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 9.2,
+        "dur": 3588,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 41
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 11,
+        "dur": 3630,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 78
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 7.3,
+        "dur": 2847,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 39.4,
+        "dur": 15760,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 202
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 27,
+        "dur": 10800,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 155
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 6,
+        "dur": 2340,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 7.2,
+        "dur": 2376,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 51
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 4.8,
+        "dur": 1872,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 40.6,
+        "dur": 16240,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 208
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 28,
+        "dur": 11200,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 160
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 6,
+        "dur": 2340,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 7.2,
+        "dur": 2376,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 51
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 4.8,
+        "dur": 1872,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 41.8,
+        "dur": 16720,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 214
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 29,
+        "dur": 11600,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 165
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 6,
+        "dur": 2340,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 7.2,
+        "dur": 2376,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 51
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 4.8,
+        "dur": 1872,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 1 (Trilha de Montanha)",
+        "desc": "Primeiro dia do longo de fim de semana em montanha técnica com mochila de hidratação.",
+        "dist": 43,
+        "dur": 17200,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 220
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Longo Consecutivo 2 (Endurance Trilha)",
+        "desc": "Segundo dia consecutivo de longo em trilha. Corra de forma leve e caminhe subidas.",
+        "dist": 30,
+        "dur": 12000,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 170
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Descanso total pós-bloco de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1/Z2",
+        "desc": "Trote leve com sensação de pernas pesadas.",
+        "dist": 3.5,
+        "dur": 1365,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 16
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo e Limiar Z3/Z4",
+        "desc": "Principal: 3x 3km no ritmo de limiar aeróbico com 3 min de caminhada ativa.",
+        "dist": 4.2,
+        "dur": 1386,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 30
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento de Pistas & Core",
+        "desc": "Foco excêntrico e pliometria para fortalecimento muscular na trilha.",
+        "dist": 0,
+        "dur": 2700,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Curto de Soltura Z1",
+        "desc": "Corrida super leve conversacional.",
+        "dist": 2.8,
+        "dur": 1092,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 11
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Trote Curto",
+        "desc": "Trote leve.",
+        "dist": 5,
+        "dur": 2000,
+        "pace": "6:40/km",
+        "power": 0,
+        "tss": 226
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "🎯 PROVA ALVO: 100K TRAIL RUN 🏁",
+        "desc": "Chegou a hora de encarar os 100km! Use sua estratégia de hidratação e alimentação a cada 40 minutos!",
+        "dist": 100,
+        "dur": 43200,
+        "pace": "7:12/km",
+        "power": 0,
+        "tss": 550
+      }
+    ]
+  ]
+}

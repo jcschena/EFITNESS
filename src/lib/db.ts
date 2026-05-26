@@ -128,6 +128,31 @@ class PostgreSQLAdapter implements DatabaseClient {
         console.warn('Erro ao rodar migration password no Postgres:', e);
       }
       try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS gender TEXT;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration gender no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS height DOUBLE PRECISION;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration height no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS resting_hr INTEGER;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration resting_hr no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS max_hr INTEGER;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration max_hr no Postgres:', e);
+      }
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS observations TEXT;');
+      } catch (e) {
+        console.warn('Erro ao rodar migration observations no Postgres:', e);
+      }
+      try {
         await this.exec('ALTER TABLE activity_logs ADD COLUMN IF NOT EXISTS user_id INTEGER;');
       } catch (e) {
         console.warn('Erro ao rodar migration user_id no Postgres:', e);
@@ -195,6 +220,24 @@ class PostgreSQLAdapter implements DatabaseClient {
         `);
       } catch (e) {
         console.warn('Erro ao rodar migration races no Postgres:', e);
+      }
+      try {
+        await this.exec(`
+          CREATE TABLE IF NOT EXISTS library_plans (
+            id TEXT PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            author TEXT,
+            source TEXT,
+            sport TEXT NOT NULL,
+            weeks INTEGER NOT NULL,
+            level TEXT NOT NULL,
+            description TEXT,
+            workouts_json TEXT NOT NULL
+          );
+        `);
+      } catch (e) {
+        console.warn('Erro ao criar tabela library_plans no Postgres:', e);
       }
 
       // Limpar atletas duplicados "JOAO CLAUDIO SCHENA"
@@ -282,6 +325,21 @@ class SQLiteAdapter implements DatabaseClient {
       // Ignorar se já existe
     }
     try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN gender TEXT;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN height REAL;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN resting_hr INTEGER;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN max_hr INTEGER;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN observations TEXT;');
+    } catch (e) {}
+    try {
       await this.db.exec('ALTER TABLE activity_logs ADD COLUMN user_id INTEGER;');
     } catch (e) {
       // Ignorar se já existe
@@ -339,6 +397,25 @@ class SQLiteAdapter implements DatabaseClient {
           country TEXT,
           city TEXT,
           is_target INTEGER DEFAULT 0,
+          FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+      `);
+    } catch (e) {
+      // Ignorar se já existe
+    }
+    try {
+      await this.db.exec(`
+        CREATE TABLE IF NOT EXISTS library_plans (
+          id TEXT PRIMARY KEY,
+          user_id INTEGER,
+          name TEXT NOT NULL,
+          author TEXT,
+          source TEXT,
+          sport TEXT NOT NULL,
+          weeks INTEGER NOT NULL,
+          level TEXT NOT NULL,
+          description TEXT,
+          workouts_json TEXT NOT NULL,
           FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
         );
       `);
@@ -425,7 +502,12 @@ function getInitialSchemaDDL(): string {
       strava_token_expires INTEGER,
       birth_date TEXT,
       username TEXT,
-      password TEXT
+      password TEXT,
+      gender TEXT,
+      height REAL,
+      resting_hr INTEGER,
+      max_hr INTEGER,
+      observations TEXT
     );
 
     CREATE TABLE IF NOT EXISTS goals (
@@ -522,6 +604,20 @@ function getInitialSchemaDDL(): string {
       country TEXT,
       city TEXT,
       is_target INTEGER DEFAULT 0,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS library_plans (
+      id TEXT PRIMARY KEY,
+      user_id INTEGER,
+      name TEXT NOT NULL,
+      author TEXT,
+      source TEXT,
+      sport TEXT NOT NULL,
+      weeks INTEGER NOT NULL,
+      level TEXT NOT NULL,
+      description TEXT,
+      workouts_json TEXT NOT NULL,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     );
   `;

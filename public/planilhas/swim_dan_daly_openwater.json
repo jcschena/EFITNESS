@@ -1,0 +1,486 @@
+{
+  "id": "swim_dan_daly_openwater",
+  "name": "Planilha de Natação: Velocidade e Limiar em Águas Abertas",
+  "author": "Dan Daly",
+  "source": "Daly Method Coaching (dandaly.com)",
+  "sport": "Natacao",
+  "weeks": 6,
+  "level": "avancado",
+  "description": "Treinamento de limiar anaeróbico aplicado à natação em águas abertas, com treinos intervalados de alta intensidade e ritmos de prova competitivos.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Intervalado de Limiar (T-Pace)",
+        "desc": "Principal: 10x 100m no ritmo de limiar aeróbico com 15s de descanso.",
+        "dist": 1.8,
+        "dur": 2070,
+        "pace": "1:55/100m",
+        "power": 0,
+        "tss": 48
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Foco no relaxamento dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Velocidade Crítica (CSS)",
+        "desc": "Principal: 4x 200m forte com foco na puxada e pernada consistente.",
+        "dist": 1.9,
+        "dur": 2090,
+        "pace": "1:50/100m",
+        "power": 0,
+        "tss": 57
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para recuperação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance em Águas Abertas (Simulado)",
+        "desc": "Principal: Séries longas de 400m respirando a cada 3 braçadas para simular águas abertas.",
+        "dist": 2.2,
+        "dur": 2640,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 53
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Nadada Contínua Longa",
+        "desc": "Série de endurance contínua longa.",
+        "dist": 2.5,
+        "dur": 3000,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 66
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Intervalado de Limiar (T-Pace)",
+        "desc": "Principal: 10x 100m no ritmo de limiar aeróbico com 15s de descanso.",
+        "dist": 1.8,
+        "dur": 2070,
+        "pace": "1:55/100m",
+        "power": 0,
+        "tss": 50
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Foco no relaxamento dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Velocidade Crítica (CSS)",
+        "desc": "Principal: 4x 200m forte com foco na puxada e pernada consistente.",
+        "dist": 2,
+        "dur": 2200,
+        "pace": "1:50/100m",
+        "power": 0,
+        "tss": 59
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para recuperação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance em Águas Abertas (Simulado)",
+        "desc": "Principal: Séries longas de 400m respirando a cada 3 braçadas para simular águas abertas.",
+        "dist": 2.3,
+        "dur": 2760,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 55
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Nadada Contínua Longa",
+        "desc": "Série de endurance contínua longa.",
+        "dist": 2.5,
+        "dur": 3000,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 68
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Intervalado de Limiar (T-Pace)",
+        "desc": "Principal: 10x 100m no ritmo de limiar aeróbico com 15s de descanso.",
+        "dist": 1.9,
+        "dur": 2185,
+        "pace": "1:55/100m",
+        "power": 0,
+        "tss": 52
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Foco no relaxamento dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Velocidade Crítica (CSS)",
+        "desc": "Principal: 4x 200m forte com foco na puxada e pernada consistente.",
+        "dist": 2.1,
+        "dur": 2310,
+        "pace": "1:50/100m",
+        "power": 0,
+        "tss": 61
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para recuperação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance em Águas Abertas (Simulado)",
+        "desc": "Principal: Séries longas de 400m respirando a cada 3 braçadas para simular águas abertas.",
+        "dist": 2.3,
+        "dur": 2760,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 56
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Nadada Contínua Longa",
+        "desc": "Série de endurance contínua longa.",
+        "dist": 2.6,
+        "dur": 3120,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 71
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Intervalado de Limiar (T-Pace)",
+        "desc": "Principal: 10x 100m no ritmo de limiar aeróbico com 15s de descanso.",
+        "dist": 1.9,
+        "dur": 2185,
+        "pace": "1:55/100m",
+        "power": 0,
+        "tss": 53
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Foco no relaxamento dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Velocidade Crítica (CSS)",
+        "desc": "Principal: 4x 200m forte com foco na puxada e pernada consistente.",
+        "dist": 2.1,
+        "dur": 2310,
+        "pace": "1:50/100m",
+        "power": 0,
+        "tss": 63
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para recuperação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance em Águas Abertas (Simulado)",
+        "desc": "Principal: Séries longas de 400m respirando a cada 3 braçadas para simular águas abertas.",
+        "dist": 2.4,
+        "dur": 2880,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 58
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Nadada Contínua Longa",
+        "desc": "Série de endurance contínua longa.",
+        "dist": 2.7,
+        "dur": 3240,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 73
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Intervalado de Limiar (T-Pace)",
+        "desc": "Principal: 10x 100m no ritmo de limiar aeróbico com 15s de descanso.",
+        "dist": 2,
+        "dur": 2300,
+        "pace": "1:55/100m",
+        "power": 0,
+        "tss": 55
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Foco no relaxamento dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Velocidade Crítica (CSS)",
+        "desc": "Principal: 4x 200m forte com foco na puxada e pernada consistente.",
+        "dist": 2.2,
+        "dur": 2420,
+        "pace": "1:50/100m",
+        "power": 0,
+        "tss": 65
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para recuperação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance em Águas Abertas (Simulado)",
+        "desc": "Principal: Séries longas de 400m respirando a cada 3 braçadas para simular águas abertas.",
+        "dist": 2.5,
+        "dur": 3000,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 60
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Nadada Contínua Longa",
+        "desc": "Série de endurance contínua longa.",
+        "dist": 2.8,
+        "dur": 3360,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 75
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Intervalado de Limiar (T-Pace)",
+        "desc": "Principal: 10x 100m no ritmo de limiar aeróbico com 15s de descanso.",
+        "dist": 2.1,
+        "dur": 2415,
+        "pace": "1:55/100m",
+        "power": 0,
+        "tss": 57
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Foco no relaxamento dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Velocidade Crítica (CSS)",
+        "desc": "Principal: 4x 200m forte com foco na puxada e pernada consistente.",
+        "dist": 2.3,
+        "dur": 2530,
+        "pace": "1:50/100m",
+        "power": 0,
+        "tss": 67
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para recuperação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance em Águas Abertas (Simulado)",
+        "desc": "Principal: Séries longas de 400m respirando a cada 3 braçadas para simular águas abertas.",
+        "dist": 2.6,
+        "dur": 3120,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 62
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Descanso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "🎯 SIMULADO DE ÁGUAS ABERTAS 3000M 🏁",
+        "desc": "Desafio de 3000m simulados contínuos em ritmo aeróbico estável.",
+        "dist": 3,
+        "dur": 3600,
+        "pace": "2:00/100m",
+        "power": 0,
+        "tss": 90
+      }
+    ]
+  ]
+}

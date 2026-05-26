@@ -1,0 +1,486 @@
+{
+  "id": "bike_beginner_base",
+  "name": "Planilha de Ciclismo: Base para Iniciantes",
+  "author": "Carmichael Training Systems",
+  "source": "TrainRight (trainright.com)",
+  "sport": "Ciclismo",
+  "weeks": 6,
+  "level": "iniciante",
+  "description": "Planilha focada no desenvolvimento de resistência aeróbica básica na bicicleta. Ideal para ciclistas novatos construírem base e adaptação.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação pós-longo.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro Confortável de Base Z2",
+        "desc": "Pedal leve com foco em giro ágil e controle de esforço.",
+        "dist": 12.8,
+        "dur": 1843,
+        "pace": "25.0 km/h",
+        "power": 100,
+        "tss": 17
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação e mobilidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Controlado Z2",
+        "desc": "Pedal constante em asfalto plano ou rolo de treino.",
+        "dist": 15.3,
+        "dur": 2143,
+        "pace": "25.7 km/h",
+        "power": 110,
+        "tss": 21
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento Core e Pernas",
+        "desc": "Treino simples com peso do corpo visando estabilização na bike.",
+        "dist": 0,
+        "dur": 1200,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Endurance Z2",
+        "desc": "Aumentando gradualmente a distância na bike de forma muito confortável.",
+        "dist": 28,
+        "dur": 4032,
+        "pace": "25.0 km/h",
+        "power": 105,
+        "tss": 43
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para recuperar as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação pós-longo.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro Confortável de Base Z2",
+        "desc": "Pedal leve com foco em giro ágil e controle de esforço.",
+        "dist": 13.5,
+        "dur": 1944,
+        "pace": "25.0 km/h",
+        "power": 100,
+        "tss": 18
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação e mobilidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Controlado Z2",
+        "desc": "Pedal constante em asfalto plano ou rolo de treino.",
+        "dist": 16.2,
+        "dur": 2269,
+        "pace": "25.7 km/h",
+        "power": 110,
+        "tss": 23
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento Core e Pernas",
+        "desc": "Treino simples com peso do corpo visando estabilização na bike.",
+        "dist": 0,
+        "dur": 1200,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Endurance Z2",
+        "desc": "Aumentando gradualmente a distância na bike de forma muito confortável.",
+        "dist": 31,
+        "dur": 4464,
+        "pace": "25.0 km/h",
+        "power": 105,
+        "tss": 51
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para recuperar as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação pós-longo.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro Confortável de Base Z2",
+        "desc": "Pedal leve com foco em giro ágil e controle de esforço.",
+        "dist": 14.3,
+        "dur": 2059,
+        "pace": "25.0 km/h",
+        "power": 100,
+        "tss": 19
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação e mobilidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Controlado Z2",
+        "desc": "Pedal constante em asfalto plano ou rolo de treino.",
+        "dist": 17.1,
+        "dur": 2395,
+        "pace": "25.7 km/h",
+        "power": 110,
+        "tss": 24
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento Core e Pernas",
+        "desc": "Treino simples com peso do corpo visando estabilização na bike.",
+        "dist": 0,
+        "dur": 1200,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Endurance Z2",
+        "desc": "Aumentando gradualmente a distância na bike de forma muito confortável.",
+        "dist": 34,
+        "dur": 4896,
+        "pace": "25.0 km/h",
+        "power": 105,
+        "tss": 59
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para recuperar as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação pós-longo.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro Confortável de Base Z2",
+        "desc": "Pedal leve com foco em giro ágil e controle de esforço.",
+        "dist": 15,
+        "dur": 2160,
+        "pace": "25.0 km/h",
+        "power": 100,
+        "tss": 20
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação e mobilidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Controlado Z2",
+        "desc": "Pedal constante em asfalto plano ou rolo de treino.",
+        "dist": 18,
+        "dur": 2521,
+        "pace": "25.7 km/h",
+        "power": 110,
+        "tss": 25
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento Core e Pernas",
+        "desc": "Treino simples com peso do corpo visando estabilização na bike.",
+        "dist": 0,
+        "dur": 1200,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Endurance Z2",
+        "desc": "Aumentando gradualmente a distância na bike de forma muito confortável.",
+        "dist": 37,
+        "dur": 5328,
+        "pace": "25.0 km/h",
+        "power": 105,
+        "tss": 67
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para recuperar as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação pós-longo.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro Confortável de Base Z2",
+        "desc": "Pedal leve com foco em giro ágil e controle de esforço.",
+        "dist": 15.8,
+        "dur": 2275,
+        "pace": "25.0 km/h",
+        "power": 100,
+        "tss": 21
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação e mobilidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Controlado Z2",
+        "desc": "Pedal constante em asfalto plano ou rolo de treino.",
+        "dist": 18.9,
+        "dur": 2647,
+        "pace": "25.7 km/h",
+        "power": 110,
+        "tss": 26
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento Core e Pernas",
+        "desc": "Treino simples com peso do corpo visando estabilização na bike.",
+        "dist": 0,
+        "dur": 1200,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Endurance Z2",
+        "desc": "Aumentando gradualmente a distância na bike de forma muito confortável.",
+        "dist": 40,
+        "dur": 5760,
+        "pace": "25.0 km/h",
+        "power": 105,
+        "tss": 75
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para recuperar as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação pós-longo.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Ciclismo",
+        "title": "Giro Confortável de Base Z2",
+        "desc": "Pedal leve com foco em giro ágil e controle de esforço.",
+        "dist": 16.5,
+        "dur": 2376,
+        "pace": "25.0 km/h",
+        "power": 100,
+        "tss": 22
+      },
+      {
+        "day": 3,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação e mobilidade.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 4,
+        "type": "Ciclismo",
+        "title": "Giro de Ritmo Controlado Z2",
+        "desc": "Pedal constante em asfalto plano ou rolo de treino.",
+        "dist": 19.8,
+        "dur": 2774,
+        "pace": "25.7 km/h",
+        "power": 110,
+        "tss": 28
+      },
+      {
+        "day": 5,
+        "type": "Forca",
+        "title": "Fortalecimento Core e Pernas",
+        "desc": "Treino simples com peso do corpo visando estabilização na bike.",
+        "dist": 0,
+        "dur": 1200,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 10
+      },
+      {
+        "day": 6,
+        "type": "Ciclismo",
+        "title": "Pedal Longo de Endurance Z2",
+        "desc": "Aumentando gradualmente a distância na bike de forma muito confortável.",
+        "dist": 43,
+        "dur": 6192,
+        "pace": "25.0 km/h",
+        "power": 105,
+        "tss": 83
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para recuperar as pernas.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ]
+  ]
+}

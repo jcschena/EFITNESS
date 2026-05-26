@@ -1,0 +1,644 @@
+{
+  "id": "run_hal_higdon_10k",
+  "name": "Planilha de Corrida: 10K Intermediário",
+  "author": "Hal Higdon",
+  "source": "Hal Higdon's Training Programs (halhigdon.com)",
+  "sport": "Corrida",
+  "weeks": 8,
+  "level": "intermediario",
+  "description": "Foco no ganho de resistência aeróbica linear e ritmo de limiar. Ideal para bater o recorde pessoal nos 10km.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico completo para supercompensação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 (Fase Base)",
+        "desc": "Corrida confortável conversacional, focado em postura.",
+        "dist": 4.3,
+        "dur": 1548,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Tiros / Ritmo Z4",
+        "desc": "Principal: 5x 400m fortes com 1:30 de trote de recuperação.",
+        "dist": 5.1,
+        "dur": 1683,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida de Ritmo (Tempo Run Z3)",
+        "desc": "Treino de ritmo constante. Mantenha esforço controlado forte.",
+        "dist": 3.4,
+        "dur": 1173,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 30
+      },
+      {
+        "day": 5,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longão de Fim de Semana Z2",
+        "desc": "Corrida longa aeróbia. Ritmo confortável e contínuo.",
+        "dist": 9,
+        "dur": 3240,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 55
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para relaxar e se recuperar.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico completo para supercompensação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 (Fase Base)",
+        "desc": "Corrida confortável conversacional, focado em postura.",
+        "dist": 4.5,
+        "dur": 1620,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Tiros / Ritmo Z4",
+        "desc": "Principal: 5x 400m fortes com 1:30 de trote de recuperação.",
+        "dist": 5.4,
+        "dur": 1782,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 41
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida de Ritmo (Tempo Run Z3)",
+        "desc": "Treino de ritmo constante. Mantenha esforço controlado forte.",
+        "dist": 3.6,
+        "dur": 1242,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 32
+      },
+      {
+        "day": 5,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longão de Fim de Semana Z2",
+        "desc": "Corrida longa aeróbia. Ritmo confortável e contínuo.",
+        "dist": 10,
+        "dur": 3600,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 60
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para relaxar e se recuperar.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico completo para supercompensação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 (Fase Base)",
+        "desc": "Corrida confortável conversacional, focado em postura.",
+        "dist": 4.8,
+        "dur": 1728,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Tiros / Ritmo Z4",
+        "desc": "Principal: 5x 400m fortes com 1:30 de trote de recuperação.",
+        "dist": 5.7,
+        "dur": 1881,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 43
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida de Ritmo (Tempo Run Z3)",
+        "desc": "Treino de ritmo constante. Mantenha esforço controlado forte.",
+        "dist": 3.8,
+        "dur": 1311,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 33
+      },
+      {
+        "day": 5,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longão de Fim de Semana Z2",
+        "desc": "Corrida longa aeróbia. Ritmo confortável e contínuo.",
+        "dist": 11,
+        "dur": 3960,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 65
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para relaxar e se recuperar.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico completo para supercompensação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 (Fase Base)",
+        "desc": "Corrida confortável conversacional, focado em postura.",
+        "dist": 5,
+        "dur": 1800,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 30
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Tiros / Ritmo Z4",
+        "desc": "Principal: 5x 400m fortes com 1:30 de trote de recuperação.",
+        "dist": 6,
+        "dur": 1980,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 45
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida de Ritmo (Tempo Run Z3)",
+        "desc": "Treino de ritmo constante. Mantenha esforço controlado forte.",
+        "dist": 4,
+        "dur": 1380,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 35
+      },
+      {
+        "day": 5,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longão de Fim de Semana Z2",
+        "desc": "Corrida longa aeróbia. Ritmo confortável e contínuo.",
+        "dist": 12,
+        "dur": 4320,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 70
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para relaxar e se recuperar.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico completo para supercompensação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 (Fase Pico)",
+        "desc": "Corrida confortável conversacional, focado em postura.",
+        "dist": 5.3,
+        "dur": 1908,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 32
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Tiros / Ritmo Z4",
+        "desc": "Principal: 5x 400m fortes com 1:30 de trote de recuperação.",
+        "dist": 6.3,
+        "dur": 2079,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 47
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida de Ritmo (Tempo Run Z3)",
+        "desc": "Treino de ritmo constante. Mantenha esforço controlado forte.",
+        "dist": 4.2,
+        "dur": 1449,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 37
+      },
+      {
+        "day": 5,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longão de Fim de Semana Z2",
+        "desc": "Corrida longa aeróbia. Ritmo confortável e contínuo.",
+        "dist": 13,
+        "dur": 4680,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 75
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para relaxar e se recuperar.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico completo para supercompensação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 (Fase Pico)",
+        "desc": "Corrida confortável conversacional, focado em postura.",
+        "dist": 5.5,
+        "dur": 1980,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 33
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Tiros / Ritmo Z4",
+        "desc": "Principal: 5x 400m fortes com 1:30 de trote de recuperação.",
+        "dist": 6.6,
+        "dur": 2178,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 50
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida de Ritmo (Tempo Run Z3)",
+        "desc": "Treino de ritmo constante. Mantenha esforço controlado forte.",
+        "dist": 4.4,
+        "dur": 1518,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 39
+      },
+      {
+        "day": 5,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longão de Fim de Semana Z2",
+        "desc": "Corrida longa aeróbia. Ritmo confortável e contínuo.",
+        "dist": 14,
+        "dur": 5040,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 80
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para relaxar e se recuperar.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico completo para supercompensação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 (Fase Pico)",
+        "desc": "Corrida confortável conversacional, focado em postura.",
+        "dist": 3.8,
+        "dur": 1368,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Tiros / Ritmo Z4",
+        "desc": "Principal: 5x 400m fortes com 1:30 de trote de recuperação.",
+        "dist": 4.5,
+        "dur": 1485,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 34
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida de Ritmo (Tempo Run Z3)",
+        "desc": "Treino de ritmo constante. Mantenha esforço controlado forte.",
+        "dist": 3,
+        "dur": 1035,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 5,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Longão de Fim de Semana Z2",
+        "desc": "Corrida longa aeróbia. Ritmo confortável e contínuo.",
+        "dist": 15,
+        "dur": 5400,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 85
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "Descanso Semanal",
+        "desc": "Aproveite o domingo para relaxar e se recuperar.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Recuperação Ativa",
+        "desc": "Descanso fisiológico completo para supercompensação.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve Z2 (Fase Pico)",
+        "desc": "Corrida confortável conversacional, focado em postura.",
+        "dist": 2.5,
+        "dur": 900,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Tiro Leve Pré-Prova",
+        "desc": "Tiros leves de 200m para ativação neuromuscular.",
+        "dist": 3,
+        "dur": 1080,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 4,
+        "type": "Corrida",
+        "title": "Corrida de Ritmo (Tempo Run Z3)",
+        "desc": "Treino de ritmo constante. Mantenha esforço controlado forte.",
+        "dist": 2,
+        "dur": 690,
+        "pace": "5:45/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 5,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Dia livre para alongamento e repouso.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Trote de Ativação",
+        "desc": "Trote bem curto para soltar a musculatura.",
+        "dist": 2,
+        "dur": 720,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 90
+      },
+      {
+        "day": 7,
+        "type": "Descanso",
+        "title": "🎯 PROVA ALVO 10K 🏁",
+        "desc": "Chegou o dia! Concentre-se e execute a prova nos 10km no seu melhor ritmo!",
+        "dist": 10,
+        "dur": 3300,
+        "pace": "5:30/km",
+        "power": 0,
+        "tss": 85
+      }
+    ]
+  ]
+}

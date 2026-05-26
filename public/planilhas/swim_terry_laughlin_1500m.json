@@ -1,0 +1,644 @@
+{
+  "id": "swim_terry_laughlin_1500m",
+  "name": "Planilha de Natação: Eficiência Total 1500m",
+  "author": "Terry Laughlin",
+  "source": "Método Total Immersion (totalimmersion.net)",
+  "sport": "Natacao",
+  "weeks": 8,
+  "level": "intermediario",
+  "description": "Foco na diminuição do arrasto hidrodinâmico, deslize prolongado e técnica crawl perfeita. Ideal para nadar 1500m com baixo gasto energético.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Técnica e Educativos de Deslize",
+        "desc": "Principal: 8x 50m focando no menor número de braçadas possível (SPL).",
+        "dist": 1,
+        "dur": 1400,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 21
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação muscular dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Ritmo e Eficiência de Braçada",
+        "desc": "Principal: 6x 100m constante mantendo a técnica do rolamento do tronco.",
+        "dist": 1.3,
+        "dur": 1755,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Alongamento leve e mobilidade de ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance Aeróbia Aquática",
+        "desc": "Principal: 3x 300m contínuos com palmar e foco na pegada alta na água.",
+        "dist": 1.5,
+        "dur": 1950,
+        "pace": "2:10/100m",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Treino Longo de Piscina",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 1.7,
+        "dur": 2244,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 42
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Técnica e Educativos de Deslize",
+        "desc": "Principal: 8x 50m focando no menor número de braçadas possível (SPL).",
+        "dist": 1.1,
+        "dur": 1540,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 22
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação muscular dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Ritmo e Eficiência de Braçada",
+        "desc": "Principal: 6x 100m constante mantendo a técnica do rolamento do tronco.",
+        "dist": 1.3,
+        "dur": 1755,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 31
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Alongamento leve e mobilidade de ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance Aeróbia Aquática",
+        "desc": "Principal: 3x 300m contínuos com palmar e foco na pegada alta na água.",
+        "dist": 1.6,
+        "dur": 2080,
+        "pace": "2:10/100m",
+        "power": 0,
+        "tss": 40
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Treino Longo de Piscina",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 1.8,
+        "dur": 2376,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 44
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Técnica e Educativos de Deslize",
+        "desc": "Principal: 8x 50m focando no menor número de braçadas possível (SPL).",
+        "dist": 1.1,
+        "dur": 1540,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 23
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação muscular dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Ritmo e Eficiência de Braçada",
+        "desc": "Principal: 6x 100m constante mantendo a técnica do rolamento do tronco.",
+        "dist": 1.4,
+        "dur": 1890,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 32
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Alongamento leve e mobilidade de ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance Aeróbia Aquática",
+        "desc": "Principal: 3x 300m contínuos com palmar e foco na pegada alta na água.",
+        "dist": 1.7,
+        "dur": 2210,
+        "pace": "2:10/100m",
+        "power": 0,
+        "tss": 41
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Treino Longo de Piscina",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 1.8,
+        "dur": 2376,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 46
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Técnica e Educativos de Deslize",
+        "desc": "Principal: 8x 50m focando no menor número de braçadas possível (SPL).",
+        "dist": 1.2,
+        "dur": 1680,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 24
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação muscular dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Ritmo e Eficiência de Braçada",
+        "desc": "Principal: 6x 100m constante mantendo a técnica do rolamento do tronco.",
+        "dist": 1.4,
+        "dur": 1890,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 34
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Alongamento leve e mobilidade de ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance Aeróbia Aquática",
+        "desc": "Principal: 3x 300m contínuos com palmar e foco na pegada alta na água.",
+        "dist": 1.7,
+        "dur": 2210,
+        "pace": "2:10/100m",
+        "power": 0,
+        "tss": 43
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Treino Longo de Piscina",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 1.9,
+        "dur": 2508,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 48
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Técnica e Educativos de Deslize",
+        "desc": "Principal: 8x 50m focando no menor número de braçadas possível (SPL).",
+        "dist": 1.2,
+        "dur": 1680,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 25
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação muscular dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Ritmo e Eficiência de Braçada",
+        "desc": "Principal: 6x 100m constante mantendo a técnica do rolamento do tronco.",
+        "dist": 1.5,
+        "dur": 2025,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 35
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Alongamento leve e mobilidade de ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance Aeróbia Aquática",
+        "desc": "Principal: 3x 300m contínuos com palmar e foco na pegada alta na água.",
+        "dist": 1.8,
+        "dur": 2340,
+        "pace": "2:10/100m",
+        "power": 0,
+        "tss": 45
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Treino Longo de Piscina",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2,
+        "dur": 2640,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 50
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Técnica e Educativos de Deslize",
+        "desc": "Principal: 8x 50m focando no menor número de braçadas possível (SPL).",
+        "dist": 1.2,
+        "dur": 1680,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação muscular dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Ritmo e Eficiência de Braçada",
+        "desc": "Principal: 6x 100m constante mantendo a técnica do rolamento do tronco.",
+        "dist": 1.6,
+        "dur": 2160,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 36
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Alongamento leve e mobilidade de ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance Aeróbia Aquática",
+        "desc": "Principal: 3x 300m contínuos com palmar e foco na pegada alta na água.",
+        "dist": 1.9,
+        "dur": 2470,
+        "pace": "2:10/100m",
+        "power": 0,
+        "tss": 47
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Treino Longo de Piscina",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.1,
+        "dur": 2772,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 52
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Técnica e Educativos de Deslize",
+        "desc": "Principal: 8x 50m focando no menor número de braçadas possível (SPL).",
+        "dist": 1.3,
+        "dur": 1820,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação muscular dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Ritmo e Eficiência de Braçada",
+        "desc": "Principal: 6x 100m constante mantendo a técnica do rolamento do tronco.",
+        "dist": 1.6,
+        "dur": 2160,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Alongamento leve e mobilidade de ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance Aeróbia Aquática",
+        "desc": "Principal: 3x 300m contínuos com palmar e foco na pegada alta na água.",
+        "dist": 1.9,
+        "dur": 2470,
+        "pace": "2:10/100m",
+        "power": 0,
+        "tss": 49
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "Treino Longo de Piscina",
+        "desc": "Nadada contínua longa confortável.",
+        "dist": 2.2,
+        "dur": 2904,
+        "pace": "2:12/100m",
+        "power": 0,
+        "tss": 54
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Natacao",
+        "title": "Técnica e Educativos de Deslize",
+        "desc": "Principal: 8x 50m focando no menor número de braçadas possível (SPL).",
+        "dist": 1.3,
+        "dur": 1820,
+        "pace": "2:20/100m",
+        "power": 0,
+        "tss": 28
+      },
+      {
+        "day": 2,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Recuperação muscular dos ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 3,
+        "type": "Natacao",
+        "title": "Série de Ritmo e Eficiência de Braçada",
+        "desc": "Principal: 6x 100m constante mantendo a técnica do rolamento do tronco.",
+        "dist": 1.7,
+        "dur": 2295,
+        "pace": "2:15/100m",
+        "power": 0,
+        "tss": 39
+      },
+      {
+        "day": 4,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Alongamento leve e mobilidade de ombros.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 5,
+        "type": "Natacao",
+        "title": "Endurance Aeróbia Aquática",
+        "desc": "Principal: 3x 300m contínuos com palmar e foco na pegada alta na água.",
+        "dist": 2,
+        "dur": 2600,
+        "pace": "2:10/100m",
+        "power": 0,
+        "tss": 50
+      },
+      {
+        "day": 6,
+        "type": "Descanso",
+        "title": "Descanso",
+        "desc": "Repouso de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 7,
+        "type": "Natacao",
+        "title": "🎯 DESAFIO 1500M CONTÍNUO 🏁",
+        "desc": "Nade os 1500m contínuos aplicando a técnica de deslize.",
+        "dist": 1.5,
+        "dur": 1995,
+        "pace": "2:13/100m",
+        "power": 0,
+        "tss": 55
+      }
+    ]
+  ]
+}

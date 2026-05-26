@@ -1,0 +1,960 @@
+{
+  "id": "ultra_beginner_50k",
+  "name": "Planilha de Ultramaratona: Meu Primeiro 50K",
+  "author": "Hal Koerner",
+  "source": "Hal Koerner's Field Guide to Ultrarunning",
+  "sport": "Ultramaratona",
+  "weeks": 12,
+  "level": "iniciante",
+  "description": "Ideal para maratonistas que querem migrar para as trilhas. Foco em treinos em dias consecutivos (Back-to-Back) de volume moderado para adaptar musculatura à fadiga.",
+  "workouts": [
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 4.9,
+        "dur": 1789,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 25
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 6.6,
+        "dur": 2376,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 37
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 4.1,
+        "dur": 1599,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 16
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 16,
+        "dur": 5920,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 78
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 10.5,
+        "dur": 4095,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 52
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 5,
+        "dur": 1825,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 25
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 6.7,
+        "dur": 2412,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 38
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 4.2,
+        "dur": 1638,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 17
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 17,
+        "dur": 6290,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 81
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 11,
+        "dur": 4290,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 54
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 5.2,
+        "dur": 1898,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 6.9,
+        "dur": 2484,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 39
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 4.3,
+        "dur": 1677,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 17
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 18,
+        "dur": 6660,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 84
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 11.5,
+        "dur": 4485,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 56
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 5.3,
+        "dur": 1935,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 26
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 7,
+        "dur": 2520,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 40
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 4.4,
+        "dur": 1716,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 19,
+        "dur": 7030,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 87
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 12,
+        "dur": 4680,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 58
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 5.4,
+        "dur": 1971,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 27
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 7.2,
+        "dur": 2592,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 41
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 4.5,
+        "dur": 1755,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 20,
+        "dur": 7400,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 90
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 12.5,
+        "dur": 4875,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 60
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 5.5,
+        "dur": 2008,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 28
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 7.4,
+        "dur": 2664,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 41
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 4.6,
+        "dur": 1794,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 18
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 21,
+        "dur": 7770,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 93
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 13,
+        "dur": 5070,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 62
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 5.6,
+        "dur": 2044,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 28
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 7.5,
+        "dur": 2700,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 42
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 4.7,
+        "dur": 1833,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 22,
+        "dur": 8140,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 96
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 13.5,
+        "dur": 5265,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 64
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 5.8,
+        "dur": 2117,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 7.7,
+        "dur": 2772,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 43
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 4.8,
+        "dur": 1872,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 19
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 23,
+        "dur": 8510,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 99
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 14,
+        "dur": 5460,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 66
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 5.9,
+        "dur": 2154,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 29
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 7.8,
+        "dur": 2808,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 44
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 4.9,
+        "dur": 1911,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 24,
+        "dur": 8880,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 102
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 14.5,
+        "dur": 5655,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 68
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 6,
+        "dur": 2190,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 30
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 8,
+        "dur": 2880,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 45
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 5,
+        "dur": 1950,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 25,
+        "dur": 9250,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 105
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 15,
+        "dur": 5850,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 70
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 4.2,
+        "dur": 1533,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 21
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 5.6,
+        "dur": 2016,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 31
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 3.5,
+        "dur": 1365,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 14
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Sábado: Volume Z2",
+        "desc": "Primeiro dia do longo consecutivo. Foco em rodagem confortável em trilha.",
+        "dist": 26,
+        "dur": 9620,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 108
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "Bloco Consecutivo Domingo: Fadiga Z2",
+        "desc": "Segundo dia do longo. Correndo com pernas cansadas do sábado para adaptação.",
+        "dist": 15.5,
+        "dur": 6045,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 72
+      }
+    ],
+    [
+      {
+        "day": 1,
+        "type": "Descanso",
+        "title": "Descanso Fisiológico",
+        "desc": "Recuperação do bloco consecutivo de fim de semana.",
+        "dist": 0,
+        "dur": 0,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 0
+      },
+      {
+        "day": 2,
+        "type": "Corrida",
+        "title": "Trote Leve de Base Z2",
+        "desc": "Corrida confortável em piso de terra ou asfalto.",
+        "dist": 2.7,
+        "dur": 986,
+        "pace": "6:05/km",
+        "power": 0,
+        "tss": 14
+      },
+      {
+        "day": 3,
+        "type": "Corrida",
+        "title": "Treino de Ritmo em Subidas",
+        "desc": "Corrida em terrenos com desnível, mantendo esforço aeróbico controlado.",
+        "dist": 3.6,
+        "dur": 1296,
+        "pace": "6:00/km",
+        "power": 0,
+        "tss": 20
+      },
+      {
+        "day": 4,
+        "type": "Forca",
+        "title": "Fortalecimento e Core",
+        "desc": "Exercícios específicos para joelhos, core e costas.",
+        "dist": 0,
+        "dur": 1800,
+        "pace": "N/A",
+        "power": 0,
+        "tss": 15
+      },
+      {
+        "day": 5,
+        "type": "Corrida",
+        "title": "Trote Regenerativo Z1",
+        "desc": "Soltura muscular super leve.",
+        "dist": 2.3,
+        "dur": 897,
+        "pace": "6:30/km",
+        "power": 0,
+        "tss": 9
+      },
+      {
+        "day": 6,
+        "type": "Corrida",
+        "title": "Trote Curto",
+        "desc": "Soltura.",
+        "dist": 4,
+        "dur": 1480,
+        "pace": "6:10/km",
+        "power": 0,
+        "tss": 111
+      },
+      {
+        "day": 7,
+        "type": "Corrida",
+        "title": "🎯 PROVA ALVO: ULTRA 50K 🏁",
+        "desc": "Seu primeiro 50K! Caminhe nas subidas, hidrate-se e divirta-se na trilha!",
+        "dist": 50,
+        "dur": 19800,
+        "pace": "6:36/km",
+        "power": 0,
+        "tss": 280
+      }
+    ]
+  ]
+}
