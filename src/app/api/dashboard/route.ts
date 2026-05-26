@@ -15,9 +15,31 @@ export async function GET(req: Request) {
     const db = await getDb();
 
     // 1. Obter Usuário
-    const user = await db.get<{ id: number; strava_connected: number; password?: string; birth_date?: string }>('SELECT * FROM users WHERE id = ?', userId);
+    const user = await db.get<{ id: number; name?: string; role?: string; coach_id?: number; strava_connected: number; password?: string; birth_date?: string; status?: string }>('SELECT * FROM users WHERE id = ?', userId);
     if (!user) {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+    }
+
+    if (user.status === 'blocked') {
+      let coachPix = { key: '', instructions: '' };
+      if (user.coach_id) {
+        const coach = await db.get('SELECT pix_key, pix_instructions FROM users WHERE id = ?', user.coach_id);
+        if (coach) {
+          coachPix = {
+            key: coach.pix_key || '',
+            instructions: coach.pix_instructions || ''
+          };
+        }
+      }
+      return NextResponse.json({
+        blocked: true,
+        user: {
+          id: user.id,
+          name: user.name,
+          status: 'blocked'
+        },
+        coachPix
+      });
     }
 
     // Sincronização automática em segundo plano das atividades do Strava

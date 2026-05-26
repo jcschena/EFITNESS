@@ -130,7 +130,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       userId,
-      name: user.name
+      name: user.name,
+      role: user.role || 'athlete',
+      coachId: user.coach_id || null
     });
 
   } catch (error: any) {

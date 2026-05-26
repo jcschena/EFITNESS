@@ -153,6 +153,23 @@ class PostgreSQLAdapter implements DatabaseClient {
         console.warn('Erro ao rodar migration observations no Postgres:', e);
       }
       try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT DEFAULT \'athlete\';');
+      } catch (e) {}
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS coach_id INTEGER;');
+      } catch (e) {}
+      try {
+        await this.exec(`
+          CREATE TABLE IF NOT EXISTS access_keys (
+            id SERIAL PRIMARY KEY,
+            key_code TEXT UNIQUE NOT NULL,
+            coach_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+            max_athletes INTEGER DEFAULT 10,
+            active INTEGER DEFAULT 1
+          );
+        `);
+      } catch (e) {}
+      try {
         await this.exec('ALTER TABLE activity_logs ADD COLUMN IF NOT EXISTS user_id INTEGER;');
       } catch (e) {
         console.warn('Erro ao rodar migration user_id no Postgres:', e);
@@ -240,6 +257,47 @@ class PostgreSQLAdapter implements DatabaseClient {
         console.warn('Erro ao criar tabela library_plans no Postgres:', e);
       }
 
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS monthly_fee DOUBLE PRECISION DEFAULT 150.00;');
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS payment_due_day INTEGER DEFAULT 10;');
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS last_payment_date TEXT;');
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT \'paid\';');
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS status TEXT DEFAULT \'active\';');
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS pix_key TEXT;');
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS pix_instructions TEXT;');
+      } catch (e) {
+        console.warn('Erro ao rodar migrations de colunas financeiras no Postgres:', e);
+      }
+
+      try {
+        await this.exec(`
+          CREATE TABLE IF NOT EXISTS payments (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            amount DOUBLE PRECISION NOT NULL,
+            payment_date TEXT NOT NULL,
+            reference_month TEXT NOT NULL,
+            method TEXT NOT NULL
+          );
+        `);
+      } catch (e) {
+        console.warn('Erro ao criar tabela payments no Postgres:', e);
+      }
+
+      try {
+        await this.exec(`
+          CREATE TABLE IF NOT EXISTS workout_feedbacks (
+            id SERIAL PRIMARY KEY,
+            workout_id INTEGER NOT NULL REFERENCES workouts(id) ON DELETE CASCADE,
+            sender_role TEXT NOT NULL,
+            message TEXT NOT NULL,
+            timestamp TEXT NOT NULL
+          );
+        `);
+      } catch (e) {
+        console.warn('Erro ao criar tabela workout_feedbacks no Postgres:', e);
+      }
+
       // Limpar atletas duplicados "JOAO CLAUDIO SCHENA"
       try {
         await this.exec(`
@@ -273,6 +331,9 @@ class PostgreSQLAdapter implements DatabaseClient {
       } catch (e) {
         console.warn('Erro ao limpar duplicados ou atualizar logs no Postgres:', e);
       }
+
+      // Assegurar que o usuário treinador e as chaves existam
+      await ensureCoachAndKeys(this);
 
       // Verificar se há dados no banco
       const userCheck = await this.get('SELECT COUNT(*) as count FROM users');
@@ -324,6 +385,24 @@ class SQLiteAdapter implements DatabaseClient {
     } catch (e) {
       // Ignorar se já existe
     }
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN role TEXT DEFAULT \'athlete\';');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN coach_id INTEGER;');
+    } catch (e) {}
+    try {
+      await this.db.exec(`
+        CREATE TABLE IF NOT EXISTS access_keys (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          key_code TEXT UNIQUE NOT NULL,
+          coach_id INTEGER,
+          max_athletes INTEGER DEFAULT 10,
+          active INTEGER DEFAULT 1,
+          FOREIGN KEY(coach_id) REFERENCES users(id) ON DELETE SET NULL
+        );
+      `);
+    } catch (e) {}
     try {
       await this.db.exec('ALTER TABLE users ADD COLUMN gender TEXT;');
     } catch (e) {}
@@ -423,6 +502,57 @@ class SQLiteAdapter implements DatabaseClient {
       // Ignorar se já existe
     }
 
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN monthly_fee REAL DEFAULT 150.00;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN payment_due_day INTEGER DEFAULT 10;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN last_payment_date TEXT;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN payment_status TEXT DEFAULT \'paid\';');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN status TEXT DEFAULT \'active\';');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN pix_key TEXT;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN pix_instructions TEXT;');
+    } catch (e) {}
+
+    try {
+      await this.db.exec(`
+        CREATE TABLE IF NOT EXISTS payments (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          amount REAL NOT NULL,
+          payment_date TEXT NOT NULL,
+          reference_month TEXT NOT NULL,
+          method TEXT NOT NULL,
+          FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+      `);
+    } catch (e) {}
+
+    try {
+      await this.db.exec(`
+        CREATE TABLE IF NOT EXISTS workout_feedbacks (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          workout_id INTEGER NOT NULL,
+          sender_role TEXT NOT NULL,
+          message TEXT NOT NULL,
+          timestamp TEXT NOT NULL,
+          FOREIGN KEY(workout_id) REFERENCES workouts(id) ON DELETE CASCADE
+        );
+      `);
+    } catch (e) {
+      // Ignorar se já existe
+    }
+
     // Limpar atletas duplicados "JOAO CLAUDIO SCHENA" no SQLite
     try {
       await this.db.exec(`
@@ -456,6 +586,9 @@ class SQLiteAdapter implements DatabaseClient {
     } catch (e) {
       console.warn('Erro ao limpar duplicados ou atualizar logs no SQLite:', e);
     }
+
+    // Assegurar que o usuário treinador e as chaves existam
+    await ensureCoachAndKeys(this);
 
     const userCheck = await this.db.get<{ count: number }>('SELECT COUNT(*) as count FROM users');
     if (userCheck && userCheck.count === 0) {
@@ -507,7 +640,16 @@ function getInitialSchemaDDL(): string {
       height REAL,
       resting_hr INTEGER,
       max_hr INTEGER,
-      observations TEXT
+      observations TEXT,
+      role TEXT DEFAULT 'athlete',
+      coach_id INTEGER,
+      monthly_fee REAL DEFAULT 150.00,
+      payment_due_day INTEGER DEFAULT 10,
+      last_payment_date TEXT,
+      payment_status TEXT DEFAULT 'paid',
+      status TEXT DEFAULT 'active',
+      pix_key TEXT,
+      pix_instructions TEXT
     );
 
     CREATE TABLE IF NOT EXISTS goals (
@@ -618,6 +760,34 @@ function getInitialSchemaDDL(): string {
       level TEXT NOT NULL,
       description TEXT,
       workouts_json TEXT NOT NULL,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS access_keys (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      key_code TEXT UNIQUE NOT NULL,
+      coach_id INTEGER,
+      max_athletes INTEGER DEFAULT 10,
+      active INTEGER DEFAULT 1,
+      FOREIGN KEY(coach_id) REFERENCES users(id) ON DELETE SET NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS workout_feedbacks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      workout_id INTEGER NOT NULL,
+      sender_role TEXT NOT NULL,
+      message TEXT NOT NULL,
+      timestamp TEXT NOT NULL,
+      FOREIGN KEY(workout_id) REFERENCES workouts(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS payments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      amount REAL NOT NULL,
+      payment_date TEXT NOT NULL,
+      reference_month TEXT NOT NULL,
+      method TEXT NOT NULL,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     );
   `;
@@ -990,22 +1160,81 @@ export function generateWorkoutsForPlan(
   return workoutsToInsert;
 }
 
+export async function ensureCoachAndKeys(db: DatabaseClient) {
+  try {
+    const coach = await db.get("SELECT * FROM users WHERE username = 'coach'");
+    let coachId: number | undefined;
+    if (!coach) {
+      console.log("Treinador padrão ('coach') não encontrado. Criando...");
+      const result = await db.run(`
+        INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password, role)
+        VALUES ('Treinador Ultra', 'elite', 42, 70.0, 160, '4:00', 10, 0, '1984-01-01', 'coach', 'ULTRA2026', 'coach')
+      `);
+      coachId = result.lastID;
+    } else {
+      coachId = coach.id;
+      if (coach.role !== 'coach') {
+        await db.run("UPDATE users SET role = 'coach' WHERE id = ?", coach.id);
+      }
+    }
+
+    if (coachId) {
+      const key1 = await db.get("SELECT * FROM access_keys WHERE key_code = 'COACH100'");
+      if (!key1) {
+        await db.run(`
+          INSERT INTO access_keys (key_code, coach_id, max_athletes, active)
+          VALUES ('COACH100', ?, 10, 1)
+        `, coachId);
+      }
+      const key2 = await db.get("SELECT * FROM access_keys WHERE key_code = 'ULTRA2026'");
+      if (!key2) {
+        await db.run(`
+          INSERT INTO access_keys (key_code, coach_id, max_athletes, active)
+          VALUES ('ULTRA2026', ?, 20, 1)
+        `, coachId);
+      }
+
+      await db.run("UPDATE users SET coach_id = ? WHERE role = 'athlete' AND coach_id IS NULL AND username != 'coach'", coachId);
+    }
+  } catch (err) {
+    console.error("Erro ao garantir coach e chaves de acesso:", err);
+  }
+}
+
 async function seedDatabase(db: DatabaseClient) {
+  // 0. Inserir treinador padrão (Coach)
+  const coachUserId = (await db.run(`
+    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password, role)
+    VALUES ('Treinador Ultra', 'elite', 42, 70.0, 160, '4:00', 10, 0, '1984-01-01', 'coach', 'ULTRA2026', 'coach')
+  `)).lastID;
+
+  // Criar chaves de acesso atreladas a este treinador
+  if (coachUserId) {
+    await db.run(`
+      INSERT INTO access_keys (key_code, coach_id, max_athletes, active)
+      VALUES ('COACH100', ?, 10, 1)
+    `, coachUserId);
+    await db.run(`
+      INSERT INTO access_keys (key_code, coach_id, max_athletes, active)
+      VALUES ('ULTRA2026', ?, 20, 1)
+    `, coachUserId);
+  }
+
   // 1. Inserir usuários
   const eliteUserId = (await db.run(`
-    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, strava_access_token, birth_date, username, password)
-    VALUES ('Tiago "Aço" Silva', 'elite', 32, 68.5, 172, '3:45', 18, 1, 'mock_strava_token_elite', '1994-05-24', 'tiago', '123456')
-  `)).lastID;
+    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, strava_access_token, birth_date, username, password, coach_id)
+    VALUES ('Tiago "Aço" Silva', 'elite', 32, 68.5, 172, '3:45', 18, 1, 'mock_strava_token_elite', '1994-05-24', 'tiago', '123456', ?)
+  `, coachUserId)).lastID;
 
   const sedentarioUserId = (await db.run(`
-    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password)
-    VALUES ('Ana Santos', 'sedentario', 45, 82.0, 145, '8:30', 4, 0, '1981-05-24', 'ana', '123456')
-  `)).lastID;
+    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password, coach_id)
+    VALUES ('Ana Santos', 'sedentario', 45, 82.0, 145, '8:30', 4, 0, '1981-05-24', 'ana', '123456', ?)
+  `, coachUserId)).lastID;
 
   const joaoUserId = (await db.run(`
-    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password)
-    VALUES ('JOAO CLAUDIO SCHENA', 'intermediario', 40, 75.0, 162, '5:15', 6, 0, '1985-05-23', 'jcschena', '1953Bigu$')
-  `)).lastID;
+    INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password, coach_id)
+    VALUES ('JOAO CLAUDIO SCHENA', 'intermediario', 40, 75.0, 162, '5:15', 6, 0, '1985-05-23', 'jcschena', '1953Bigu$', ?)
+  `, coachUserId)).lastID;
 
   if (!eliteUserId || !sedentarioUserId || !joaoUserId) return;
 

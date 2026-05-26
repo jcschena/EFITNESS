@@ -38,6 +38,7 @@ import { SPORTS_CONFIG, getSportConfig } from '@/lib/sports';
 import { NUTRITION_DATA, STRETCHING_DATA } from '@/lib/nutrition-stretching';
 import { TRAINING_LIBRARY, getWeeksAfterCut, getBestMatchingPlan, calibrateWorkout } from '@/lib/training-library';
 import { BookOpen, Award, Settings, Eye, HelpCircle, Download } from 'lucide-react';
+import CoachDashboard from '@/components/CoachDashboard';
 
 
 const BarChart = dynamic(
@@ -102,6 +103,16 @@ const UltraLogoIcon = ({ color }: { color: string }) => (
 
 export default function Home() {
   // Estados Globais da SPA
+  const [userRole, setUserRole] = useState<string>(() => {
+    if (typeof window === 'undefined') return 'athlete';
+    return localStorage.getItem('user_role') || 'athlete';
+  });
+
+  const [activeUserName, setActiveUserName] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('active_user_name') || '';
+  });
+
   const [activeUser, setActiveUser] = useState<number | null>(() => {
     if (typeof window === 'undefined') return null;
     
@@ -157,6 +168,9 @@ export default function Home() {
   const [selectedPreviewWeek, setSelectedPreviewWeek] = useState<number>(1);
 
   const [selectedWorkout, setSelectedWorkout] = useState<any>(null);
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [feedbackInput, setFeedbackInput] = useState<string>('');
+  const [feedbacksLoading, setFeedbacksLoading] = useState<boolean>(false);
 
   // Estados para importação e criação de planilhas
   const [libraryPlans, setLibraryPlans] = useState<any[]>([]);
@@ -1139,6 +1153,10 @@ export default function Home() {
         const data = await res.json();
         localStorage.setItem('is_authenticated', 'true');
         localStorage.setItem('active_user_id', String(data.userId));
+        localStorage.setItem('user_role', data.role || 'athlete');
+        localStorage.setItem('active_user_name', data.name || '');
+        setUserRole(data.role || 'athlete');
+        setActiveUserName(data.name || '');
         setActiveUser(data.userId);
       } else {
         const errData = await res.json().catch(() => ({}));
@@ -1180,18 +1198,26 @@ export default function Home() {
     if (activeUser) {
       localStorage.setItem('active_user_id', String(activeUser));
       localStorage.setItem('is_authenticated', 'true');
-      fetchDashboard(activeUser);
-      fetchRaces(activeUser);
+      if (userRole === 'athlete') {
+        fetchDashboard(activeUser);
+        fetchRaces(activeUser);
+      } else {
+        setLoading(false);
+      }
     } else {
       localStorage.removeItem('active_user_id');
       localStorage.removeItem('is_authenticated');
+      localStorage.removeItem('user_role');
+      localStorage.removeItem('active_user_name');
+      setUserRole('athlete');
+      setActiveUserName('');
       setDashboardData(null);
       setLoading(false);
     }
-  }, [activeUser]);
+  }, [activeUser, userRole]);
 
   // Efeito para garantir tempo mínimo do loader (1 ciclo completo dos esportes = 6s)
-  const isCurrentlyLoading = !!(loading || (activeUser && !dashboardData));
+  const isCurrentlyLoading = !!(loading || (activeUser && userRole === 'athlete' && !dashboardData));
   useEffect(() => {
     if (!activeUser) {
       setMinLoadingTimePassed(true);
@@ -1293,6 +1319,52 @@ export default function Home() {
       });
     }
   }, [dashboardData]);
+
+  // Carregar feedbacks do treino selecionado
+  useEffect(() => {
+    if (selectedWorkout?.id) {
+      setFeedbacksLoading(true);
+      fetch(`/api/workouts/feedback?workoutId=${selectedWorkout.id}`)
+        .then(res => res.json())
+        .then(data => {
+          setFeedbacks(data.feedbacks || []);
+        })
+        .catch(err => console.error('Erro ao carregar feedbacks:', err))
+        .finally(() => setFeedbacksLoading(false));
+    } else {
+      setFeedbacks([]);
+    }
+  }, [selectedWorkout]);
+
+  // Enviar novo feedback do treino
+  const handleSendFeedback = async () => {
+    if (!feedbackInput.trim() || !selectedWorkout?.id) return;
+    try {
+      const res = await fetch('/api/workouts/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workoutId: selectedWorkout.id,
+          senderRole: 'athlete',
+          message: feedbackInput.trim()
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFeedbacks(prev => [...prev, {
+          id: Date.now(),
+          workout_id: selectedWorkout.id,
+          sender_role: 'athlete',
+          message: feedbackInput.trim(),
+          timestamp: data.timestamp || new Date().toISOString()
+        }]);
+        setFeedbackInput('');
+      }
+    } catch (err) {
+      console.error('Erro ao enviar feedback:', err);
+    }
+  };
+
 
   // Enviar alteração do Perfil para a API
   const handleProfileSubmit = async (e: React.FormEvent) => {
@@ -1548,7 +1620,14 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
 
-        if (onboardForm.stravaConnected) {
+        localStorage.setItem('is_authenticated', 'true');
+        localStorage.setItem('active_user_id', String(data.userId));
+        localStorage.setItem('user_role', data.role || 'athlete');
+        localStorage.setItem('active_user_name', onboardForm.name || 'Treinador');
+        setUserRole(data.role || 'athlete');
+        setActiveUserName(onboardForm.name || 'Treinador');
+
+        if (onboardForm.stravaConnected && data.role !== 'coach') {
           window.location.href = `/api/strava/auth?userId=${data.userId}`;
         } else {
           setActiveUser(data.userId);
@@ -2036,9 +2115,16 @@ export default function Home() {
           ) : (
             /* Register Card (Onboarding) */
             <div className="premium-card" style={{ padding: '32px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '16px' }}>
-              <h3 style={{ marginBottom: '20px', fontSize: '1.4rem', fontWeight: 700, color: '#fff', textAlign: 'center' }}>Cadastrar Novo Atleta</h3>
+              <h3 style={{ marginBottom: '20px', fontSize: '1.4rem', fontWeight: 700, color: '#fff', textAlign: 'center' }}>
+                {onboardForm.accessKey === 'SUPERCOACH2026' ? 'Cadastrar Novo Treinador' : 'Cadastrar Novo Atleta'}
+              </h3>
               
               <form onSubmit={handleOnboardSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {onboardForm.accessKey === 'SUPERCOACH2026' && (
+                  <div style={{ background: 'rgba(52, 211, 153, 0.1)', border: '1px solid #34d399', borderRadius: '8px', padding: '10px', fontSize: '0.8rem', color: '#34d399', marginBottom: '10px', textAlign: 'center' }}>
+                    🔑 Cadastro de Treinador detectado. As métricas de condicionamento e metas esportivas iniciais serão ignoradas.
+                  </div>
+                )}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Nome Completo</label>
@@ -2240,7 +2326,127 @@ export default function Home() {
     );
   }
 
+  // SE USUÁRIO ATIVO FOR UM TREINADOR, REDIRECIONAR PARA O PAINEL DE TREINADORES
+  if (activeUser && userRole === 'coach') {
+    return (
+      <CoachDashboard 
+        userId={String(activeUser)} 
+        userName={activeUserName || 'Treinador'} 
+        onLogout={() => {
+          setActiveUser(null);
+          setUserRole('athlete');
+          setActiveUserName('');
+          localStorage.removeItem('active_user_id');
+          localStorage.removeItem('is_authenticated');
+          localStorage.removeItem('user_role');
+          localStorage.removeItem('active_user_name');
+        }}
+      />
+    );
+  }
+
   // SE JÁ EXISTE UM USUÁRIO ATIVO CARREGADO E COM DADOS DO DASHBOARD
+  if (dashboardData && 'blocked' in dashboardData && (dashboardData as any).blocked) {
+    const handleCopyPix = () => {
+      const pixKey = (dashboardData as any).coachPix?.key;
+      if (pixKey) {
+        navigator.clipboard.writeText(pixKey);
+        alert('Chave Pix copiada para a área de transferência! 👍');
+      } else {
+        alert('Chave Pix não cadastrada pelo treinador.');
+      }
+    };
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px', background: 'radial-gradient(circle at center, #111827 0%, #030712 100%)', color: '#fff' }} className="animate-slide-up">
+        <div className="premium-card" style={{ maxWidth: '480px', width: '100%', padding: '40px 32px', textAlign: 'center', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '24px', background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(20px)', boxShadow: '0 0 40px rgba(239, 68, 68, 0.15)' }}>
+          
+          {/* Locked Icon */}
+          <div style={{ display: 'inline-flex', padding: '20px', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '50%', marginBottom: '24px', border: '1px solid rgba(239, 68, 68, 0.25)', boxShadow: '0 0 30px rgba(239, 68, 68, 0.2)' }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.6))' }}>
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </div>
+
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '12px', background: 'linear-gradient(90deg, #fff 0%, #fca5a5 50%, #ef4444 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            Acesso Suspenso
+          </h2>
+          
+          <p style={{ color: '#9ca3af', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '28px' }}>
+            Olá, <strong>{(dashboardData as any).user?.name}</strong>. Constatamos uma pendência financeira em sua mensalidade. Seu acesso às planilhas e feedbacks foi temporariamente suspenso pela assessoria.
+          </p>
+
+          {/* Pix Box */}
+          <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '16px', padding: '24px', marginBottom: '28px', textAlign: 'left' }}>
+            <h4 style={{ color: 'var(--neon-cyan)', fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>💸</span> Regularize via Pix
+            </h4>
+            
+            {(dashboardData as any).coachPix?.key ? (
+              <>
+                <div style={{ marginBottom: '12px' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#9ca3af', display: 'block', marginBottom: '4px' }}>Chave Pix do Treinador:</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0, 0, 0, 0.25)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <code style={{ flex: 1, fontSize: '0.85rem', color: '#fff', wordBreak: 'break-all' }}>{(dashboardData as any).coachPix.key}</code>
+                    <button 
+                      onClick={handleCopyPix}
+                      style={{ background: 'var(--neon-cyan)', border: 'none', color: '#000', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}
+                    >
+                      Copiar
+                    </button>
+                  </div>
+                </div>
+
+                {(dashboardData as any).coachPix.instructions && (
+                  <div>
+                    <span style={{ fontSize: '0.75rem', color: '#9ca3af', display: 'block', marginBottom: '4px' }}>Instruções:</span>
+                    <p style={{ fontSize: '0.85rem', color: '#d1d5db', margin: 0, whiteSpace: 'pre-line', lineHeight: '1.4' }}>
+                      {(dashboardData as any).coachPix.instructions}
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p style={{ fontSize: '0.85rem', color: '#9ca3af', margin: 0, textAlign: 'center', padding: '8px 0' }}>
+                Entre em contato com o seu treinador para obter os dados de pagamento e reestabelecer o seu acesso.
+              </p>
+            )}
+          </div>
+
+          <p style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '24px' }}>
+            Assim que o treinador confirmar o pagamento, seu acesso será liberado instantaneamente.
+          </p>
+
+          {/* Action buttons */}
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <button
+              onClick={() => fetchDashboard((dashboardData as any).user.id)}
+              style={{ flex: 1, background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#fff', padding: '12px 18px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+            >
+              🔄 Já paguei / Atualizar
+            </button>
+            <button
+              onClick={() => {
+                setActiveUser(null);
+                setUserRole('athlete');
+                setActiveUserName('');
+                localStorage.removeItem('active_user_id');
+                localStorage.removeItem('is_authenticated');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('active_user_name');
+              }}
+              style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)', color: '#fca5a5', padding: '12px 20px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+            >
+              Sair
+            </button>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
   const { user, goal, plan, workouts, activityLogs, notifications, metrics, lastSyncedActivity, celebration, calendarUrl } = dashboardData || {};
   const recommendedPlan = goal ? getBestMatchingPlan(goal.type, user?.level || 'intermediario', goal.distance) : null;
 
@@ -2467,7 +2673,19 @@ export default function Home() {
                 );
               })()}
               <span style={{ color: 'var(--text-secondary)' }}>Atleta:</span>
-              <strong style={{ color: '#fff' }}>{user?.name}</strong>
+              <strong 
+                onClick={() => setActiveTab('perfil')}
+                style={{ 
+                  color: activeTab === 'perfil' ? 'var(--neon-cyan)' : '#fff', 
+                  cursor: 'pointer',
+                  borderBottom: activeTab === 'perfil' ? '1.5px solid var(--neon-cyan)' : '1px dashed rgba(255,255,255,0.4)',
+                  paddingBottom: '1px',
+                  transition: 'var(--transition-smooth)'
+                }}
+                title="Ver Perfil & Dados"
+              >
+                {user?.name}
+              </strong>
               <span style={{ fontSize: '0.75rem', padding: '1px 6px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: user?.level === 'elite' ? 'var(--neon-green)' : 'var(--neon-cyan)' }}>
                 {user?.level?.toUpperCase() || ''}
               </span>
@@ -2953,19 +3171,26 @@ export default function Home() {
         )}
 
         {/* TAB NAVIGATION */}
-        <div className="hide-scrollbar" style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', gap: '8px', paddingBottom: '2px' }}>
+        <div style={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          borderBottom: '1px solid var(--border-color)', 
+          gap: '8px', 
+          paddingBottom: '10px',
+          width: '100%'
+        }}>
           <button 
             className="tab-btn" 
             onClick={() => setActiveTab('planilha')}
             style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              borderBottom: activeTab === 'planilha' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              background: activeTab === 'planilha' ? 'rgba(0, 240, 255, 0.1)' : 'rgba(255, 255, 255, 0.03)', 
+              border: activeTab === 'planilha' ? '1px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.08)', 
+              borderRadius: '12px',
               color: activeTab === 'planilha' ? '#fff' : 'var(--text-secondary)', 
               fontWeight: activeTab === 'planilha' ? 700 : 500,
-              padding: '10px 16px',
+              padding: '8px 16px',
               cursor: 'pointer',
-              fontSize: '0.95rem',
+              fontSize: '0.9rem',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -2976,44 +3201,46 @@ export default function Home() {
             Planilha Semanal
           </button>
           
-          <button 
-            className="tab-btn" 
-            onClick={() => {
-              setActiveTab('coach');
-              setSelectedPreviewWeek(1);
-            }}
-            style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              borderBottom: activeTab === 'coach' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
-              color: activeTab === 'coach' ? '#fff' : 'var(--text-secondary)', 
-              fontWeight: activeTab === 'coach' ? 700 : 500,
-              padding: '10px 16px',
-              cursor: 'pointer',
-              fontSize: '0.95rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'var(--transition-smooth)'
-            }}
-          >
-            <BookOpen size={18} style={{ color: activeTab === 'coach' ? 'var(--neon-cyan)' : 'inherit' }} />
-            Biblioteca de Planilhas
-            <Award size={12} style={{ color: 'var(--neon-orange)' }} />
-          </button>
+          {userRole === 'coach' && (
+            <button 
+              className="tab-btn" 
+              onClick={() => {
+                setActiveTab('coach');
+                setSelectedPreviewWeek(1);
+              }}
+              style={{ 
+                background: activeTab === 'coach' ? 'rgba(0, 240, 255, 0.1)' : 'rgba(255, 255, 255, 0.03)', 
+                border: activeTab === 'coach' ? '1px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.08)', 
+                borderRadius: '12px',
+                color: activeTab === 'coach' ? '#fff' : 'var(--text-secondary)', 
+                fontWeight: activeTab === 'coach' ? 700 : 500,
+                padding: '8px 16px',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'var(--transition-smooth)'
+              }}
+            >
+              <BookOpen size={18} style={{ color: activeTab === 'coach' ? 'var(--neon-cyan)' : 'inherit' }} />
+              Biblioteca de Planilhas
+              <Award size={12} style={{ color: 'var(--neon-orange)' }} />
+            </button>
+          )}
 
           <button 
             className="tab-btn" 
             onClick={() => setActiveTab('simulador')}
             style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              borderBottom: activeTab === 'simulador' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              background: activeTab === 'simulador' ? 'rgba(0, 240, 255, 0.1)' : 'rgba(255, 255, 255, 0.03)', 
+              border: activeTab === 'simulador' ? '1px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.08)', 
+              borderRadius: '12px',
               color: activeTab === 'simulador' ? '#fff' : 'var(--text-secondary)', 
               fontWeight: activeTab === 'simulador' ? 700 : 500,
-              padding: '10px 16px',
+              padding: '8px 16px',
               cursor: 'pointer',
-              fontSize: '0.95rem',
+              fontSize: '0.9rem',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -3029,14 +3256,14 @@ export default function Home() {
             className="tab-btn" 
             onClick={() => setActiveTab('provas')}
             style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              borderBottom: activeTab === 'provas' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              background: activeTab === 'provas' ? 'rgba(0, 240, 255, 0.1)' : 'rgba(255, 255, 255, 0.03)', 
+              border: activeTab === 'provas' ? '1px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.08)', 
+              borderRadius: '12px',
               color: activeTab === 'provas' ? '#fff' : 'var(--text-secondary)', 
               fontWeight: activeTab === 'provas' ? 700 : 500,
-              padding: '10px 16px',
+              padding: '8px 16px',
               cursor: 'pointer',
-              fontSize: '0.95rem',
+              fontSize: '0.9rem',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -3051,14 +3278,14 @@ export default function Home() {
             className="tab-btn" 
             onClick={() => setActiveTab('nutricao')}
             style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              borderBottom: activeTab === 'nutricao' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              background: activeTab === 'nutricao' ? 'rgba(0, 240, 255, 0.1)' : 'rgba(255, 255, 255, 0.03)', 
+              border: activeTab === 'nutricao' ? '1px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.08)', 
+              borderRadius: '12px',
               color: activeTab === 'nutricao' ? '#fff' : 'var(--text-secondary)', 
               fontWeight: activeTab === 'nutricao' ? 700 : 500,
-              padding: '10px 16px',
+              padding: '8px 16px',
               cursor: 'pointer',
-              fontSize: '0.95rem',
+              fontSize: '0.9rem',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -3073,14 +3300,14 @@ export default function Home() {
             className="tab-btn" 
             onClick={() => setActiveTab('alongamento')}
             style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              borderBottom: activeTab === 'alongamento' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              background: activeTab === 'alongamento' ? 'rgba(0, 240, 255, 0.1)' : 'rgba(255, 255, 255, 0.03)', 
+              border: activeTab === 'alongamento' ? '1px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.08)', 
+              borderRadius: '12px',
               color: activeTab === 'alongamento' ? '#fff' : 'var(--text-secondary)', 
               fontWeight: activeTab === 'alongamento' ? 700 : 500,
-              padding: '10px 16px',
+              padding: '8px 16px',
               cursor: 'pointer',
-              fontSize: '0.95rem',
+              fontSize: '0.9rem',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -3095,14 +3322,14 @@ export default function Home() {
             className="tab-btn" 
             onClick={() => setActiveTab('gravar')}
             style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              borderBottom: activeTab === 'gravar' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
+              background: activeTab === 'gravar' ? 'rgba(0, 240, 255, 0.1)' : 'rgba(255, 255, 255, 0.03)', 
+              border: activeTab === 'gravar' ? '1px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.08)', 
+              borderRadius: '12px',
               color: activeTab === 'gravar' ? '#fff' : 'var(--text-secondary)', 
               fontWeight: activeTab === 'gravar' ? 700 : 500,
-              padding: '10px 16px',
+              padding: '8px 16px',
               cursor: 'pointer',
-              fontSize: '0.95rem',
+              fontSize: '0.9rem',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -3114,27 +3341,6 @@ export default function Home() {
             <span style={{ fontSize: '0.65rem', background: 'var(--neon-green)', padding: '1px 5px', color: '#030712', borderRadius: '4px', fontWeight: 700 }}>GPS</span>
           </button>
 
-          <button 
-            className="tab-btn" 
-            onClick={() => setActiveTab('perfil')}
-            style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              borderBottom: activeTab === 'perfil' ? '2px solid var(--neon-cyan)' : '2px solid transparent',
-              color: activeTab === 'perfil' ? '#fff' : 'var(--text-secondary)', 
-              fontWeight: activeTab === 'perfil' ? 700 : 500,
-              padding: '10px 16px',
-              cursor: 'pointer',
-              fontSize: '0.95rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'var(--transition-smooth)'
-            }}
-          >
-            <User size={18} style={{ color: activeTab === 'perfil' ? 'var(--neon-cyan)' : 'inherit' }} />
-            Perfil & Dados
-          </button>
         </div>
 
         {/* TAB CONTENTS */}
@@ -3192,78 +3398,75 @@ export default function Home() {
                     
                     {plan?.library_id ? (
                       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
-                        Seus treinos são orientados pela planilha periodizada da biblioteca: <strong style={{ color: '#fff' }}>{plan?.name}</strong>. 
+                        Seus treinos são orientados pela planilha periodizada prescrita pelo seu treinador: <strong style={{ color: '#fff' }}>{plan?.name}</strong>. 
                         A periodização está sincronizada com a sua prova de <strong>{goal.type} ({goal.distance} km)</strong> marcada para o dia <strong>{new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}</strong>.
                       </p>
                     ) : (
                       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
                         Você estabeleceu uma prova alvo de <strong>{goal.type} ({goal.distance} km)</strong> para o dia <strong>{new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}</strong>. 
-                        Para garantir o melhor rendimento físico, <strong>sempre sugerimos utilizar uma planilha periodizada da nossa biblioteca</strong>. 
-                        {recommendedPlan && (
-                          <span style={{ display: 'block', marginTop: '6px', color: '#fff' }}>
-                            👉 Recomendação: <strong style={{ color: 'var(--neon-green)' }}>{recommendedPlan.name}</strong> por {recommendedPlan.author}.
-                          </span>
-                        )}
+                        Os treinos prescritos por seu treinador aparecerão no seu calendário semanal.
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  {plan?.library_id ? (
-                    <button
-                      onClick={() => {
-                        const libPlan = libraryPlans.find(p => p.id === plan.library_id) || TRAINING_LIBRARY[plan.library_id];
-                        if (libPlan) {
-                          handleSelectLibraryPlan(libPlan, plan.effort_pct || 100, plan.cut_choice || 'none', plan.current_week || 1);
-                        }
-                        setActiveTab('coach');
-                      }}
-                      className="glow-btn"
-                      style={{ padding: '10px 20px', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}
-                    >
-                      <Sliders size={16} />
-                      Calibrar Esforço
-                    </button>
-                  ) : (
-                    <>
+                {userRole === 'coach' && (
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    {plan?.library_id ? (
                       <button
                         onClick={() => {
-                          if (recommendedPlan) {
-                            setViewingLibraryPlan(recommendedPlan);
-                            setEffortPctCalibration(100);
-                            setCutChoiceSelection('ambos');
-                            setSelectedPreviewWeek(1);
-                            setActiveTab('coach');
+                          const libPlan = libraryPlans.find(p => p.id === plan.library_id) || TRAINING_LIBRARY[plan.library_id];
+                          if (libPlan) {
+                            handleSelectLibraryPlan(libPlan, plan.effort_pct || 100, plan.cut_choice || 'none', plan.current_week || 1);
                           }
+                          setActiveTab('coach');
                         }}
                         className="glow-btn"
                         style={{ padding: '10px 20px', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}
                       >
-                        <Check size={16} />
-                        Aplicar Recomendada
+                        <Sliders size={16} />
+                        Calibrar Esforço
                       </button>
-                      <button
-                        onClick={() => {
-                          setSelectedSportFilter(goal.type.includes('Natac') || goal.type.includes('Nataç') ? 'Natação' : goal.type);
-                          setActiveTab('coach');
-                        }}
-                        style={{ 
-                          padding: '10px 20px', 
-                          fontSize: '0.85rem', 
-                          fontWeight: 650, 
-                          background: 'rgba(255,255,255,0.03)', 
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          borderRadius: '10px',
-                          color: '#fff',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Ver Todas
-                      </button>
-                    </>
-                  )}
-                </div>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => {
+                            if (recommendedPlan) {
+                              setViewingLibraryPlan(recommendedPlan);
+                              setEffortPctCalibration(100);
+                              setCutChoiceSelection('ambos');
+                              setSelectedPreviewWeek(1);
+                              setActiveTab('coach');
+                            }
+                          }}
+                          className="glow-btn"
+                          style={{ padding: '10px 20px', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}
+                        >
+                          <Check size={16} />
+                          Aplicar Recomendada
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedSportFilter(goal.type.includes('Natac') || goal.type.includes('Nataç') ? 'Natação' : goal.type);
+                            setActiveTab('coach');
+                          }}
+                          style={{ 
+                            padding: '10px 20px', 
+                            fontSize: '0.85rem', 
+                            fontWeight: 650, 
+                            background: 'rgba(255,255,255,0.03)', 
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: '10px',
+                            color: '#fff',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Ver Todas
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -3493,7 +3696,7 @@ export default function Home() {
                   <div>
                     <h4 style={{ margin: 0, fontSize: '0.9rem', color: '#fff', fontWeight: 700 }}>Modo Livre</h4>
                     <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                      Você não possui nenhuma planilha ativa da biblioteca. Abaixo estão exibidos os treinos que você realizou esta semana (sincronizados ou manuais). Escolha ou importe uma planilha na aba <strong>Treinador IA</strong> para ter treinos periodizados.
+                      Você não possui nenhuma planilha ativa. Abaixo estão exibidos os treinos que você realizou esta semana (sincronizados ou manuais). Peça para seu treinador prescrever seus treinos estruturados.
                     </p>
                   </div>
                 </div>
@@ -6662,6 +6865,128 @@ export default function Home() {
                     );
                   }
                 })()}
+              </div>
+            </div>
+
+            {/* SEÇÃO DE FEEDBACK DE TREINO */}
+            <div style={{ marginTop: '24px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <MessageSquare size={16} color="var(--neon-cyan)" />
+                <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, margin: 0 }}>
+                  Feedback do Treino
+                </h4>
+              </div>
+
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '12px',
+                padding: '12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}>
+                {/* Lista de mensagens */}
+                <div style={{
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  paddingRight: '4px'
+                }}>
+                  {feedbacksLoading ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                      <RefreshCw className="animate-spin" size={16} color="var(--neon-cyan)" style={{ animation: 'spin 1s linear infinite' }} />
+                    </div>
+                  ) : feedbacks.length === 0 ? (
+                    <p style={{ color: '#9ca3af', fontSize: '0.8rem', textAlign: 'center', margin: '20px 0' }}>
+                      Nenhum feedback enviado ainda. Envie uma mensagem para alinhar com o seu treinador!
+                    </p>
+                  ) : (
+                    feedbacks.map((f: any) => {
+                      const isMe = f.sender_role === 'athlete';
+                      return (
+                        <div key={f.id} style={{
+                          display: 'flex',
+                          justifyContent: isMe ? 'flex-end' : 'flex-start',
+                          width: '100%'
+                        }}>
+                          <div style={{
+                            background: isMe ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 242, 254, 0.08)',
+                            border: isMe ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 242, 254, 0.15)',
+                            borderRadius: '12px',
+                            borderTopRightRadius: isMe ? '2px' : '12px',
+                            borderTopLeftRadius: isMe ? '12px' : '2px',
+                            padding: '10px 14px',
+                            maxWidth: '80%'
+                          }}>
+                            <div style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              gap: '12px',
+                              fontSize: '0.65rem',
+                              color: isMe ? '#9ca3af' : 'var(--neon-cyan)',
+                              fontWeight: 600,
+                              marginBottom: '4px'
+                            }}>
+                              <span>{isMe ? 'Você (Atleta)' : 'Treinador'}</span>
+                              <span style={{ fontSize: '0.6rem', color: '#6b7280' }}>
+                                {new Date(f.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '0.82rem', color: '#fff', lineHeight: '1.4', whiteSpace: 'pre-wrap' }}>
+                              {f.message}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Form de Envio */}
+                <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '10px' }}>
+                  <input
+                    type="text"
+                    value={feedbackInput}
+                    onChange={e => setFeedbackInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') handleSendFeedback();
+                    }}
+                    placeholder="Escreva um feedback ou pergunta sobre este treino..."
+                    style={{
+                      flex: 1,
+                      background: '#0d0d12',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      fontSize: '0.85rem',
+                      color: '#f3f4f6',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    onClick={handleSendFeedback}
+                    disabled={!feedbackInput.trim()}
+                    style={{
+                      background: feedbackInput.trim() ? 'linear-gradient(135deg, #00f2fe, #4facfe)' : 'rgba(255, 255, 255, 0.05)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      width: '36px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: feedbackInput.trim() ? 'pointer' : 'default',
+                      color: feedbackInput.trim() ? '#0a0a0f' : '#4b5563',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Send size={14} />
+                  </button>
+                </div>
               </div>
             </div>
 

@@ -14,12 +14,32 @@ export async function POST(req: Request) {
     const accessKey = data.accessKey;
 
     // Validar chave de acesso
-    const serverAccessKey = process.env.ACCESS_KEY || 'ULTRA2026';
-    if (!accessKey || accessKey !== serverAccessKey) {
-      return NextResponse.json({
-        success: false,
-        error: 'Chave de acesso inválida ou expirada. Solicite a chave correta ao administrador.'
-      }, { status: 403 });
+    let userRole = 'athlete';
+    let coachId = null;
+
+    if (accessKey === 'SUPERCOACH2026') {
+      userRole = 'coach';
+    } else {
+      // Validar chave de acesso no banco
+      const keyRecord = await db.get('SELECT * FROM access_keys WHERE key_code = ? AND active = 1', accessKey);
+      if (!keyRecord) {
+        return NextResponse.json({
+          success: false,
+          error: 'Chave de acesso inválida ou expirada. Solicite a chave correta ao administrador.'
+        }, { status: 403 });
+      }
+
+      // Verificar limite de alunos
+      const countObj = await db.get('SELECT COUNT(*) as count FROM users WHERE coach_id = ? AND role = \'athlete\'', keyRecord.coach_id);
+      const athleteCount = countObj ? countObj.count : 0;
+      if (athleteCount >= keyRecord.max_athletes) {
+        return NextResponse.json({
+          success: false,
+          error: 'O limite de alunos para esta chave de acesso foi atingido.'
+        }, { status: 400 });
+      }
+
+      coachId = keyRecord.coach_id;
     }
 
     if (!username || !password) {
@@ -84,11 +104,21 @@ export async function POST(req: Request) {
 
     // 2. Inserir Usuário
     const userInsert = await db.run(`
-      INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, name, level, age, weight, thresholdHr, thresholdPace, weeklyHours, 0, birthDate, username, password); // Always start as 0 (authorization is done via OAuth redirect after onboarding)
+      INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password, role, coach_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, name, level, age, weight, thresholdHr, thresholdPace, weeklyHours, 0, birthDate, username, password, userRole, coachId); // Always start as 0 (authorization is done via OAuth redirect after onboarding)
     
     const userId = userInsert.lastID;
+
+    // Se for treinador, encerra o onboarding aqui
+    if (userRole === 'coach') {
+      return NextResponse.json({
+        success: true,
+        userId,
+        role: 'coach',
+        message: 'Onboarding de Treinador concluído com sucesso!'
+      });
+    }
 
     // 3. Inserir Objetivo (Goal)
     // Prova alvo calculada para daqui a 60 dias por padrão
