@@ -61,7 +61,7 @@ export async function POST(req: Request) {
             console.log('Perfil de JOAO CLAUDIO SCHENA não encontrado. Criando perfil padrão...');
             const userInsert = await db.run(`
               INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password)
-              VALUES ('JOAO CLAUDIO SCHENA', 'intermediario', 40, 75.0, 162, '5:15', 6, 0, '1985-05-23', 'jcschena', '1953Bigu$')
+              VALUES ('JOAO CLAUDIO SCHENA', 'elite', 40, 75.0, 162, '5:15', 6, 0, '1985-05-23', 'jcschena', '1953Bigu$')
             `);
             const createdId = userInsert.lastID!;
 
@@ -84,15 +84,15 @@ export async function POST(req: Request) {
 
             const planId = planInsert.lastID!;
 
-            // Inserir treinos padrão (Intermediário)
+            // Inserir treinos padrão (Avançado/Elite)
             const workouts = [
-              { day: 1, type: 'Corrida', dist: 6.0, dur: 2160, pace: '6:00/km', power: 0, tss: 35, title: 'Corrida Leve Aeróbia Z2', desc: 'Corrida confortável em ritmo conversacional para ganho de base aeróbia.' },
-              { day: 2, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso', desc: 'Permita que seus músculos se recuperem do estresse acumulado.' },
-              { day: 3, type: 'Corrida', dist: 8.0, dur: 2880, pace: '5:45/km', power: 0, tss: 60, title: 'Treino de Ritmo / Tempo Run', desc: 'Principal: 20 min contínuos em ritmo moderado/forte (Pace ~5:10/km). Excelente estímulo de limiar.' },
-              { day: 4, type: 'Forca', dist: 0.0, dur: 2400, pace: 'N/A', power: 0, tss: 15, title: 'Fortalecimento Geral de Pernas & Core', desc: 'Agachamentos, passadas e pranchas para estabilização articular.' },
-              { day: 5, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso', desc: 'Dia livre para relaxamento e regeneração.' },
-              { day: 6, type: 'Corrida', dist: 12.0, dur: 4680, pace: '6:30/km', power: 0, tss: 110, title: 'Treino Longo de Fim de Semana', desc: 'O treino mais longo da semana. Foco em ritmo estável de Zona 2. Hidrate-se bem antes e depois.' },
-              { day: 7, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso', desc: 'Dia de repouso total.' }
+              { day: 1, type: 'Corrida', dist: 8.0, dur: 2400, pace: '5:00/km', power: 0, tss: 40, title: 'Corrida Regenerativa Leve', desc: 'Corrida confortável em Z1/Z2 para restabelecer fluxo sanguíneo e soltar as articulações.' },
+              { day: 2, type: 'Corrida', dist: 12.0, dur: 3240, pace: '4:30/km', power: 0, tss: 90, title: 'Treino Intervalado de VO2 Máx', desc: 'Principal: 5x 1000m forte (Pace ~3:45/km) com 2 min de recuperação ativa de trote.' },
+              { day: 3, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso Fisiológico Completo', desc: 'Recuperação total para assimilação celular dos estímulos intervalados.' },
+              { day: 4, type: 'Corrida', dist: 10.0, dur: 2880, pace: '4:48/km', power: 0, tss: 75, title: 'Corrida de Ritmo Z3 (Tempo Run)', desc: 'Corrida em ritmo firme mantendo intensidade linear constante próximo ao limiar de lactato.' },
+              { day: 5, type: 'Forca', dist: 0.0, dur: 2700, pace: 'N/A', power: 0, tss: 25, title: 'Força Máxima Específica', desc: 'Treino resistido focado em membros inferiores, potência excêntrica de panturrilhas e quadríceps.' },
+              { day: 6, type: 'Corrida', dist: 24.0, dur: 6912, pace: '4:48/km', power: 0, tss: 220, title: 'Longo de Endurance Z2 Aeróbia', desc: 'Grande volume semanal. Corrida longa constante em ritmo aeróbico confortável para adaptação capilar.' },
+              { day: 7, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Supercompensação Ativa', desc: 'Descanso completo para assimilação metabólica e restauração de estoques de glicogênio.' }
             ];
 
             for (const w of workouts) {

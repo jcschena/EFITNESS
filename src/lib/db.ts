@@ -1348,7 +1348,7 @@ async function seedDatabase(db: DatabaseClient) {
 
   const joaoUserId = (await db.run(`
     INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password, coach_id)
-    VALUES ('JOAO CLAUDIO SCHENA', 'intermediario', 40, 75.0, 162, '5:15', 6, 0, '1985-05-23', 'jcschena', '1953Bigu$', ?)
+    VALUES ('JOAO CLAUDIO SCHENA', 'elite', 40, 75.0, 162, '5:15', 6, 0, '1985-05-23', 'jcschena', '1953Bigu$', ?)
   `, coachUserId)).lastID;
 
   if (!eliteUserId || !sedentarioUserId || !joaoUserId) return;
@@ -1410,8 +1410,8 @@ async function seedDatabase(db: DatabaseClient) {
     `, sedentarioPlanId, w.day, formatDate(weekDates[w.day - 1]), w.type, w.dist, w.dur, w.pace, w.power, w.tss, w.title, w.desc);
   }
 
-  // João Claudio (Intermediário - Corrida)
-  const joaoWorkouts = generateWorkoutsForPlan('Corrida', 'intermediario');
+  // João Claudio (Avançado/Elite - Corrida)
+  const joaoWorkouts = generateWorkoutsForPlan('Corrida', 'elite');
   for (const w of joaoWorkouts) {
     await db.run(`
       INSERT INTO workouts (plan_id, day_of_week, date, type, distance_target, duration_target, pace_target, power_target, tss_target, title, description, status)
