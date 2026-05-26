@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users, Key, LogOut, Search, Activity, AlertTriangle, 
   TrendingUp, Calendar, Edit3, Save, X, Plus, Check, RefreshCw,
-  BookOpen, Download, MessageSquare, Send
+  BookOpen, Download, MessageSquare, Send, Trash2
 } from 'lucide-react';
 
 interface Athlete {
@@ -43,8 +43,16 @@ interface CoachDashboardProps {
 }
 
 export default function CoachDashboard({ userId, userName, onLogout }: CoachDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'athletes' | 'keys' | 'library' | 'finance' | 'teachers'>('athletes');
+  const [activeTab, setActiveTab] = useState<'athletes' | 'keys' | 'library' | 'finance' | 'teachers' | 'branding'>('athletes');
   const [athletes, setAthletes] = useState<Athlete[]>([]);
+  const [brandingForm, setBrandingForm] = useState({
+    customName: '',
+    customLogo: '',
+    customInfo: '',
+    customColor: '#00f2fe'
+  });
+  const [brandingLoading, setBrandingLoading] = useState(false);
+  const [brandingSaving, setBrandingSaving] = useState(false);
   const [accessKeys, setAccessKeys] = useState<AccessKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -59,6 +67,9 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
   const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null);
   const [workouts, setWorkouts] = useState<any[]>([]);
   const [workoutsLoading, setWorkoutsLoading] = useState(false);
+  const [activePlanId, setActivePlanId] = useState<number | null>(null);
+  const [activePlanStartDate, setActivePlanStartDate] = useState<string | null>(null);
+  const [draggedOverDay, setDraggedOverDay] = useState<number | null>(null);
   const [editingWorkout, setEditingWorkout] = useState<any | null>(null);
   const [saveLoading, setSaveLoading] = useState(false);
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
@@ -420,14 +431,15 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
     }
   };
 
-  const handleSelectAthlete = async (athlete: Athlete) => {
-    setSelectedAthlete(athlete);
+  const fetchAthleteWorkouts = async (athleteId: number) => {
     setWorkoutsLoading(true);
     try {
-      const res = await fetch(`/api/coach/workouts?athleteId=${athlete.id}`);
+      const res = await fetch(`/api/coach/workouts?athleteId=${athleteId}`);
       const data = await res.json();
       if (data.success) {
         setWorkouts(data.workouts || []);
+        setActivePlanId(data.planId || null);
+        setActivePlanStartDate(data.startDate || null);
       } else {
         alert(data.error || 'Erro ao buscar planilha');
       }
@@ -436,6 +448,11 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
     } finally {
       setWorkoutsLoading(false);
     }
+  };
+
+  const handleSelectAthlete = async (athlete: Athlete) => {
+    setSelectedAthlete(athlete);
+    await fetchAthleteWorkouts(athlete.id);
   };
 
   const handleSaveWorkout = async (e: React.FormEvent) => {
@@ -450,10 +467,10 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
       });
       const data = await res.json();
       if (data.success) {
-        // Atualizar lista local de treinos
-        setWorkouts(workouts.map(w => w.id === editingWorkout.workoutId ? { ...w, ...editingWorkout, status: 'adjusted' } : w));
         setEditingWorkout(null);
-        // Recarregar estatísticas em background
+        if (selectedAthlete) {
+          await fetchAthleteWorkouts(selectedAthlete.id);
+        }
         fetchCoachData();
       } else {
         alert(data.error || 'Erro ao salvar treino');
@@ -464,6 +481,83 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
       setSaveLoading(false);
     }
   };
+
+  const handleDeleteWorkout = async (workoutId: number) => {
+    if (!window.confirm('Tem certeza de que deseja excluir este treino previamente prescrito?')) return;
+    setSaveLoading(true);
+    try {
+      const res = await fetch(`/api/coach/workouts?workoutId=${workoutId}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Atualizar lista local de treinos removendo o treino deletado
+        setWorkouts(workouts.filter(w => w.id !== workoutId));
+        if (editingWorkout?.workoutId === workoutId) {
+          setEditingWorkout(null);
+        }
+        // Recarregar estatísticas em background
+        fetchCoachData();
+      } else {
+        alert(data.error || 'Erro ao excluir treino');
+      }
+    } catch (err) {
+      alert('Erro de rede ao excluir treino');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent, workoutId: number) => {
+    e.dataTransfer.setData('text/plain', String(workoutId));
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetDay: number) => {
+    e.preventDefault();
+    const workoutIdStr = e.dataTransfer.getData('text/plain');
+    if (!workoutIdStr) return;
+    const workoutId = parseInt(workoutIdStr, 10);
+    
+    const draggedWorkout = workouts.find(w => w.id === workoutId);
+    if (!draggedWorkout || draggedWorkout.day_of_week === targetDay) return;
+
+    // Atualização otimista
+    setWorkouts(prev => prev.map(w => w.id === workoutId ? { ...w, day_of_week: targetDay } : w));
+
+    try {
+      const res = await fetch('/api/coach/workouts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workoutId,
+          day_of_week: targetDay
+        })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        alert(data.error || 'Erro ao mover treino');
+        if (selectedAthlete) {
+          await fetchAthleteWorkouts(selectedAthlete.id);
+        }
+      } else {
+        if (selectedAthlete) {
+          await fetchAthleteWorkouts(selectedAthlete.id);
+        }
+      }
+    } catch (err) {
+      alert('Erro de conexão ao mover treino');
+      if (selectedAthlete) {
+        await fetchAthleteWorkouts(selectedAthlete.id);
+      }
+    }
+  };
+
+
+
 
   // Funções de Gerenciamento de Professores
   const fetchTeachers = async () => {
@@ -892,6 +986,279 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
     );
   };
 
+  const fetchBrandingData = async () => {
+    setBrandingLoading(true);
+    try {
+      const res = await fetch(`/api/coach/branding?coachId=${userId}`);
+      const data = await res.json();
+      if (data.success && data.branding) {
+        setBrandingForm({
+          customName: data.branding.custom_name || '',
+          customLogo: data.branding.custom_logo || '',
+          customInfo: data.branding.custom_info || '',
+          customColor: data.branding.custom_color || '#00f2fe'
+        });
+      }
+    } catch (err) {
+      console.error('Erro ao carregar dados de personalização:', err);
+    } finally {
+      setBrandingLoading(false);
+    }
+  };
+
+  const handleSaveBranding = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBrandingSaving(true);
+    try {
+      const res = await fetch('/api/coach/branding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          coachId: userId,
+          customName: brandingForm.customName,
+          customLogo: brandingForm.customLogo,
+          customInfo: brandingForm.customInfo,
+          customColor: brandingForm.customColor
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message || 'Configurações de personalização salvas!');
+      } else {
+        alert(data.error || 'Erro ao salvar personalização');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao salvar personalização');
+    } finally {
+      setBrandingSaving(false);
+    }
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert('O logotipo deve ter no máximo 2MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setBrandingForm(prev => ({
+        ...prev,
+        customLogo: reader.result as string
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const renderBrandingTab = () => {
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '30px', alignItems: 'start' }} className="animate-slide-up">
+        <div style={{ background: 'rgba(20, 20, 28, 0.4)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '24px' }}>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '0 0 8px 0', color: '#00f2fe' }}>Identidade Visual da Assessoria</h3>
+          <p style={{ fontSize: '0.85rem', color: '#9ca3af', margin: '0 0 24px 0', lineHeight: '1.5' }}>
+            Personalize o nome, o logotipo, a cor de destaque e as informações que seus atletas visualizam ao acessar o aplicativo.
+          </p>
+
+          {brandingLoading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+              <RefreshCw className="animate-spin" size={24} color="#00f2fe" style={{ animation: 'spin 1s linear infinite' }} />
+            </div>
+          ) : (
+            <form onSubmit={handleSaveBranding} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>NOME DA ASSESSORIA / MARCA</label>
+                <input 
+                  type="text" 
+                  placeholder="Ex: Prime Assessoria Esportiva"
+                  value={brandingForm.customName}
+                  onChange={e => setBrandingForm({ ...brandingForm, customName: e.target.value })}
+                  style={{
+                    width: '100%',
+                    background: '#0d0d12',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#f3f4f6',
+                    fontSize: '0.85rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>LOGOTIPO DA ASSESSORIA</label>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  style={{
+                    width: '100%',
+                    background: '#0d0d12',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#f3f4f6',
+                    fontSize: '0.85rem',
+                    outline: 'none'
+                  }}
+                />
+                <span style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px', display: 'block' }}>Formatos recomendados: PNG ou SVG transparente. Máximo 2MB.</span>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>COR DE DESTAQUE DO TEMA</label>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <input 
+                    type="color" 
+                    value={brandingForm.customColor || '#00f2fe'}
+                    onChange={e => setBrandingForm({ ...brandingForm, customColor: e.target.value })}
+                    style={{
+                      border: 'none',
+                      background: 'none',
+                      width: '44px',
+                      height: '44px',
+                      cursor: 'pointer',
+                      padding: 0
+                    }}
+                  />
+                  <input 
+                    type="text"
+                    value={brandingForm.customColor || '#00f2fe'}
+                    onChange={e => setBrandingForm({ ...brandingForm, customColor: e.target.value })}
+                    style={{
+                      background: '#0d0d12',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      borderRadius: '8px',
+                      padding: '10px 12px',
+                      color: '#f3f4f6',
+                      fontSize: '0.85rem',
+                      outline: 'none',
+                      width: '100px'
+                    }}
+                  />
+                  <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Esta cor substituirá o ciano elétrico em botões, bordas e detalhes do app do atleta.</span>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>INFORMAÇÕES ADICIONAIS / CONTATO</label>
+                <textarea 
+                  placeholder="Ex: Endereço físico, links de redes sociais, telefone de suporte ou slogan da assessoria."
+                  value={brandingForm.customInfo}
+                  onChange={e => setBrandingForm({ ...brandingForm, customInfo: e.target.value })}
+                  rows={5}
+                  style={{
+                    width: '100%',
+                    background: '#0d0d12',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#f3f4f6',
+                    fontSize: '0.85rem',
+                    outline: 'none',
+                    resize: 'none',
+                    fontFamily: 'inherit',
+                    lineHeight: '1.4'
+                  }}
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={brandingSaving}
+                style={{
+                  width: '100%',
+                  background: `linear-gradient(135deg, ${brandingForm.customColor || '#00f2fe'}, #4facfe)`,
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  color: '#0a0a0f',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                {brandingSaving ? 'Salvando...' : 'Salvar Alterações de Branding'}
+              </button>
+            </form>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ background: 'rgba(20, 20, 28, 0.5)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '20px' }}>
+            <h4 style={{ margin: '0 0 16px 0', fontSize: '1rem', fontWeight: 700 }}>
+              Pré-visualização do Topo (Atleta)
+            </h4>
+            
+            <div style={{
+              background: '#060913',
+              border: '1px solid rgba(255,255,255,0.07)',
+              borderRadius: '12px',
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {brandingForm.customLogo ? (
+                  <img 
+                    src={brandingForm.customLogo} 
+                    alt="Logo" 
+                    style={{ maxHeight: '32px', maxWidth: '80px', objectFit: 'contain' }} 
+                  />
+                ) : (
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    background: `linear-gradient(135deg, ${brandingForm.customColor || '#00f2fe'}, #4facfe)`,
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <span style={{ color: '#0a0a0f', fontSize: '0.8rem', fontWeight: 800 }}>U</span>
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#ffffff' }}>
+                    {brandingForm.customName || 'ULTRA COACH'}
+                  </span>
+                  <span style={{ fontSize: '0.55rem', color: '#94a3b8' }}>
+                    PLANILHA SEMANAL
+                  </span>
+                </div>
+              </div>
+              <div style={{
+                background: `${brandingForm.customColor || '#00f2fe'}1a`,
+                color: brandingForm.customColor || '#00f2fe',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '4px 8px',
+                borderRadius: '6px'
+              }}>
+                INTERMEDIÁRIO
+              </div>
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(20, 20, 28, 0.5)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '20px' }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '1rem', fontWeight: 700 }}>
+              Informações Adicionais
+            </h4>
+            <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
+              {brandingForm.customInfo || 'Nenhuma informação adicional de contato inserida.'}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: '#0d0d12', color: '#f3f4f6', fontFamily: 'system-ui, sans-serif' }}>
       
@@ -1137,6 +1504,29 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
               Financeiro 💰
             </button>
           )}
+
+          {!isSubTeacher && (
+            <button 
+              onClick={() => { setActiveTab('branding'); fetchBrandingData(); }}
+              style={{
+                background: 'none',
+                border: 'none',
+                borderBottom: activeTab === 'branding' ? '2px solid #00f2fe' : '2px solid transparent',
+                color: activeTab === 'branding' ? '#00f2fe' : '#9ca3af',
+                fontSize: '1rem',
+                fontWeight: 600,
+                padding: '12px 6px',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <span style={{ fontSize: '1.1rem' }}>🎨</span>
+              Personalização
+            </button>
+          )}
         </div>
 
         {/* LOADING & ERROR */}
@@ -1220,7 +1610,7 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
                                   color: athlete.level === 'elite' ? '#3b82f6' : athlete.level === 'sedentario' ? '#9ca3af' : '#10b981',
                                   fontWeight: 600
                                 }}>
-                                  {athlete.level === 'elite' ? 'Elite' : athlete.level === 'sedentario' ? 'Iniciante' : 'Intermediário'}
+                                  {athlete.level === 'elite' ? 'Avançado' : athlete.level === 'sedentario' ? 'Iniciante' : 'Intermediário'}
                                 </span>
                               </td>
                               {!isSubTeacher && (
@@ -1730,6 +2120,9 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
             {/* ABA: FINANCEIRO */}
             {activeTab === 'finance' && renderFinanceTab()}
 
+            {/* ABA: PERSONALIZAÇÃO */}
+            {activeTab === 'branding' && renderBrandingTab()}
+
           </div>
         )}
 
@@ -1787,68 +2180,251 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
                 <div style={{ display: 'grid', gridTemplateColumns: editingWorkout ? '1fr 320px' : '1fr', gap: '24px', alignItems: 'start' }}>
                   
                   {/* Lista de Treinos */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {workouts.length === 0 ? (
-                      <p style={{ color: '#9ca3af', textAlign: 'center', padding: '20px' }}>Nenhum treino na planilha desta semana.</p>
-                    ) : (
-                      workouts.map(w => (
-                        <div key={w.id} style={{
-                          background: 'rgba(255,255,255,0.02)',
-                          border: '1px solid rgba(255,255,255,0.04)',
-                          borderRadius: '12px',
-                          padding: '16px',
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {activePlanId && (
+                      <button
+                        onClick={() => setEditingWorkout({
+                          planId: activePlanId,
+                          day_of_week: 1,
+                          title: '',
+                          type: 'Corrida',
+                          distance_target: 0,
+                          duration_target: 0,
+                          pace_target: 'N/A',
+                          power_target: 0,
+                          tss_target: 0,
+                          description: '',
+                          status: 'pending'
+                        })}
+                        style={{
+                          background: 'rgba(0, 242, 254, 0.1)',
+                          border: '1px solid rgba(0, 242, 254, 0.2)',
+                          borderRadius: '10px',
+                          padding: '12px',
+                          color: '#00f2fe',
+                          fontWeight: 700,
+                          fontSize: '0.9rem',
+                          cursor: 'pointer',
                           display: 'flex',
-                          justifyContent: 'space-between',
                           alignItems: 'center',
-                          gap: '12px'
-                        }}>
-                          <div>
-                            <span style={{ fontSize: '0.7rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase' }}>
-                              Dia {w.day_of_week} ({w.date})
-                            </span>
-                            <h4 style={{ margin: '4px 0 6px 0', fontSize: '0.95rem', fontWeight: 700 }}>
-                              {w.title}
-                            </h4>
-                            <div style={{ display: 'flex', gap: '12px', fontSize: '0.75rem', color: '#9ca3af' }}>
-                              <span>Tipo: <strong style={{ color: '#f3f4f6' }}>{w.type}</strong></span>
-                              {w.distance_target > 0 && <span>Distância: <strong style={{ color: '#f3f4f6' }}>{w.distance_target}km</strong></span>}
-                              {w.tss_target > 0 && <span>Carga: <strong style={{ color: '#00f2fe' }}>{w.tss_target} TSS</strong></span>}
-                            </div>
-                            {w.description && <p style={{ fontSize: '0.75rem', color: '#9ca3af', margin: '8px 0 0 0', fontStyle: 'italic' }}>{w.description}</p>}
-                          </div>
-                          
-                          <button
-                            onClick={() => setEditingWorkout({
-                              workoutId: w.id,
-                              title: w.title,
-                              type: w.type,
-                              distance_target: w.distance_target,
-                              duration_target: w.duration_target,
-                              pace_target: w.pace_target,
-                              power_target: w.power_target,
-                              tss_target: w.tss_target,
-                              description: w.description || '',
-                              status: w.status
-                            })}
+                          justifyContent: 'center',
+                          gap: '8px',
+                          marginBottom: '8px',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <Plus size={16} />
+                        Adicionar Novo Treino na Semana
+                      </button>
+                    )}
+
+                    {(() => {
+                      const DAYS_OF_WEEK = [
+                        { day: 1, name: 'Segunda-feira' },
+                        { day: 2, name: 'Terça-feira' },
+                        { day: 3, name: 'Quarta-feira' },
+                        { day: 4, name: 'Quinta-feira' },
+                        { day: 5, name: 'Sexta-feira' },
+                        { day: 6, name: 'Sábado' },
+                        { day: 7, name: 'Domingo' }
+                      ];
+
+                      const getDayDateLabel = (dayNum: number) => {
+                        if (!activePlanStartDate) return '';
+                        try {
+                          const baseDate = new Date(activePlanStartDate + 'T12:00:00');
+                          baseDate.setDate(baseDate.getDate() + (dayNum - 1));
+                          const dayStr = String(baseDate.getDate()).padStart(2, '0');
+                          const monthStr = String(baseDate.getMonth() + 1).padStart(2, '0');
+                          return `${dayStr}/${monthStr}`;
+                        } catch (e) {
+                          return '';
+                        }
+                      };
+
+                      return DAYS_OF_WEEK.map(dayObj => {
+                        const dayWorkouts = workouts.filter(w => w.day_of_week === dayObj.day);
+                        const isOver = draggedOverDay === dayObj.day;
+                        const dateLabel = getDayDateLabel(dayObj.day);
+
+                        return (
+                          <div
+                            key={dayObj.day}
+                            onDragOver={handleDragOver}
+                            onDragEnter={(e) => { e.preventDefault(); setDraggedOverDay(dayObj.day); }}
+                            onDragLeave={() => setDraggedOverDay(null)}
+                            onDrop={(e) => handleDrop(e, dayObj.day)}
                             style={{
-                              background: 'rgba(255,255,255,0.04)',
-                              border: '1px solid rgba(255,255,255,0.08)',
-                              borderRadius: '8px',
-                              padding: '8px 12px',
-                              fontSize: '0.8rem',
-                              color: '#f3f4f6',
-                              cursor: 'pointer',
+                              background: isOver ? 'rgba(0, 242, 254, 0.05)' : 'rgba(255, 255, 255, 0.01)',
+                              border: isOver ? '1px solid #00f2fe' : '1px solid rgba(255, 255, 255, 0.05)',
+                              borderRadius: '16px',
+                              padding: '16px',
                               display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px'
+                              flexDirection: 'column',
+                              gap: '10px',
+                              transition: 'all 0.2s',
+                              boxShadow: isOver ? '0 0 15px rgba(0, 242, 254, 0.15)' : 'none'
                             }}
                           >
-                            <Edit3 size={14} />
-                            Prescrever
-                          </button>
-                        </div>
-                      ))
-                    )}
+                            {/* Cabeçalho do Dia */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 800, color: '#f3f4f6', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                {dayObj.name} {dateLabel && <span style={{ color: '#00f2fe', fontSize: '0.8rem', fontWeight: 500 }}>({dateLabel})</span>}
+                              </h4>
+                              {activePlanId && (
+                                <button
+                                  onClick={() => setEditingWorkout({
+                                    planId: activePlanId,
+                                    day_of_week: dayObj.day,
+                                    title: '',
+                                    type: 'Corrida',
+                                    distance_target: 0,
+                                    duration_target: 0,
+                                    pace_target: 'N/A',
+                                    power_target: 0,
+                                    tss_target: 0,
+                                    description: '',
+                                    status: 'pending'
+                                  })}
+                                  style={{
+                                    background: 'rgba(255, 255, 255, 0.03)',
+                                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                                    borderRadius: '6px',
+                                    width: '24px',
+                                    height: '24px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#9ca3af',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                  }}
+                                  title="Adicionar treino para este dia"
+                                >
+                                  <Plus size={14} />
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Treinos do Dia */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              {dayWorkouts.length === 0 ? (
+                                <div style={{
+                                  border: '1px dashed rgba(255, 255, 255, 0.08)',
+                                  borderRadius: '10px',
+                                  padding: '12px',
+                                  textAlign: 'center',
+                                  fontSize: '0.75rem',
+                                  color: '#6b7280',
+                                  userSelect: 'none'
+                                }}>
+                                  Nenhum treino programado
+                                </div>
+                              ) : (
+                                dayWorkouts.map(w => (
+                                  <div
+                                    key={w.id}
+                                    draggable="true"
+                                    onDragStart={(e) => handleDragStart(e, w.id)}
+                                    style={{
+                                      background: 'rgba(255, 255, 255, 0.03)',
+                                      border: '1px solid rgba(255, 255, 255, 0.06)',
+                                      borderRadius: '12px',
+                                      padding: '12px 14px',
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center',
+                                      gap: '12px',
+                                      cursor: 'grab',
+                                      transition: 'all 0.2s'
+                                    }}
+                                  >
+                                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                      {/* Drag Indicator (Icone de grip) */}
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', color: '#4b5563', cursor: 'grab' }}>
+                                        <div style={{ display: 'flex', gap: '2px' }}>
+                                          <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'currentColor' }} />
+                                          <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'currentColor' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '2px' }}>
+                                          <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'currentColor' }} />
+                                          <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'currentColor' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '2px' }}>
+                                          <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'currentColor' }} />
+                                          <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'currentColor' }} />
+                                        </div>
+                                      </div>
+                                      
+                                      <div>
+                                        <h5 style={{ margin: 0, fontSize: '0.88rem', fontWeight: 700, color: '#f3f4f6' }}>
+                                          {w.title}
+                                        </h5>
+                                        <div style={{ display: 'flex', gap: '10px', fontSize: '0.7rem', color: '#9ca3af', marginTop: '4px' }}>
+                                          <span>Tipo: <strong style={{ color: '#00f2fe' }}>{w.type}</strong></span>
+                                          {w.distance_target > 0 && <span>Distância: <strong>{w.distance_target}km</strong></span>}
+                                          {w.tss_target > 0 && <span>Carga: <strong>{w.tss_target} TSS</strong></span>}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div style={{ display: 'flex', gap: '6px' }}>
+                                      <button
+                                        onClick={() => setEditingWorkout({
+                                          workoutId: w.id,
+                                          title: w.title,
+                                          type: w.type,
+                                          distance_target: w.distance_target,
+                                          duration_target: w.duration_target,
+                                          pace_target: w.pace_target,
+                                          power_target: w.power_target,
+                                          tss_target: w.tss_target,
+                                          description: w.description || '',
+                                          status: w.status
+                                        })}
+                                        style={{
+                                          background: 'rgba(255, 255, 255, 0.05)',
+                                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                                          borderRadius: '6px',
+                                          padding: '5px 8px',
+                                          fontSize: '0.75rem',
+                                          color: '#f3f4f6',
+                                          cursor: 'pointer',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '4px'
+                                        }}
+                                      >
+                                        <Edit3 size={12} />
+                                        Prescrever
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteWorkout(w.id)}
+                                        style={{
+                                          background: 'rgba(239, 68, 68, 0.1)',
+                                          border: '1px solid rgba(239, 68, 68, 0.2)',
+                                          borderRadius: '6px',
+                                          padding: '5px 8px',
+                                          fontSize: '0.75rem',
+                                          color: '#ef4444',
+                                          cursor: 'pointer',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '4px'
+                                        }}
+                                      >
+                                        <Trash2 size={12} />
+                                        Excluir
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
 
                   {/* Painel Lateral de Edição/Prescrição */}
@@ -1862,7 +2438,9 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
                       top: '0'
                     }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#00f2fe' }}>Editar Treino</h4>
+                        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#00f2fe' }}>
+                          {editingWorkout.workoutId ? 'Editar Treino' : 'Adicionar Novo Treino'}
+                        </h4>
                         <button 
                           onClick={() => setEditingWorkout(null)} 
                           style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer' }}
@@ -1872,6 +2450,25 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
                       </div>
 
                       <form onSubmit={handleSaveWorkout} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {!editingWorkout.workoutId && (
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.7rem', color: '#9ca3af', marginBottom: '4px', fontWeight: 600 }}>DIA DA SEMANA</label>
+                            <select
+                              value={editingWorkout.day_of_week || 1}
+                              onChange={e => setEditingWorkout({ ...editingWorkout, day_of_week: parseInt(e.target.value, 10) })}
+                              style={{ width: '100%', background: '#0d0d12', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', padding: '8px', color: '#f3f4f6', fontSize: '0.85rem' }}
+                            >
+                              <option value={1}>Segunda-feira</option>
+                              <option value={2}>Terça-feira</option>
+                              <option value={3}>Quarta-feira</option>
+                              <option value={4}>Quinta-feira</option>
+                              <option value={5}>Sexta-feira</option>
+                              <option value={6}>Sábado</option>
+                              <option value={7}>Domingo</option>
+                            </select>
+                          </div>
+                        )}
+
                         <div>
                           <label style={{ display: 'block', fontSize: '0.7rem', color: '#9ca3af', marginBottom: '4px', fontWeight: 600 }}>TÍTULO</label>
                           <input 
@@ -1970,127 +2567,156 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
                             </>
                           )}
                         </button>
+
+                        {editingWorkout.workoutId && (
+                          <button 
+                            type="button" 
+                            onClick={() => handleDeleteWorkout(editingWorkout.workoutId)}
+                            disabled={saveLoading}
+                            style={{
+                              width: '100%',
+                              background: 'rgba(239, 68, 68, 0.1)',
+                              border: '1px solid rgba(239, 68, 68, 0.2)',
+                              borderRadius: '8px',
+                              padding: '10px',
+                              color: '#ef4444',
+                              fontWeight: 700,
+                              fontSize: '0.85rem',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              marginTop: '8px'
+                            }}
+                          >
+                            <Trash2 size={14} />
+                            Excluir Treino
+                          </button>
+                        )}
                       </form>
 
                       {/* SEÇÃO DE FEEDBACK DE TREINO */}
-                      <div style={{ marginTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                          <MessageSquare size={14} color="#00f2fe" />
-                          <h5 style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            Feedback / Mensagens
-                          </h5>
-                        </div>
+                      {editingWorkout.workoutId && (
+                        <div style={{ marginTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                            <MessageSquare size={14} color="#00f2fe" />
+                            <h5 style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                              Feedback / Mensagens
+                            </h5>
+                          </div>
 
-                        <div style={{
-                          background: 'rgba(0, 0, 0, 0.2)',
-                          border: '1px solid rgba(255, 255, 255, 0.04)',
-                          borderRadius: '8px',
-                          padding: '10px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '8px'
-                        }}>
-                          {/* Histórico */}
                           <div style={{
-                            maxHeight: '160px',
-                            overflowY: 'auto',
+                            background: 'rgba(0, 0, 0, 0.2)',
+                            border: '1px solid rgba(255, 255, 255, 0.04)',
+                            borderRadius: '8px',
+                            padding: '10px',
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '8px',
-                            paddingRight: '2px'
+                            gap: '8px'
                           }}>
-                            {feedbacksLoading ? (
-                              <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
-                                <RefreshCw className="animate-spin" size={14} color="#00f2fe" style={{ animation: 'spin 1s linear infinite' }} />
-                              </div>
-                            ) : feedbacks.length === 0 ? (
-                              <p style={{ color: '#6b7280', fontSize: '0.75rem', textAlign: 'center', margin: '10px 0' }}>
-                                Nenhum feedback enviado ainda.
-                              </p>
-                            ) : (
-                              feedbacks.map((f: any) => {
-                                const isMe = f.sender_role === 'coach';
-                                return (
-                                  <div key={f.id} style={{
-                                    display: 'flex',
-                                    justifyContent: isMe ? 'flex-end' : 'flex-start',
-                                    width: '100%'
-                                  }}>
-                                    <div style={{
-                                      background: isMe ? 'rgba(0, 242, 254, 0.08)' : 'rgba(255, 255, 255, 0.05)',
-                                      border: isMe ? '1px solid rgba(0, 242, 254, 0.15)' : '1px solid rgba(255, 255, 255, 0.08)',
-                                      borderRadius: '8px',
-                                      padding: '8px 10px',
-                                      maxWidth: '85%'
+                            {/* Histórico */}
+                            <div style={{
+                              maxHeight: '160px',
+                              overflowY: 'auto',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '8px',
+                              paddingRight: '2px'
+                            }}>
+                              {feedbacksLoading ? (
+                                <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
+                                  <RefreshCw className="animate-spin" size={14} color="#00f2fe" style={{ animation: 'spin 1s linear infinite' }} />
+                                </div>
+                              ) : feedbacks.length === 0 ? (
+                                <p style={{ color: '#6b7280', fontSize: '0.75rem', textAlign: 'center', margin: '10px 0' }}>
+                                  Nenhum feedback enviado ainda.
+                                </p>
+                              ) : (
+                                feedbacks.map((f: any) => {
+                                  const isMe = f.sender_role === 'coach';
+                                  return (
+                                    <div key={f.id} style={{
+                                      display: 'flex',
+                                      justifyContent: isMe ? 'flex-end' : 'flex-start',
+                                      width: '100%'
                                     }}>
                                       <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        gap: '8px',
-                                        fontSize: '0.6rem',
-                                        color: isMe ? '#00f2fe' : '#9ca3af',
-                                        fontWeight: 600,
-                                        marginBottom: '2px'
+                                        background: isMe ? 'rgba(0, 242, 254, 0.08)' : 'rgba(255, 255, 255, 0.05)',
+                                        border: isMe ? '1px solid rgba(0, 242, 254, 0.15)' : '1px solid rgba(255, 255, 255, 0.08)',
+                                        borderRadius: '8px',
+                                        padding: '8px 10px',
+                                        maxWidth: '85%'
                                       }}>
-                                        <span>{isMe ? 'Você (Coach)' : 'Aluno'}</span>
-                                        <span style={{ color: '#4b5563', fontSize: '0.55rem' }}>
-                                          {new Date(f.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
+                                        <div style={{
+                                          display: 'flex',
+                                          justifyContent: 'space-between',
+                                          alignItems: 'center',
+                                          gap: '8px',
+                                          fontSize: '0.6rem',
+                                          color: isMe ? '#00f2fe' : '#9ca3af',
+                                          fontWeight: 600,
+                                          marginBottom: '2px'
+                                        }}>
+                                          <span>{isMe ? 'Você (Coach)' : 'Aluno'}</span>
+                                          <span style={{ color: '#4b5563', fontSize: '0.55rem' }}>
+                                            {new Date(f.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                          </span>
+                                        </div>
+                                        <p style={{ margin: 0, fontSize: '0.78rem', color: '#e5e7eb', lineHeight: '1.3', whiteSpace: 'pre-wrap' }}>
+                                          {f.message}
+                                        </p>
                                       </div>
-                                      <p style={{ margin: 0, fontSize: '0.78rem', color: '#e5e7eb', lineHeight: '1.3', whiteSpace: 'pre-wrap' }}>
-                                        {f.message}
-                                      </p>
                                     </div>
-                                  </div>
-                                );
-                              })
-                            )}
-                          </div>
+                                  );
+                                })
+                              )}
+                            </div>
 
-                          {/* Enviar */}
-                          <div style={{ display: 'flex', gap: '6px', borderTop: '1px solid rgba(255, 255, 255, 0.04)', paddingTop: '8px' }}>
-                            <input
-                              type="text"
-                              value={feedbackInput}
-                              onChange={e => setFeedbackInput(e.target.value)}
-                              onKeyDown={e => {
-                                if (e.key === 'Enter') handleSendFeedback();
-                              }}
-                              placeholder="Responder ao aluno..."
-                              style={{
-                                flex: 1,
-                                background: '#0d0d12',
-                                border: '1px solid rgba(255, 255, 255, 0.08)',
-                                borderRadius: '6px',
-                                padding: '6px 10px',
-                                fontSize: '0.8rem',
-                                color: '#f3f4f6',
-                                outline: 'none'
-                              }}
-                            />
-                            <button
-                              onClick={handleSendFeedback}
-                              disabled={!feedbackInput.trim()}
-                              style={{
-                                background: feedbackInput.trim() ? 'linear-gradient(135deg, #00f2fe, #4facfe)' : 'rgba(255, 255, 255, 0.05)',
-                                border: 'none',
-                                borderRadius: '6px',
-                                width: '30px',
-                                height: '30px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: feedbackInput.trim() ? 'pointer' : 'default',
-                                color: feedbackInput.trim() ? '#0a0a0f' : '#4b5563',
-                                transition: 'all 0.2s'
-                              }}
-                            >
-                              <Send size={12} />
-                            </button>
+                            {/* Enviar */}
+                            <div style={{ display: 'flex', gap: '6px', borderTop: '1px solid rgba(255, 255, 255, 0.04)', paddingTop: '8px' }}>
+                              <input
+                                type="text"
+                                value={feedbackInput}
+                                onChange={e => setFeedbackInput(e.target.value)}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') handleSendFeedback();
+                                }}
+                                placeholder="Responder ao aluno..."
+                                style={{
+                                  flex: 1,
+                                  background: '#0d0d12',
+                                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                                  borderRadius: '6px',
+                                  padding: '6px 10px',
+                                  fontSize: '0.8rem',
+                                  color: '#f3f4f6',
+                                  outline: 'none'
+                                }}
+                              />
+                              <button
+                                onClick={handleSendFeedback}
+                                disabled={!feedbackInput.trim()}
+                                style={{
+                                  background: feedbackInput.trim() ? 'linear-gradient(135deg, #00f2fe, #4facfe)' : 'rgba(255, 255, 255, 0.05)',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  width: '30px',
+                                  height: '30px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: feedbackInput.trim() ? 'pointer' : 'default',
+                                  color: feedbackInput.trim() ? '#0a0a0f' : '#4b5563',
+                                  transition: 'all 0.2s'
+                                }}
+                              >
+                                <Send size={12} />
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
 
                     </div>
                   )}

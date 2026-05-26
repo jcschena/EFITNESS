@@ -132,7 +132,7 @@ export async function POST(req: Request) {
     const planInsert = await db.run(`
       INSERT INTO training_plans (user_id, name, start_date, end_date, active)
       VALUES (?, ?, ?, ?, 1)
-    `, userId, `Planilha Inicial Personalizada - Nível ${level.toUpperCase()}`, startDateStr, endDateStr);
+    `, userId, `Planilha Inicial Personalizada - Nível ${level === 'elite' ? 'AVANÇADO' : level === 'intermediario' ? 'INTERMEDIÁRIO' : 'INICIANTE'}`, startDateStr, endDateStr);
 
     const planId = planInsert.lastID;
 

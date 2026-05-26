@@ -2614,8 +2614,26 @@ export default function Home() {
     return diffTime > 48 * 60 * 60 * 1000;
   };
 
+  const coachBranding = dashboardData?.coachBranding;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
+      {coachBranding?.custom_color && (
+        <style dangerouslySetInnerHTML={{ __html: `
+          :root {
+            --neon-cyan: ${coachBranding.custom_color} !important;
+            --border-focus: ${coachBranding.custom_color} !important;
+            --shadow-cyan: 0 0 15px ${coachBranding.custom_color}40 !important;
+          }
+          .glow-btn {
+            background: linear-gradient(135deg, ${coachBranding.custom_color} 0%, #4facfe 100%) !important;
+            box-shadow: 0 4px 14px ${coachBranding.custom_color}4d !important;
+          }
+          .glow-btn:hover {
+            box-shadow: 0 6px 20px ${coachBranding.custom_color}80 !important;
+          }
+        `}} />
+      )}
       {/* NAVBAR HEADER */}
       <header style={{ background: 'rgba(6, 9, 19, 0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, zIndex: 10, padding: '12px 20px' }}>
         <div className="navbar-container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -2623,29 +2641,47 @@ export default function Home() {
           {/* Logo */}
           <div className="navbar-logo-container">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transition: 'transform 0.3s ease', filter: 'drop-shadow(0 0 8px rgba(0, 240, 255, 0.4))' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1) rotate(0deg)'}>
-                <defs>
-                  <linearGradient id="ultra-grad-nav" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#00f0ff" />
-                    <stop offset="50%" stopColor="#b4f8c8" />
-                    <stop offset="100%" stopColor="#39ff14" />
-                  </linearGradient>
-                </defs>
-                <path d="M6 18L16 6L26 18" stroke="url(#ultra-grad-nav)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M10 24L16 16L22 24" stroke="url(#ultra-grad-nav)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
-                <path d="M6 18C6 24 10 28 16 28C22 28 26 24 26 18" stroke="url(#ultra-grad-nav)" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
-              </svg>
+              {coachBranding?.custom_logo ? (
+                <img 
+                  src={coachBranding.custom_logo} 
+                  alt="Logo" 
+                  style={{ maxHeight: '36px', maxWidth: '90px', objectFit: 'contain', transition: 'transform 0.3s ease' }} 
+                  onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'} 
+                  onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                />
+              ) : (
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transition: 'transform 0.3s ease', filter: `drop-shadow(0 0 8px ${coachBranding?.custom_color || 'rgba(0, 240, 255, 0.4)'})` }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1) rotate(0deg)'}>
+                  <defs>
+                    <linearGradient id="ultra-grad-nav" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor={coachBranding?.custom_color || "#00f0ff"} />
+                      <stop offset="50%" stopColor="#b4f8c8" />
+                      <stop offset="100%" stopColor="#39ff14" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M6 18L16 6L26 18" stroke="url(#ultra-grad-nav)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M10 24L16 16L22 24" stroke="url(#ultra-grad-nav)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+                  <path d="M6 18C6 24 10 28 16 28C22 28 26 24 26 18" stroke="url(#ultra-grad-nav)" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+                </svg>
+              )}
               <div className="navbar-logo-text">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.05em', background: 'linear-gradient(90deg, #fff 0%, #00f0ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0, lineHeight: 1 }}>
-                    ULTRA
-                  </h2>
-                  <span style={{ fontSize: '0.6rem', padding: '1px 4px', background: 'rgba(0, 240, 255, 0.1)', border: '1px solid rgba(0, 240, 255, 0.2)', borderRadius: '4px', color: 'var(--neon-cyan)', fontWeight: 700, letterSpacing: '0.05em', lineHeight: 1 }}>
-                    COACH
-                  </span>
+                  {coachBranding?.custom_name ? (
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.05em', color: '#fff', margin: 0, lineHeight: 1 }}>
+                      {coachBranding.custom_name}
+                    </h2>
+                  ) : (
+                    <>
+                      <h2 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.05em', background: 'linear-gradient(90deg, #fff 0%, #00f0ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0, lineHeight: 1 }}>
+                        ULTRA
+                      </h2>
+                      <span style={{ fontSize: '0.6rem', padding: '1px 4px', background: 'rgba(0, 240, 255, 0.1)', border: '1px solid rgba(0, 240, 255, 0.2)', borderRadius: '4px', color: 'var(--neon-cyan)', fontWeight: 700, letterSpacing: '0.05em', lineHeight: 1 }}>
+                        COACH
+                      </span>
+                    </>
+                  )}
                 </div>
                 <span className="navbar-slogan">
-                  Esforço conjunto, conquista compartilhada!
+                  {coachBranding?.custom_info || 'Esforço conjunto, conquista compartilhada!'}
                 </span>
               </div>
             </div>
@@ -3369,13 +3405,19 @@ export default function Home() {
                 style={{ 
                   background: plan?.library_id 
                     ? 'linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(57, 255, 20, 0.03) 100%)' 
-                    : 'linear-gradient(135deg, rgba(255, 107, 53, 0.08) 0%, rgba(13, 21, 39, 0.8) 100%)',
+                    : user?.coach_id
+                      ? 'linear-gradient(135deg, rgba(57, 255, 20, 0.06) 0%, rgba(13, 21, 39, 0.8) 100%)'
+                      : 'linear-gradient(135deg, rgba(255, 107, 53, 0.08) 0%, rgba(13, 21, 39, 0.8) 100%)',
                   border: plan?.library_id 
                     ? '1px solid rgba(0, 240, 255, 0.25)' 
-                    : '1px solid rgba(255, 107, 53, 0.25)',
+                    : user?.coach_id
+                      ? '1px solid rgba(57, 255, 20, 0.2)'
+                      : '1px solid rgba(255, 107, 53, 0.25)',
                   boxShadow: plan?.library_id 
                     ? '0 8px 32px rgba(0, 240, 255, 0.08)' 
-                    : '0 8px 32px rgba(255, 107, 53, 0.08)',
+                    : user?.coach_id
+                      ? '0 8px 32px rgba(57, 255, 20, 0.05)'
+                      : '0 8px 32px rgba(255, 107, 53, 0.08)',
                   padding: '24px',
                   borderRadius: '16px',
                   display: 'flex',
@@ -3388,19 +3430,41 @@ export default function Home() {
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flex: '1', minWidth: '280px' }}>
                   <div style={{ 
                     padding: '12px', 
-                    background: plan?.library_id ? 'rgba(0, 240, 255, 0.1)' : 'rgba(255, 107, 53, 0.1)', 
+                    background: plan?.library_id 
+                      ? 'rgba(0, 240, 255, 0.1)' 
+                      : user?.coach_id
+                        ? 'rgba(57, 255, 20, 0.08)'
+                        : 'rgba(255, 107, 53, 0.1)', 
                     borderRadius: '12px',
-                    border: plan?.library_id ? '1px solid rgba(0, 240, 255, 0.2)' : '1px solid rgba(255, 107, 53, 0.2)'
+                    border: plan?.library_id 
+                      ? '1px solid rgba(0, 240, 255, 0.2)' 
+                      : user?.coach_id
+                        ? '1px solid rgba(57, 255, 20, 0.15)'
+                        : '1px solid rgba(255, 107, 53, 0.2)'
                   }}>
-                    <Target style={{ color: plan?.library_id ? 'var(--neon-cyan)' : 'var(--neon-orange)' }} size={28} />
+                    <Target style={{ 
+                      color: plan?.library_id 
+                        ? 'var(--neon-cyan)' 
+                        : user?.coach_id
+                          ? 'var(--neon-green)'
+                          : 'var(--neon-orange)' 
+                    }} size={28} />
                   </div>
                   <div>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {plan?.library_id ? 'Planilha Científica Ativa' : 'Atenção: Planilha Não Vinculada'}
+                      {plan?.library_id 
+                        ? 'Planilha Científica Ativa' 
+                        : user?.coach_id 
+                          ? 'Planilha da Assessoria Ativa' 
+                          : 'Atenção: Planilha Não Vinculada'}
                       <span style={{ 
                         fontSize: '0.75rem', 
-                        background: plan?.library_id ? 'rgba(57, 255, 20, 0.15)' : 'rgba(255, 107, 53, 0.15)', 
-                        color: plan?.library_id ? 'var(--neon-green)' : 'var(--neon-orange)', 
+                        background: plan?.library_id 
+                          ? 'rgba(57, 255, 20, 0.15)' 
+                          : user?.coach_id
+                            ? 'rgba(57, 255, 20, 0.15)'
+                            : 'rgba(255, 107, 53, 0.15)', 
+                        color: plan?.library_id || user?.coach_id ? 'var(--neon-green)' : 'var(--neon-orange)', 
                         padding: '2px 8px', 
                         borderRadius: '4px',
                         fontWeight: 700
@@ -3417,15 +3481,22 @@ export default function Home() {
                       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
                         Seu objetivo ativo é <strong style={{ color: 'var(--neon-orange)' }}>Musculação (Hipertrofia/Força)</strong>. Sua planilha semanal contém uma programação estruturada por grupos musculares de acordo com seu nível.
                       </p>
-                    ) : plan?.library_id ? (
+                    ) : plan ? (
                       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
-                        Seus treinos são orientados pela planilha periodizada prescrita pelo seu treinador: <strong style={{ color: '#fff' }}>{plan?.name}</strong>. 
-                        A periodização está sincronizada com a sua prova de <strong>{goal.type} ({goal.distance} km)</strong>{goal.date_target ? ` marcada para o dia ${new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}.
+                        {user?.coach_id ? (
+                          <>Seus treinos são orientados pela planilha prescrita pela sua assessoria: <strong style={{ color: '#fff' }}>{plan.name}</strong>.</>
+                        ) : (
+                          <>Seus treinos são orientados pela planilha periodizada: <strong style={{ color: '#fff' }}>{plan.name}</strong>.</>
+                        )}
+                        {` A periodização está sincronizada com a sua prova de `}<strong>{goal.type} ({goal.distance} km)</strong>{goal.date_target ? ` marcada para o dia ${new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}.
                       </p>
                     ) : (
                       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
-                        Você estabeleceu uma prova alvo de <strong>{goal.type} ({goal.distance} km)</strong>{goal.date_target ? ` para o dia ${new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}. 
-                        Os treinos prescritos por seu treinador aparecerão no seu calendário semanal.
+                        {user?.coach_id ? (
+                          <>Você está associado a uma assessoria esportiva. Aguarde a liberação de novos treinos estruturados pelo seu treinador no calendário semanal.</>
+                        ) : (
+                          <>Você estabeleceu uma prova alvo de <strong>{goal.type} ({goal.distance} km)</strong>{goal.date_target ? ` para o dia ${new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}. Os treinos prescritos por seu treinador aparecerão no seu calendário semanal.</>
+                        )}
                       </p>
                     )}
                   </div>

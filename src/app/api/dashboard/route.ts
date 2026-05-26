@@ -752,6 +752,34 @@ export async function GET(req: Request) {
     const calendarToken = getCalendarToken(userId, user.password || '');
     const calendarUrl = `${baseUrl}/api/calendar?userId=${userId}&token=${calendarToken}`;
 
+    // 9b. Obter Branding do Coach/Assessoria se houver
+    let coachBranding = null;
+    if (user.coach_id) {
+      const coach = await db.get(
+        'SELECT id, name, custom_logo, custom_name, custom_info, custom_color, parent_coach_id FROM users WHERE id = ?',
+        user.coach_id
+      );
+      if (coach) {
+        let brandingSource = coach;
+        if (coach.parent_coach_id) {
+          const parentCoach = await db.get(
+            'SELECT id, name, custom_logo, custom_name, custom_info, custom_color FROM users WHERE id = ?',
+            coach.parent_coach_id
+          );
+          if (parentCoach) {
+            brandingSource = parentCoach;
+          }
+        }
+        coachBranding = {
+          name: brandingSource.name,
+          custom_logo: brandingSource.custom_logo || '',
+          custom_name: brandingSource.custom_name || '',
+          custom_info: brandingSource.custom_info || '',
+          custom_color: brandingSource.custom_color || '',
+        };
+      }
+    }
+
     return NextResponse.json({
       user,
       goal,
@@ -762,7 +790,8 @@ export async function GET(req: Request) {
       metrics: physioMetrics,
       lastSyncedActivity: lastSyncedActivity || null,
       celebration,
-      calendarUrl
+      calendarUrl,
+      coachBranding
     });
 
   } catch (error: any) {

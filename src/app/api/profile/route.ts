@@ -303,7 +303,7 @@ export async function POST(req: Request) {
             }
 
             // Atualizar o nome do plano de treino ativo para o novo nível
-            let newPlanName = `Planilha Inicial Personalizada - Nível ${level.toUpperCase()}`;
+            let newPlanName = `Planilha Inicial Personalizada - Nível ${level === 'elite' ? 'AVANÇADO' : level === 'intermediario' ? 'INTERMEDIÁRIO' : 'INICIANTE'}`;
             const weekRegex = /(Semana\s+)(\d+)/i;
             const match = activePlan.name?.match(weekRegex);
             if (match) {
@@ -321,7 +321,7 @@ export async function POST(req: Request) {
             await db.run(`
               INSERT INTO coach_notifs (user_id, date, title, content, read)
               VALUES (?, ?, 'Planilha Recalibrada! 🔄', ?, 0)
-            `, userId, todayYmd, `Identifiquei a mudança de ${levelChanged ? 'Nível' : ''}${levelChanged && goalTypeChanged ? ' e ' : ''}${goalTypeChanged ? 'Objetivo Esportivo' : ''}. Recalibrei sua planilha para a modalidade de ${goal_type} (${level === 'elite' ? 'Elite' : level === 'intermediario' ? 'Intermediário' : 'Iniciante'}) para alinhar com suas novas metas.`);
+            `, userId, todayYmd, `Identifiquei a mudança de ${levelChanged ? 'Nível' : ''}${levelChanged && goalTypeChanged ? ' e ' : ''}${goalTypeChanged ? 'Objetivo Esportivo' : ''}. Recalibrei sua planilha para a modalidade de ${goal_type} (${level === 'elite' ? 'Avançado' : level === 'intermediario' ? 'Intermediário' : 'Iniciante'}) para alinhar com suas novas metas.`);
           }
         }
       }

@@ -159,6 +159,18 @@ class PostgreSQLAdapter implements DatabaseClient {
         await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS coach_id INTEGER;');
       } catch (e) {}
       try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_logo TEXT;');
+      } catch (e) {}
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_name TEXT;');
+      } catch (e) {}
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_info TEXT;');
+      } catch (e) {}
+      try {
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_color TEXT;');
+      } catch (e) {}
+      try {
         await this.exec(`
           CREATE TABLE IF NOT EXISTS access_keys (
             id SERIAL PRIMARY KEY,
@@ -531,6 +543,18 @@ class SQLiteAdapter implements DatabaseClient {
     try {
       await this.db.exec('ALTER TABLE users ADD COLUMN teacher_id INTEGER;');
     } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN custom_logo TEXT;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN custom_name TEXT;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN custom_info TEXT;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN custom_color TEXT;');
+    } catch (e) {}
 
     try {
       await this.db.exec(`
@@ -659,7 +683,11 @@ function getInitialSchemaDDL(): string {
       pix_key TEXT,
       pix_instructions TEXT,
       parent_coach_id INTEGER,
-      teacher_id INTEGER
+      teacher_id INTEGER,
+      custom_logo TEXT,
+      custom_name TEXT,
+      custom_info TEXT,
+      custom_color TEXT
     );
 
     CREATE TABLE IF NOT EXISTS goals (
