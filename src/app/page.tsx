@@ -3575,13 +3575,12 @@ export default function Home() {
                       Importar Planilha via Link
                     </h3>
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.4' }}>
-                      Cole um link JSON contendo a estrutura da planilha. Você pode testar copiando um dos seguintes links locais:
+                      Cole um link de planilha pública do Google Sheets, arquivo CSV, página HTML ou JSON.
                     </p>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--neon-cyan)', background: 'rgba(0, 240, 255, 0.05)', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(0, 240, 255, 0.1)', fontFamily: 'monospace' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>Exemplos para copiar:</span><br/>
-                      • <code>/planilhas/run_hal_higdon_10k.json</code> (Corrida)<br/>
-                      • <code>/planilhas/bike_joe_friel_gran_fondo.json</code> (Ciclismo)<br/>
-                      • <code>/planilhas/tri_joe_friel_olympic.json</code> (Triathlon)
+                    <div style={{ fontSize: '0.75rem', color: 'var(--neon-cyan)', background: 'rgba(0, 240, 255, 0.05)', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(0, 240, 255, 0.1)' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Formatos aceitos:</span><br/>
+                      • <strong>Google Sheets:</strong> Link de compartilhamento público da planilha.<br/>
+                      • <strong>CSV / HTML / JSON:</strong> URL direta do arquivo ou da página contendo a tabela de treinos.
                     </div>
                     <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
                       <input 
