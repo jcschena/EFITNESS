@@ -68,28 +68,29 @@ export async function POST(req: Request) {
         finalWorkoutId
       );
     } else {
-      // 2. Criar um novo treino extra manual na planilha ativa
+      // 2. Criar um novo treino extra manual na planilha ativa (se houver)
       const activePlan = await db.get('SELECT * FROM training_plans WHERE user_id = ? AND active = 1', uId);
-      if (!activePlan) {
-        return NextResponse.json({ error: 'Nenhuma planilha ativa encontrada para este usuário' }, { status: 400 });
+      if (activePlan) {
+        // Calcular dia da semana (1-Segunda a 7-Domingo)
+        const d = new Date(date + 'T12:00:00');
+        let dayOfWeek = d.getDay();
+        dayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
+
+        const res = await db.run(
+          `INSERT INTO workouts (plan_id, day_of_week, date, type, distance_target, duration_target, pace_target, power_target, tss_target, title, description, status)
+           VALUES (?, ?, ?, ?, 0, 0, 'N/A', 0, 0, ?, ?, 'completed')`,
+          activePlan.id,
+          dayOfWeek,
+          date,
+          type,
+          title || `Treino Extra de ${type}`,
+          description || 'Treino extra registrado manualmente.'
+        );
+        finalWorkoutId = res.lastID!;
+      } else {
+        // Sem planilha ativa: Modo Livre. finalWorkoutId continua null.
+        console.log('Modo Livre ativo. Registrando atividade avulsa em activity_logs.');
       }
-
-      // Calcular dia da semana (1-Segunda a 7-Domingo)
-      const d = new Date(date + 'T12:00:00');
-      let dayOfWeek = d.getDay();
-      dayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
-
-      const res = await db.run(
-        `INSERT INTO workouts (plan_id, day_of_week, date, type, distance_target, duration_target, pace_target, power_target, tss_target, title, description, status)
-         VALUES (?, ?, ?, ?, 0, 0, 'N/A', 0, 0, ?, ?, 'completed')`,
-        activePlan.id,
-        dayOfWeek,
-        date,
-        type,
-        title || `Treino Extra de ${type}`,
-        description || 'Treino extra registrado manualmente.'
-      );
-      finalWorkoutId = res.lastID!;
     }
 
     // Inserir o log na tabela activity_logs
