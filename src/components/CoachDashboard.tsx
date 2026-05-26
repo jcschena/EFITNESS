@@ -41,7 +41,7 @@ interface CoachDashboardProps {
 }
 
 export default function CoachDashboard({ userId, userName, onLogout }: CoachDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'athletes' | 'keys' | 'library'>('athletes');
+  const [activeTab, setActiveTab] = useState<'athletes' | 'keys' | 'library' | 'finance'>('athletes');
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [accessKeys, setAccessKeys] = useState<AccessKey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +74,162 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
   const [selectedAthleteId, setSelectedAthleteId] = useState<string>('');
   const [effortPct, setApplyEffortPct] = useState<number>(100);
   const [applyPlanLoading, setApplyPlanLoading] = useState(false);
+
+  // ==========================================
+  // SISTEMA DE GESTÃO FINANCEIRA (TREINADOR)
+  // ==========================================
+  const [financeAthletes, setFinanceAthletes] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [coachPix, setCoachPix] = useState({ key: '', instructions: '' });
+  const [financeLoading, setFinanceLoading] = useState(false);
+  const [recordingPaymentAthlete, setRecordingPaymentAthlete] = useState<any | null>(null);
+  const [editingFinanceAthlete, setEditingFinanceAthlete] = useState<any | null>(null);
+  const [viewingPaymentHistoryAthlete, setViewingPaymentHistoryAthlete] = useState<any | null>(null);
+  const [paymentForm, setPaymentForm] = useState({ amount: '', referenceMonth: '', method: 'Pix' });
+  const [financeForm, setFinanceForm] = useState({ monthlyFee: '', paymentDueDay: '' });
+  const [pixForm, setPixForm] = useState({ key: '', instructions: '' });
+  const [pixSaving, setPixSaving] = useState(false);
+  const [financeSearchTerm, setFinanceSearchTerm] = useState('');
+  const [financeFilterStatus, setFinanceFilterStatus] = useState<'all' | 'paid' | 'overdue' | 'blocked'>('all');
+
+  const fetchFinanceData = async () => {
+    setFinanceLoading(true);
+    try {
+      const res = await fetch(`/api/coach/finance?coachId=${userId}`);
+      const data = await res.json();
+      if (data.success) {
+        setFinanceAthletes(data.athletes || []);
+        setPayments(data.payments || []);
+        setCoachPix(data.coachPix || { key: '', instructions: '' });
+        setPixForm(data.coachPix || { key: '', instructions: '' });
+      } else {
+        alert(data.error || 'Erro ao carregar dados financeiros');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao buscar dados financeiros');
+    } finally {
+      setFinanceLoading(false);
+    }
+  };
+
+  const handleSavePix = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPixSaving(true);
+    try {
+      const res = await fetch('/api/coach/finance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_pix',
+          coachId: userId,
+          pixKey: pixForm.key,
+          pixInstructions: pixForm.instructions
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Dados do Pix salvos com sucesso!');
+        setCoachPix({ key: pixForm.key, instructions: pixForm.instructions });
+      } else {
+        alert(data.error || 'Erro ao salvar Pix');
+      }
+    } catch (err) {
+      alert('Erro de rede ao salvar Pix');
+    } finally {
+      setPixSaving(false);
+    }
+  };
+
+  const handleSaveAthleteFinance = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingFinanceAthlete) return;
+    try {
+      const res = await fetch('/api/coach/finance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_athlete_finance',
+          coachId: userId,
+          athleteId: editingFinanceAthlete.id,
+          monthlyFee: financeForm.monthlyFee,
+          paymentDueDay: financeForm.paymentDueDay
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Dados financeiros atualizados!');
+        setEditingFinanceAthlete(null);
+        fetchFinanceData();
+      } else {
+        alert(data.error || 'Erro ao atualizar dados');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao salvar dados financeiros');
+    }
+  };
+
+  const handleRecordPaymentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!recordingPaymentAthlete) return;
+    try {
+      const res = await fetch('/api/coach/finance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'record_payment',
+          coachId: userId,
+          athleteId: recordingPaymentAthlete.id,
+          amount: paymentForm.amount,
+          paymentDate: new Date().toLocaleDateString('en-CA'),
+          referenceMonth: paymentForm.referenceMonth,
+          method: paymentForm.method
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Pagamento registrado com sucesso e acesso liberado!');
+        setRecordingPaymentAthlete(null);
+        fetchFinanceData();
+        // Atualizar lista principal de atletas também
+        fetchCoachData();
+      } else {
+        alert(data.error || 'Erro ao registrar pagamento');
+      }
+    } catch (err) {
+      alert('Erro de rede ao registrar pagamento');
+    }
+  };
+
+  const handleToggleBlockAthlete = async (athlete: any) => {
+    const isBlocked = athlete.status === 'blocked';
+    const msg = isBlocked 
+      ? `Deseja liberar o acesso do aluno ${athlete.name}?`
+      : `Deseja suspender temporariamente o acesso do aluno ${athlete.name} por inadimplência?`;
+    if (!confirm(msg)) return;
+
+    try {
+      const res = await fetch('/api/coach/finance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'toggle_block',
+          coachId: userId,
+          athleteId: athlete.id,
+          newStatus: isBlocked ? 'active' : 'blocked'
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message);
+        fetchFinanceData();
+        fetchCoachData();
+      } else {
+        alert(data.error || 'Erro ao alterar status de acesso');
+      }
+    } catch (err) {
+      alert('Erro de rede ao alterar status de acesso');
+    }
+  };
 
   const fetchLibraryPlans = async () => {
     setLibraryLoading(true);
@@ -300,6 +456,326 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
 
   const overtrainingCount = athletes.filter(a => a.metrics.tsb < -20).length;
 
+  const renderFinanceTab = () => {
+    // Calcular estatísticas financeiras
+    const currentYear = new Date().getFullYear();
+    const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+    const currentMonthRef = `${currentMonth}/${currentYear}`;
+
+    const totalPredicted = financeAthletes.reduce((sum, a) => sum + (a.monthlyFee || 150), 0);
+    
+    const totalConfirmed = payments
+      .filter(p => p.reference_month === currentMonthRef)
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    const blockedCount = financeAthletes.filter(a => a.status === 'blocked').length;
+    const overdueCount = financeAthletes.filter(a => a.paymentStatus === 'overdue' && a.status !== 'blocked').length;
+    const paidCount = financeAthletes.filter(a => a.paymentStatus === 'paid' && a.status !== 'blocked').length;
+    
+    const activeAthletesCount = financeAthletes.length;
+    const adhesionRate = activeAthletesCount > 0 ? Math.round((paidCount / activeAthletesCount) * 100) : 100;
+
+    const filteredFinanceAthletes = financeAthletes.filter(a => {
+      const matchesSearch = a.name.toLowerCase().includes(financeSearchTerm.toLowerCase());
+      if (financeFilterStatus === 'all') return matchesSearch;
+      if (financeFilterStatus === 'paid') return matchesSearch && a.paymentStatus === 'paid' && a.status !== 'blocked';
+      if (financeFilterStatus === 'overdue') return matchesSearch && a.paymentStatus === 'overdue' && a.status !== 'blocked';
+      if (financeFilterStatus === 'blocked') return matchesSearch && a.status === 'blocked';
+      return matchesSearch;
+    });
+
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '30px', alignItems: 'start' }} className="animate-slide-up">
+        
+        {/* LADO ESQUERDO: LISTAGEM E STATS */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          {/* CARDS DE STATS FINANCEIROS */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+            <div style={{ background: 'rgba(20, 20, 28, 0.4)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '16px' }}>
+              <span style={{ fontSize: '0.75rem', color: '#9ca3af', display: 'block', marginBottom: '4px' }}>Previsto ({currentMonthRef})</span>
+              <h4 style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0, color: '#f3f4f6' }}>
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalPredicted)}
+              </h4>
+              <span style={{ fontSize: '0.7rem', color: '#9ca3af' }}>{activeAthletesCount} alunos vinculados</span>
+            </div>
+            
+            <div style={{ background: 'rgba(52, 211, 153, 0.05)', border: '1px solid rgba(52, 211, 153, 0.2)', borderRadius: '12px', padding: '16px' }}>
+              <span style={{ fontSize: '0.75rem', color: '#34d399', display: 'block', marginBottom: '4px' }}>Faturamento Confirmado</span>
+              <h4 style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0, color: '#34d399' }}>
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalConfirmed)}
+              </h4>
+              <span style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Recebido este mês</span>
+            </div>
+
+            <div style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', padding: '16px' }}>
+              <span style={{ fontSize: '0.75rem', color: '#fca5a5', display: 'block', marginBottom: '4px' }}>Inadimplentes / Bloqueados</span>
+              <h4 style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0, color: '#ef4444' }}>
+                {blockedCount} <span style={{ fontSize: '0.9rem', fontWeight: 400, color: '#9ca3af' }}>bloqueados</span>
+              </h4>
+              <span style={{ fontSize: '0.7rem', color: '#9ca3af' }}>{overdueCount} pendentes de pagamento</span>
+            </div>
+
+            <div style={{ background: 'rgba(0, 242, 254, 0.05)', border: '1px solid rgba(0, 242, 254, 0.2)', borderRadius: '12px', padding: '16px' }}>
+              <span style={{ fontSize: '0.75rem', color: '#00f2fe', display: 'block', marginBottom: '4px' }}>Taxa de Adimplência</span>
+              <h4 style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0, color: '#00f2fe' }}>
+                {adhesionRate}%
+              </h4>
+              <span style={{ fontSize: '0.7rem', color: '#9ca3af' }}>{paidCount} de {activeAthletesCount} pagos</span>
+            </div>
+          </div>
+
+          {/* FILTROS E BUSCA */}
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+              <input 
+                type="text" 
+                placeholder="Pesquisar aluno..."
+                value={financeSearchTerm}
+                onChange={e => setFinanceSearchTerm(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: 'rgba(20, 20, 28, 0.5)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '8px',
+                  padding: '10px 12px 10px 36px',
+                  color: '#f3f4f6',
+                  fontSize: '0.85rem',
+                  outline: 'none'
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {(['all', 'paid', 'overdue', 'blocked'] as const).map(status => (
+                <button
+                  key={status}
+                  onClick={() => setFinanceFilterStatus(status)}
+                  style={{
+                    background: financeFilterStatus === status ? 'rgba(0, 242, 254, 0.15)' : 'rgba(255,255,255,0.03)',
+                    border: financeFilterStatus === status ? '1px solid #00f2fe' : '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    color: financeFilterStatus === status ? '#00f2fe' : '#9ca3af',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {status === 'all' && 'Todos'}
+                  {status === 'paid' && 'Adimplentes'}
+                  {status === 'overdue' && 'Pendentes'}
+                  {status === 'blocked' && 'Bloqueados'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* TABELA DE ALUNOS FINANCEIRO */}
+          <div style={{ overflowX: 'auto', background: 'rgba(20, 20, 28, 0.3)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px' }}>
+            {financeLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+                <RefreshCw className="animate-spin" size={24} color="#00f2fe" style={{ animation: 'spin 1s linear infinite' }} />
+              </div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', color: '#9ca3af', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                    <th style={{ padding: '16px' }}>Aluno</th>
+                    <th style={{ padding: '16px' }}>Mensalidade</th>
+                    <th style={{ padding: '16px' }}>Vencimento</th>
+                    <th style={{ padding: '16px' }}>Último Pagamento</th>
+                    <th style={{ padding: '16px' }}>Status</th>
+                    <th style={{ padding: '16px', textAlign: 'right' }}>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredFinanceAthletes.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: '#9ca3af' }}>Nenhum aluno financeiro encontrado.</td>
+                    </tr>
+                  ) : (
+                    filteredFinanceAthletes.map(athlete => {
+                      const isBlocked = athlete.status === 'blocked';
+                      return (
+                        <tr key={athlete.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.85rem' }}>
+                          <td style={{ padding: '16px', fontWeight: 700 }}>{athlete.name}</td>
+                          <td style={{ padding: '16px', color: '#fff', fontWeight: 600 }}>
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(athlete.monthlyFee)}
+                          </td>
+                          <td style={{ padding: '16px', color: '#9ca3af' }}>Dia {athlete.paymentDueDay}</td>
+                          <td style={{ padding: '16px', color: '#9ca3af' }}>
+                            {athlete.lastPaymentDate ? new Date(athlete.lastPaymentDate + 'T12:00:00').toLocaleDateString('pt-BR') : 'Nenhum'}
+                          </td>
+                          <td style={{ padding: '16px' }}>
+                            <span style={{
+                              fontSize: '0.75rem',
+                              padding: '4px 8px',
+                              borderRadius: '6px',
+                              fontWeight: 600,
+                              background: isBlocked 
+                                ? 'rgba(239, 68, 68, 0.15)' 
+                                : athlete.paymentStatus === 'overdue' 
+                                  ? 'rgba(251, 146, 60, 0.15)' 
+                                  : 'rgba(52, 211, 153, 0.15)',
+                              color: isBlocked 
+                                ? '#ef4444' 
+                                : athlete.paymentStatus === 'overdue' 
+                                  ? '#fb923c' 
+                                  : '#34d399'
+                            }}>
+                              {isBlocked ? 'Bloqueado' : athlete.paymentStatus === 'overdue' ? 'Pendente' : 'Adimplente'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px', textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                            <button
+                              onClick={() => {
+                                setRecordingPaymentAthlete(athlete);
+                                setPaymentForm({
+                                  amount: String(athlete.monthlyFee),
+                                  referenceMonth: currentMonthRef,
+                                  method: 'Pix'
+                                });
+                              }}
+                              style={{ background: 'rgba(52, 211, 153, 0.1)', border: '1px solid rgba(52, 211, 153, 0.2)', color: '#34d399', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}
+                              title="Registrar Pagamento"
+                            >
+                              💰 Pagar
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingFinanceAthlete(athlete);
+                                setFinanceForm({
+                                  monthlyFee: String(athlete.monthlyFee),
+                                  paymentDueDay: String(athlete.paymentDueDay)
+                                });
+                              }}
+                              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem' }}
+                              title="Configurar Mensalidade"
+                            >
+                              ⚙️
+                            </button>
+                            <button
+                              onClick={() => handleToggleBlockAthlete(athlete)}
+                              style={{ 
+                                background: isBlocked ? 'rgba(52, 211, 153, 0.1)' : 'rgba(239, 68, 68, 0.1)', 
+                                border: isBlocked ? '1px solid rgba(52, 211, 153, 0.2)' : '1px solid rgba(239, 68, 68, 0.2)', 
+                                color: isBlocked ? '#34d399' : '#ef4444', 
+                                padding: '6px 10px', 
+                                borderRadius: '6px', 
+                                cursor: 'pointer', 
+                                fontSize: '0.75rem',
+                                fontWeight: 600
+                              }}
+                              title={isBlocked ? 'Liberar Acesso' : 'Bloquear Acesso'}
+                            >
+                              {isBlocked ? '🔓 Liberar' : '🚫 Bloquear'}
+                            </button>
+                            <button
+                              onClick={() => setViewingPaymentHistoryAthlete(athlete)}
+                              style={{ background: 'rgba(79, 172, 254, 0.1)', border: '1px solid rgba(79, 172, 254, 0.2)', color: '#4facfe', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem' }}
+                              title="Histórico de Pagamentos"
+                            >
+                              📜 Histórico
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/* LADO DIREITO: CONFIGURAÇÃO DE PIX */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ background: 'rgba(20, 20, 28, 0.5)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '20px' }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🔑</span> Configuração de Pix
+            </h4>
+            <p style={{ fontSize: '0.75rem', color: '#9ca3af', margin: '0 0 16px 0', lineHeight: '1.4' }}>
+              Defina sua chave Pix principal e instruções de pagamento. Elas serão exibidas na tela de bloqueio dos alunos inadimplentes.
+            </p>
+            <form onSubmit={handleSavePix} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>CHAVE PIX</label>
+                <input 
+                  type="text" 
+                  placeholder="E-mail, celular, CPF ou aleatória"
+                  value={pixForm.key}
+                  onChange={e => setPixForm({ ...pixForm, key: e.target.value })}
+                  style={{
+                    width: '100%',
+                    background: '#0d0d12',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#f3f4f6',
+                    fontSize: '0.85rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>INSTRUÇÕES DE PAGAMENTO</label>
+                <textarea 
+                  placeholder="Ex: Enviar comprovante para o WhatsApp do treinador após o pagamento."
+                  value={pixForm.instructions}
+                  onChange={e => setPixForm({ ...pixForm, instructions: e.target.value })}
+                  rows={4}
+                  style={{
+                    width: '100%',
+                    background: '#0d0d12',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#f3f4f6',
+                    fontSize: '0.85rem',
+                    outline: 'none',
+                    resize: 'none',
+                    fontFamily: 'inherit',
+                    lineHeight: '1.4'
+                  }}
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={pixSaving}
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #00f2fe, #4facfe)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px',
+                  color: '#0a0a0f',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                {pixSaving ? 'Salvando...' : (
+                  <>
+                    <Save size={14} />
+                    Salvar Pix
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: '#0d0d12', color: '#f3f4f6', fontFamily: 'system-ui, sans-serif' }}>
       
@@ -494,6 +970,26 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
           >
             <BookOpen size={18} />
             Biblioteca de Planilhas
+          </button>
+          <button 
+            onClick={() => { setActiveTab('finance'); fetchFinanceData(); }}
+            style={{
+              background: 'none',
+              border: 'none',
+              borderBottom: activeTab === 'finance' ? '2px solid #00f2fe' : '2px solid transparent',
+              color: activeTab === 'finance' ? '#00f2fe' : '#9ca3af',
+              fontSize: '1rem',
+              fontWeight: 600,
+              padding: '12px 6px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <TrendingUp size={18} />
+            Financeiro 💰
           </button>
         </div>
 
@@ -902,6 +1398,9 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
 
               </div>
             )}
+
+            {/* ABA: FINANCEIRO */}
+            {activeTab === 'finance' && renderFinanceTab()}
 
           </div>
         )}
@@ -1393,6 +1892,340 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
                 )}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: REGISTRAR PAGAMENTO */}
+      {recordingPaymentAthlete && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(10, 10, 15, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100
+        }}>
+          <div style={{
+            background: '#14141c',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '16px',
+            padding: '24px',
+            width: '100%',
+            maxWidth: '400px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Registrar Pagamento</h3>
+              <button 
+                onClick={() => setRecordingPaymentAthlete(null)}
+                style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.85rem', color: '#9ca3af', marginBottom: '20px' }}>
+              Registrando mensalidade para o aluno <strong>{recordingPaymentAthlete.name}</strong>.
+            </p>
+
+            <form onSubmit={handleRecordPaymentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>MÊS DE REFERÊNCIA</label>
+                <input 
+                  type="text" 
+                  placeholder="Ex: 05/2026"
+                  value={paymentForm.referenceMonth}
+                  onChange={e => setPaymentForm({ ...paymentForm, referenceMonth: e.target.value })}
+                  required
+                  style={{
+                    width: '100%',
+                    background: '#0d0d12',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#f3f4f6',
+                    fontSize: '0.9rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>VALOR PAGO (R$)</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  value={paymentForm.amount}
+                  onChange={e => setPaymentForm({ ...paymentForm, amount: e.target.value })}
+                  required
+                  style={{
+                    width: '100%',
+                    background: '#0d0d12',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#f3f4f6',
+                    fontSize: '0.9rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>MÉTODO DE PAGAMENTO</label>
+                <select
+                  value={paymentForm.method}
+                  onChange={e => setPaymentForm({ ...paymentForm, method: e.target.value })}
+                  style={{
+                    width: '100%',
+                    background: '#0d0d12',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#f3f4f6',
+                    fontSize: '0.9rem',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="Pix">Pix</option>
+                  <option value="Cartão">Cartão de Crédito/Débito</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Transferência">Transferência Bancária</option>
+                </select>
+              </div>
+
+              <button 
+                type="submit"
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #34d399, #10b981)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  color: '#0a0a0f',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  marginTop: '8px'
+                }}
+              >
+                <Check size={16} />
+                Confirmar Pagamento
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: EDITAR VALOR DA MENSALIDADE E VENCIMENTO */}
+      {editingFinanceAthlete && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(10, 10, 15, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100
+        }}>
+          <div style={{
+            background: '#14141c',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '16px',
+            padding: '24px',
+            width: '100%',
+            maxWidth: '400px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Configurar Mensalidade</h3>
+              <button 
+                onClick={() => setEditingFinanceAthlete(null)}
+                style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.85rem', color: '#9ca3af', marginBottom: '20px' }}>
+              Defina os parâmetros financeiros para <strong>{editingFinanceAthlete.name}</strong>.
+            </p>
+
+            <form onSubmit={handleSaveAthleteFinance} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>VALOR DA MENSALIDADE (R$)</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  value={financeForm.monthlyFee}
+                  onChange={e => setFinanceForm({ ...financeForm, monthlyFee: e.target.value })}
+                  required
+                  style={{
+                    width: '100%',
+                    background: '#0d0d12',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#f3f4f6',
+                    fontSize: '0.9rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>DIA DE VENCIMENTO</label>
+                <input 
+                  type="number" 
+                  min={1}
+                  max={31}
+                  value={financeForm.paymentDueDay}
+                  onChange={e => setFinanceForm({ ...financeForm, paymentDueDay: e.target.value })}
+                  required
+                  style={{
+                    width: '100%',
+                    background: '#0d0d12',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#f3f4f6',
+                    fontSize: '0.9rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <button 
+                type="submit"
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #00f2fe, #4facfe)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  color: '#0a0a0f',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  marginTop: '8px'
+                }}
+              >
+                <Check size={16} />
+                Salvar Configurações
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: HISTÓRICO DE PAGAMENTOS DO ALUNO */}
+      {viewingPaymentHistoryAthlete && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(10, 10, 15, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100
+        }}>
+          <div style={{
+            background: '#14141c',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '16px',
+            padding: '24px',
+            width: '100%',
+            maxWidth: '550px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Histórico de Pagamentos</h3>
+              <button 
+                onClick={() => setViewingPaymentHistoryAthlete(null)}
+                style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.85rem', color: '#9ca3af', marginBottom: '20px' }}>
+              Pagamentos registrados para <strong>{viewingPaymentHistoryAthlete.name}</strong>.
+            </p>
+
+            <div style={{ maxHeight: '300px', overflowY: 'auto', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', background: '#0d0d12' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.08)', color: '#9ca3af' }}>
+                    <th style={{ padding: '12px' }}>Mês Ref</th>
+                    <th style={{ padding: '12px' }}>Valor</th>
+                    <th style={{ padding: '12px' }}>Data Pgto</th>
+                    <th style={{ padding: '12px' }}>Método</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.filter(p => p.user_id === viewingPaymentHistoryAthlete.id).length === 0 ? (
+                    <tr>
+                      <td colSpan={4} style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>Nenhum pagamento registrado.</td>
+                    </tr>
+                  ) : (
+                    payments
+                      .filter(p => p.user_id === viewingPaymentHistoryAthlete.id)
+                      .map(p => (
+                        <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                          <td style={{ padding: '12px', fontWeight: 700, color: '#00f2fe' }}>{p.reference_month}</td>
+                          <td style={{ padding: '12px', color: '#34d399', fontWeight: 600 }}>
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.amount)}
+                          </td>
+                          <td style={{ padding: '12px', color: '#9ca3af' }}>
+                            {new Date(p.payment_date + 'T12:00:00').toLocaleDateString('pt-BR')}
+                          </td>
+                          <td style={{ padding: '12px', color: '#9ca3af' }}>{p.method}</td>
+                        </tr>
+                      ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <button 
+              onClick={() => setViewingPaymentHistoryAthlete(null)}
+              style={{
+                width: '100%',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '8px',
+                padding: '10px',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                marginTop: '20px'
+              }}
+            >
+              Fechar
+            </button>
           </div>
         </div>
       )}
