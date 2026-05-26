@@ -124,9 +124,8 @@ export async function POST(req: Request) {
 
     const userId = user.id;
 
-    // 3. Deletar TODOS os outros perfis cadastrados no banco para manter consistência de usuário único no cockpit
-    console.log(`Limpando todos os perfis adicionais do banco, exceto id=${userId}`);
-    await db.run('DELETE FROM users WHERE id != ?', userId);
+    // Permitir coexistência de múltiplos perfis
+    console.log(`Login bem-sucedido para id=${userId}`);
 
     return NextResponse.json({
       success: true,

@@ -9,6 +9,35 @@ export async function POST(req: Request) {
     const name = data.name || 'Novo Atleta';
     const level = data.level || 'intermediario'; // 'elite', 'intermediario', 'sedentario'
     const birthDate = data.birthDate || null;
+    const username = data.username?.trim();
+    const password = data.password;
+    const accessKey = data.accessKey;
+
+    // Validar chave de acesso
+    const serverAccessKey = process.env.ACCESS_KEY || 'ULTRA2026';
+    if (!accessKey || accessKey !== serverAccessKey) {
+      return NextResponse.json({
+        success: false,
+        error: 'Chave de acesso inválida ou expirada. Solicite a chave correta ao administrador.'
+      }, { status: 403 });
+    }
+
+    if (!username || !password) {
+      return NextResponse.json({
+        success: false,
+        error: 'Usuário e senha são obrigatórios para o cadastro.'
+      }, { status: 400 });
+    }
+
+    // Verificar se o usuário já existe
+    const existingUser = await db.get('SELECT id FROM users WHERE username = ?', username);
+    if (existingUser) {
+      return NextResponse.json({
+        success: false,
+        error: 'Este nome de usuário já está sendo utilizado por outro atleta.'
+      }, { status: 400 });
+    }
+
     let age = 30;
 
     if (birthDate) {
@@ -55,9 +84,9 @@ export async function POST(req: Request) {
 
     // 2. Inserir Usuário
     const userInsert = await db.run(`
-      INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, name, level, age, weight, thresholdHr, thresholdPace, weeklyHours, 0, birthDate); // Always start as 0 (authorization is done via OAuth redirect after onboarding)
+      INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, name, level, age, weight, thresholdHr, thresholdPace, weeklyHours, 0, birthDate, username, password); // Always start as 0 (authorization is done via OAuth redirect after onboarding)
     
     const userId = userInsert.lastID;
 

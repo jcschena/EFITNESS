@@ -200,9 +200,13 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   // Estados de Onboarding
+  const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [onboardStep, setOnboardStep] = useState<number>(1);
   const [onboardForm, setOnboardForm] = useState({
     name: '',
+    username: '',
+    password: '',
+    accessKey: '',
     level: 'intermediario',
     birthDate: '',
     age: '',
@@ -1921,15 +1925,15 @@ export default function Home() {
     );
   }
 
-  // TELA DE LOGIN E SENHA
+  // TELA DE LOGIN E SENHA OU CADASTRO
   if (!activeUser) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', width: '100%' }} className="animate-slide-up">
-        <div style={{ maxWidth: '420px', width: '100%' }}>
+        <div style={{ maxWidth: isRegistering ? '550px' : '420px', width: '100%', transition: 'max-width 0.3s ease' }}>
           {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{ display: 'inline-flex', padding: '20px', background: 'rgba(0, 240, 255, 0.04)', borderRadius: '50%', marginBottom: '20px', border: '1px solid rgba(0, 240, 255, 0.15)', boxShadow: '0 0 30px rgba(0, 240, 255, 0.1)' }}>
-              <svg width="64" height="64" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 12px rgba(0, 240, 255, 0.5))' }}>
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'inline-flex', padding: '16px', background: 'rgba(0, 240, 255, 0.04)', borderRadius: '50%', marginBottom: '12px', border: '1px solid rgba(0, 240, 255, 0.15)', boxShadow: '0 0 30px rgba(0, 240, 255, 0.1)' }}>
+              <svg width="48" height="48" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 12px rgba(0, 240, 255, 0.5))' }}>
                 <defs>
                   <linearGradient id="ultra-grad-large" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#00f0ff" />
@@ -1942,79 +1946,295 @@ export default function Home() {
                 <path d="M6 18C6 24 10 28 16 28C22 28 26 24 26 18" stroke="url(#ultra-grad-large)" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
               </svg>
             </div>
-            <h1 style={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '0.05em', marginBottom: '4px', background: 'linear-gradient(90deg, #fff 0%, #00f0ff 50%, #39ff14 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '0.05em', marginBottom: '4px', background: 'linear-gradient(90deg, #fff 0%, #00f0ff 50%, #39ff14 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               ULTRA
             </h1>
-            <p style={{ color: 'var(--neon-cyan)', fontSize: '0.9rem', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '16px' }}>
+            <p style={{ color: 'var(--neon-cyan)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '8px' }}>
               Esforço conjunto, conquista compartilhada!
             </p>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', maxWidth: '340px', margin: '0 auto', lineHeight: '1.4' }}>
-              Periodização Fisiológica Científica e Coaching Virtual Autônomo
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', maxWidth: '340px', margin: '0 auto', lineHeight: '1.4' }}>
+              Periodização Fisiológica Científica e Controle de Carga de Treinos
             </p>
           </div>
 
-          {/* Login Card */}
-          <div className="premium-card" style={{ padding: '32px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '16px' }}>
-            <h3 style={{ marginBottom: '24px', fontSize: '1.4rem', fontWeight: 700, color: '#fff', textAlign: 'center' }}>Acesso ao Cockpit</h3>
-            
-            <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div>
-                <label htmlFor="username" style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Usuário</label>
-                <input 
-                  id="username"
-                  type="text" 
-                  className="glass-input" 
-                  placeholder="Seu usuário"
-                  value={usernameInput} 
-                  onChange={e => setUsernameInput(e.target.value)} 
-                  required 
-                  disabled={loginLoading}
-                  style={{ fontSize: '1rem' }}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="password" style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Senha</label>
-                <input 
-                  id="password"
-                  type="password" 
-                  className="glass-input" 
-                  placeholder="Sua senha"
-                  value={passwordInput} 
-                  onChange={e => setPasswordInput(e.target.value)} 
-                  required 
-                  disabled={loginLoading}
-                  style={{ fontSize: '1rem' }}
-                />
-              </div>
-
-              {loginError && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: 'rgba(255, 59, 48, 0.08)', border: '1px solid rgba(255, 59, 48, 0.25)', borderRadius: '8px', color: 'var(--neon-red)', fontSize: '0.85rem', fontWeight: 500 }} className="animate-fade-in">
-                  <AlertTriangle size={16} style={{ flexShrink: 0 }} />
-                  <span>{loginError}</span>
+          {!isRegistering ? (
+            /* Login Card */
+            <div className="premium-card" style={{ padding: '32px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '16px' }}>
+              <h3 style={{ marginBottom: '24px', fontSize: '1.4rem', fontWeight: 700, color: '#fff', textAlign: 'center' }}>Acesso ao Cockpit</h3>
+              
+              <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div>
+                  <label htmlFor="username" style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Usuário</label>
+                  <input 
+                    id="username"
+                    type="text" 
+                    className="glass-input" 
+                    placeholder="Seu usuário"
+                    value={usernameInput} 
+                    onChange={e => setUsernameInput(e.target.value)} 
+                    required 
+                    disabled={loginLoading}
+                    style={{ fontSize: '1rem' }}
+                  />
                 </div>
-              )}
 
-              <button 
-                type="submit" 
-                className="glow-btn" 
-                style={{ width: '100%', marginTop: '8px', padding: '14px', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
-                disabled={loginLoading}
-              >
-                {loginLoading ? (
-                  <>
-                    <RefreshCw style={{ animation: 'spin 1s linear infinite' }} size={18} />
-                    Autenticando...
-                  </>
-                ) : (
-                  <>
-                    Entrar no Painel
-                    <ArrowRight size={18} />
-                  </>
+                <div>
+                  <label htmlFor="password" style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Senha</label>
+                  <input 
+                    id="password"
+                    type="password" 
+                    className="glass-input" 
+                    placeholder="Sua senha"
+                    value={passwordInput} 
+                    onChange={e => setPasswordInput(e.target.value)} 
+                    required 
+                    disabled={loginLoading}
+                    style={{ fontSize: '1rem' }}
+                  />
+                </div>
+
+                {loginError && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: 'rgba(255, 59, 48, 0.08)', border: '1px solid rgba(255, 59, 48, 0.25)', borderRadius: '8px', color: 'var(--neon-red)', fontSize: '0.85rem', fontWeight: 500 }} className="animate-fade-in">
+                    <AlertTriangle size={16} style={{ flexShrink: 0 }} />
+                    <span>{loginError}</span>
+                  </div>
                 )}
-              </button>
-            </form>
-          </div>
+
+                <button 
+                  type="submit" 
+                  className="glow-btn" 
+                  style={{ width: '100%', marginTop: '8px', padding: '14px', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                  disabled={loginLoading}
+                >
+                  {loginLoading ? (
+                    <>
+                      <RefreshCw style={{ animation: 'spin 1s linear infinite' }} size={18} />
+                      Autenticando...
+                    </>
+                  ) : (
+                    <>
+                      Entrar no Painel
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div style={{ textAlign: 'center', marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '16px' }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
+                  Novo no app?{' '}
+                  <button 
+                    type="button" 
+                    onClick={() => setIsRegistering(true)} 
+                    style={{ background: 'none', border: 'none', color: 'var(--neon-cyan)', fontWeight: 600, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+                  >
+                    Cadastrar Atleta
+                  </button>
+                </p>
+              </div>
+            </div>
+          ) : (
+            /* Register Card (Onboarding) */
+            <div className="premium-card" style={{ padding: '32px', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '16px' }}>
+              <h3 style={{ marginBottom: '20px', fontSize: '1.4rem', fontWeight: 700, color: '#fff', textAlign: 'center' }}>Cadastrar Novo Atleta</h3>
+              
+              <form onSubmit={handleOnboardSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Nome Completo</label>
+                    <input 
+                      type="text" 
+                      className="glass-input" 
+                      placeholder="Ex: Ana Souza"
+                      value={onboardForm.name} 
+                      onChange={e => setOnboardForm({ ...onboardForm, name: e.target.value })} 
+                      required 
+                      style={{ fontSize: '0.9rem', padding: '10px' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Chave de Acesso</label>
+                    <input 
+                      type="password" 
+                      className="glass-input" 
+                      placeholder="Chave do convite"
+                      value={onboardForm.accessKey} 
+                      onChange={e => setOnboardForm({ ...onboardForm, accessKey: e.target.value })} 
+                      required 
+                      style={{ fontSize: '0.9rem', padding: '10px' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Usuário</label>
+                    <input 
+                      type="text" 
+                      className="glass-input" 
+                      placeholder="Nome de login"
+                      value={onboardForm.username} 
+                      onChange={e => setOnboardForm({ ...onboardForm, username: e.target.value })} 
+                      required 
+                      style={{ fontSize: '0.9rem', padding: '10px' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Senha</label>
+                    <input 
+                      type="password" 
+                      className="glass-input" 
+                      placeholder="Senha forte"
+                      value={onboardForm.password} 
+                      onChange={e => setOnboardForm({ ...onboardForm, password: e.target.value })} 
+                      required 
+                      style={{ fontSize: '0.9rem', padding: '10px' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Nascimento</label>
+                    <input 
+                      type="date" 
+                      className="glass-input" 
+                      value={onboardForm.birthDate} 
+                      onChange={e => setOnboardForm({ ...onboardForm, birthDate: e.target.value })} 
+                      required 
+                      style={{ fontSize: '0.9rem', padding: '10px' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Peso (kg)</label>
+                    <input 
+                      type="number" 
+                      step="0.1"
+                      className="glass-input" 
+                      placeholder="Ex: 72.5"
+                      value={onboardForm.weight} 
+                      onChange={e => setOnboardForm({ ...onboardForm, weight: e.target.value })} 
+                      required 
+                      style={{ fontSize: '0.9rem', padding: '10px' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Condicionamento</label>
+                    <select 
+                      className="glass-input"
+                      value={onboardForm.level}
+                      onChange={e => setOnboardForm({ ...onboardForm, level: e.target.value })}
+                      style={{ fontSize: '0.9rem', padding: '10px', background: '#1c1c24' }}
+                    >
+                      <option value="sedentario">Iniciante / Sedentário</option>
+                      <option value="intermediario">Intermediário</option>
+                      <option value="elite">Elite / Avançado</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Disponibilidade semanal</label>
+                    <select 
+                      className="glass-input"
+                      value={onboardForm.weeklyHours}
+                      onChange={e => setOnboardForm({ ...onboardForm, weeklyHours: e.target.value })}
+                      required
+                      style={{ fontSize: '0.9rem', padding: '10px', background: '#1c1c24' }}
+                    >
+                      <option value="">Selecione...</option>
+                      <option value="3">Até 3 horas/semana</option>
+                      <option value="6">4 a 7 horas/semana</option>
+                      <option value="10">8 a 12 horas/semana</option>
+                      <option value="15">Mais de 12 horas/semana</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px' }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '12px', color: 'var(--neon-cyan)' }}>Meta Esportiva Inicial</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Modalidade</label>
+                      <select 
+                        className="glass-input"
+                        value={onboardForm.goalType}
+                        onChange={e => setOnboardForm({ ...onboardForm, goalType: e.target.value })}
+                        style={{ fontSize: '0.9rem', padding: '10px', background: '#1c1c24' }}
+                      >
+                        <option value="Corrida">Corrida de Rua</option>
+                        <option value="Ciclismo">Ciclismo</option>
+                        <option value="Natacao">Natação</option>
+                        <option value="Triathlon">Triathlon</option>
+                        <option value="Duathlon">Duathlon</option>
+                        <option value="Aquathlon">Aquathlon</option>
+                        <option value="Trail">Corrida de Trilha (Trail)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase' }}>Distância Alvo (km)</label>
+                      <input 
+                        type="number" 
+                        step="0.1"
+                        className="glass-input" 
+                        placeholder="Ex: 10.0"
+                        value={onboardForm.goalDistance} 
+                        onChange={e => setOnboardForm({ ...onboardForm, goalDistance: e.target.value })} 
+                        required 
+                        style={{ fontSize: '0.9rem', padding: '10px' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+                  <input 
+                    type="checkbox" 
+                    id="stravaConnectedOnboard"
+                    checked={onboardForm.stravaConnected}
+                    onChange={e => setOnboardForm({ ...onboardForm, stravaConnected: e.target.checked })}
+                    style={{ width: '16px', height: '16px', accentColor: '#fc4c02', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="stravaConnectedOnboard" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    Sincronizar com o <span style={{ color: '#fc4c02', fontWeight: 700 }}>Strava</span> após o cadastro
+                  </label>
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="glow-btn" 
+                  style={{ width: '100%', marginTop: '12px', padding: '12px', fontSize: '0.95rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <RefreshCw style={{ animation: 'spin 1s linear infinite' }} size={16} />
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      Finalizar e Criar Planilha
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div style={{ textAlign: 'center', marginTop: '20px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px' }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
+                  Já possui conta?{' '}
+                  <button 
+                    type="button" 
+                    onClick={() => setIsRegistering(false)} 
+                    style={{ background: 'none', border: 'none', color: 'var(--neon-cyan)', fontWeight: 600, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+                  >
+                    Fazer Login
+                  </button>
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
