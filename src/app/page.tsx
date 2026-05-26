@@ -109,7 +109,7 @@ export default function Home() {
   const [activeUser, setActiveUser] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [minLoadingTimePassed, setMinLoadingTimePassed] = useState<boolean>(true);
+  const [minLoadingTimePassed, setMinLoadingTimePassed] = useState<boolean>(false);
   const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
@@ -1215,8 +1215,8 @@ export default function Home() {
   // Efeito para garantir tempo mínimo do loader (1 ciclo completo dos esportes = 6s)
   const isCurrentlyLoading = !!(loading || (activeUser && userRole === 'athlete' && !dashboardData));
   useEffect(() => {
-    if (!activeUser) {
-      setMinLoadingTimePassed(true);
+    if (!activeUser || userRole !== 'athlete') {
+      setMinLoadingTimePassed(false);
       if (loadingTimerRef.current) {
         clearTimeout(loadingTimerRef.current);
         loadingTimerRef.current = null;
@@ -1224,16 +1224,14 @@ export default function Home() {
       return;
     }
 
-    if (isCurrentlyLoading) {
-      if (!loadingTimerRef.current) {
-        setMinLoadingTimePassed(false);
-        loadingTimerRef.current = setTimeout(() => {
-          setMinLoadingTimePassed(true);
-          loadingTimerRef.current = null;
-        }, 6000); // 6 segundos
-      }
+    if (!loadingTimerRef.current) {
+      setMinLoadingTimePassed(false);
+      loadingTimerRef.current = setTimeout(() => {
+        setMinLoadingTimePassed(true);
+        loadingTimerRef.current = null;
+      }, 6000); // 6 segundos
     }
-  }, [activeUser, isCurrentlyLoading]);
+  }, [activeUser, userRole]);
 
   // Limpeza de timer na desmontagem
   useEffect(() => {
@@ -1533,7 +1531,7 @@ export default function Home() {
           type: 'success', 
           text: `Calibração concluída! Nível ajustado para ${
             calibrationResult.suggestedMetrics.level === 'elite' 
-              ? 'Elite' 
+              ? 'Avançado' 
               : calibrationResult.suggestedMetrics.level === 'intermediario' 
                 ? 'Intermediário' 
                 : 'Iniciante'
@@ -1720,7 +1718,7 @@ export default function Home() {
     );
   };
 
-  const showLoadingScreen = isCurrentlyLoading || (activeUser && !minLoadingTimePassed);
+  const showLoadingScreen = isCurrentlyLoading || (activeUser && userRole === 'athlete' && !minLoadingTimePassed);
 
   if (showLoadingScreen) {
     return (
@@ -2213,7 +2211,7 @@ export default function Home() {
                     >
                       <option value="sedentario">Iniciante / Sedentário</option>
                       <option value="intermediario">Intermediário</option>
-                      <option value="elite">Elite / Avançado</option>
+                      <option value="elite">Avançado</option>
                     </select>
                   </div>
                   <div>
@@ -2702,7 +2700,7 @@ export default function Home() {
                 {user?.name}
               </strong>
               <span style={{ fontSize: '0.75rem', padding: '1px 6px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: user?.level === 'elite' ? 'var(--neon-green)' : 'var(--neon-cyan)' }}>
-                {user?.level?.toUpperCase() || ''}
+                {user?.level === 'elite' ? 'AVANÇADO' : user?.level === 'intermediario' ? 'INTERMEDIÁRIO' : user?.level === 'sedentario' ? 'INICIANTE' : (user?.level?.toUpperCase() || '')}
               </span>
             </div>
             
@@ -5274,7 +5272,7 @@ export default function Home() {
                           <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600 }}>Nível Esportivo</span>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
-                              {calibrationResult.currentMetrics.level === 'elite' ? 'Elite' : calibrationResult.currentMetrics.level === 'intermediario' ? 'Intermediário' : 'Iniciante'}
+                              {calibrationResult.currentMetrics.level === 'elite' ? 'Avançado' : calibrationResult.currentMetrics.level === 'intermediario' ? 'Intermediário' : 'Iniciante'}
                             </span>
                             <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} />
                             <span style={{ 
@@ -5285,7 +5283,7 @@ export default function Home() {
                               padding: '2px 8px',
                               borderRadius: '4px'
                             }}>
-                              {calibrationResult.suggestedMetrics.level === 'elite' ? 'Elite' : calibrationResult.suggestedMetrics.level === 'intermediario' ? 'Intermediário' : 'Iniciante'}
+                              {calibrationResult.suggestedMetrics.level === 'elite' ? 'Avançado' : calibrationResult.suggestedMetrics.level === 'intermediario' ? 'Intermediário' : 'Iniciante'}
                             </span>
                           </div>
                         </div>
@@ -5550,7 +5548,7 @@ export default function Home() {
                         {[
                           { value: 'sedentario', label: 'Iniciante', desc: 'Saindo do sedentarismo' },
                           { value: 'intermediario', label: 'Intermediário', desc: 'Treinos estruturados' },
-                          { value: 'elite', label: 'Elite / Avançado', desc: 'Treinos em alta intensidade' }
+                          { value: 'elite', label: 'Avançado', desc: 'Treinos em alta intensidade' }
                         ].map(l => {
                           const isActive = profileForm.level === l.value;
                           return (
