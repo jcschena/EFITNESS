@@ -111,7 +111,7 @@ export default function Home() {
 
   const [minLoadingTimePassed, setMinLoadingTimePassed] = useState<boolean>(true);
   const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const isInitializedRef = useRef<boolean>(false);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   const [activeTab, setActiveTab] = useState<string>('planilha'); // 'planilha', 'coach', 'simulador', 'nutricao', 'alongamento'
   
@@ -1166,7 +1166,7 @@ export default function Home() {
     setUserRole(savedRole);
     setActiveUserName(savedName);
     setActiveUser(currentUserId);
-    isInitializedRef.current = true;
+    setIsInitialized(true);
 
     if (currentUserId) {
       if (savedRole === 'athlete') {
@@ -1187,11 +1187,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!isInitializedRef.current) return;
+    if (!isInitialized) return;
 
     if (activeUser) {
       localStorage.setItem('active_user_id', String(activeUser));
       localStorage.setItem('is_authenticated', 'true');
+      localStorage.setItem('user_role', userRole);
+      localStorage.setItem('active_user_name', activeUserName);
       if (userRole === 'athlete') {
         fetchDashboard(activeUser);
         fetchRaces(activeUser);
@@ -1208,7 +1210,7 @@ export default function Home() {
       setDashboardData(null);
       setLoading(false);
     }
-  }, [activeUser, userRole]);
+  }, [activeUser, userRole, activeUserName, isInitialized]);
 
   // Efeito para garantir tempo mínimo do loader (1 ciclo completo dos esportes = 6s)
   const isCurrentlyLoading = !!(loading || (activeUser && userRole === 'athlete' && !dashboardData));
@@ -3363,7 +3365,7 @@ export default function Home() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
             
             {/* Banner de Orientação da Prova Alvo / Biblioteca */}
-            {goal?.date_target && (
+            {goal && (
               <div 
                 className="premium-card animate-slide-up" 
                 style={{ 
@@ -3405,18 +3407,26 @@ export default function Home() {
                         borderRadius: '4px',
                         fontWeight: 700
                       }}>
-                        PROVA ALVO
+                        {goal.type === 'Saude' || goal.type === 'Musculacao' ? 'FOCO ATIVO' : 'PROVA ALVO'}
                       </span>
                     </h3>
                     
-                    {plan?.library_id ? (
+                    {goal.type === 'Saude' ? (
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
+                        Seu objetivo ativo é <strong style={{ color: 'var(--neon-lime)' }}>Saúde & Qualidade de Vida</strong>. Seus treinos semanais estão calibrados para o seu bem-estar, consistência e manutenção da saúde fisiológica.
+                      </p>
+                    ) : goal.type === 'Musculacao' ? (
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
+                        Seu objetivo ativo é <strong style={{ color: 'var(--neon-orange)' }}>Musculação (Hipertrofia/Força)</strong>. Sua planilha semanal contém uma programação estruturada por grupos musculares de acordo com seu nível.
+                      </p>
+                    ) : plan?.library_id ? (
                       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
                         Seus treinos são orientados pela planilha periodizada prescrita pelo seu treinador: <strong style={{ color: '#fff' }}>{plan?.name}</strong>. 
-                        A periodização está sincronizada com a sua prova de <strong>{goal.type} ({goal.distance} km)</strong> marcada para o dia <strong>{new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}</strong>.
+                        A periodização está sincronizada com a sua prova de <strong>{goal.type} ({goal.distance} km)</strong>{goal.date_target ? ` marcada para o dia ${new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}.
                       </p>
                     ) : (
                       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '6px 0 0 0', lineHeight: '1.5' }}>
-                        Você estabeleceu uma prova alvo de <strong>{goal.type} ({goal.distance} km)</strong> para o dia <strong>{new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}</strong>. 
+                        Você estabeleceu uma prova alvo de <strong>{goal.type} ({goal.distance} km)</strong>{goal.date_target ? ` para o dia ${new Date(goal.date_target + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}. 
                         Os treinos prescritos por seu treinador aparecerão no seu calendário semanal.
                       </p>
                     )}
@@ -3604,23 +3614,28 @@ export default function Home() {
                           <span style={{ fontSize: '0.8rem', color: '#fc4c02', fontWeight: 700 }}>Tempo Total Esperado</span>
                           <strong style={{ fontSize: '1.05rem', color: '#fff', fontFamily: 'var(--font-title)' }}>{goal?.target_time || 'N/A'}</strong>
                         </div>
-
                       </div>
                     );
                   })() : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', margin: '20px 0' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
                         <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Grande Objetivo</span>
-                        <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.type} ({formatDistance(goal?.distance)} km)</strong>
+                        <strong style={{ fontSize: '0.9rem', color: '#fff' }}>
+                          {goal?.type === 'Saude' ? 'Saúde & Qualidade de Vida' : goal?.type === 'Musculacao' ? 'Musculação' : `${goal?.type} (${formatDistance(goal?.distance)} km)`}
+                        </strong>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Data Alvo da Prova</span>
-                        <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.date_target ? new Date(goal.date_target).toLocaleDateString('pt-BR') : 'N/A'}</strong>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Tempo Alvo Prescrito</span>
-                        <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.target_time || 'N/A'}</strong>
-                      </div>
+                      {goal?.type !== 'Saude' && goal?.type !== 'Musculacao' && (
+                        <>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Data Alvo da Prova</span>
+                            <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.date_target ? new Date(goal.date_target).toLocaleDateString('pt-BR') : 'N/A'}</strong>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Tempo Alvo Prescrito</span>
+                            <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{goal?.target_time || 'N/A'}</strong>
+                          </div>
+                        </>
+                      )}
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
                         <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Carga Alvo Semanal</span>
                         <strong style={{ fontSize: '0.9rem', color: '#fc4c02' }}>{goal?.weekly_tss_target} TSS</strong>
@@ -5672,9 +5687,9 @@ export default function Home() {
 
                   <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     
-                    <div className="form-grid-2">
-                      <div>
-                        <label htmlFor="goal-type" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Tipo de Prova</label>
+                    <div className={profileForm.goal_type !== 'Saude' && profileForm.goal_type !== 'Musculacao' ? "form-grid-2" : ""}>
+                      <div style={{ flex: 1 }}>
+                        <label htmlFor="goal-type" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Tipo de Prova / Objetivo</label>
                         <select 
                           id="goal-type"
                           className="glass-input" 
@@ -5694,48 +5709,52 @@ export default function Home() {
                           ))}
                         </select>
                       </div>
-                      <div>
-                        <label htmlFor="goal-distance" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Distância Alvo (km)</label>
-                        <input 
-                          id="goal-distance"
-                          type="number" 
-                          step="0.01"
-                          className="glass-input" 
-                          placeholder="Ex: 42.2 ou 226.2"
-                          value={profileForm.goal_distance} 
-                          onChange={e => setProfileForm({ ...profileForm, goal_distance: e.target.value })} 
-                          required 
-                          disabled={profileSaving}
-                        />
-                      </div>
+                      {profileForm.goal_type !== 'Saude' && profileForm.goal_type !== 'Musculacao' && (
+                        <div>
+                          <label htmlFor="goal-distance" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Distância Alvo (km)</label>
+                          <input 
+                            id="goal-distance"
+                            type="number" 
+                            step="0.01"
+                            className="glass-input" 
+                            placeholder="Ex: 42.2 ou 226.2"
+                            value={profileForm.goal_distance} 
+                            onChange={e => setProfileForm({ ...profileForm, goal_distance: e.target.value })} 
+                            required 
+                            disabled={profileSaving}
+                          />
+                        </div>
+                      )}
                     </div>
 
-                    <div className="form-grid-2">
-                      <div>
-                        <label htmlFor="goal-date" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Data da Prova</label>
-                        <input 
-                          id="goal-date"
-                          type="date" 
-                          className="glass-input" 
-                          value={profileForm.goal_date_target} 
-                          onChange={e => setProfileForm({ ...profileForm, goal_date_target: e.target.value })} 
-                          disabled={profileSaving}
-                        />
+                    {profileForm.goal_type !== 'Saude' && profileForm.goal_type !== 'Musculacao' && (
+                      <div className="form-grid-2">
+                        <div>
+                          <label htmlFor="goal-date" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Data da Prova</label>
+                          <input 
+                            id="goal-date"
+                            type="date" 
+                            className="glass-input" 
+                            value={profileForm.goal_date_target} 
+                            onChange={e => setProfileForm({ ...profileForm, goal_date_target: e.target.value })} 
+                            disabled={profileSaving}
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="goal-time" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Tempo Alvo Esperado</label>
+                          <input 
+                            id="goal-time"
+                            type="text" 
+                            className="glass-input" 
+                            placeholder="Ex: 09:45:00"
+                            value={profileForm.goal_target_time} 
+                            onChange={e => setProfileForm({ ...profileForm, goal_target_time: maskTimeInput(e.target.value) })} 
+                            required 
+                            disabled={profileSaving}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <label htmlFor="goal-time" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Tempo Alvo Esperado</label>
-                        <input 
-                          id="goal-time"
-                          type="text" 
-                          className="glass-input" 
-                          placeholder="Ex: 09:45:00"
-                          value={profileForm.goal_target_time} 
-                          onChange={e => setProfileForm({ ...profileForm, goal_target_time: maskTimeInput(e.target.value) })} 
-                          required 
-                          disabled={profileSaving}
-                        />
-                      </div>
-                    </div>
+                    )}
 
                     <div>
                       <label htmlFor="goal-tss" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Carga Alvo Semanal (TSS)</label>
@@ -5746,7 +5765,7 @@ export default function Home() {
                         placeholder="Ex: 650"
                         value={profileForm.goal_weekly_tss_target} 
                         onChange={e => setProfileForm({ ...profileForm, goal_weekly_tss_target: e.target.value })} 
-                        required 
+                        required={profileForm.goal_type !== 'Saude' && profileForm.goal_type !== 'Musculacao'} 
                         disabled={profileSaving}
                       />
                     </div>
