@@ -39,6 +39,7 @@ import { NUTRITION_DATA, STRETCHING_DATA } from '@/lib/nutrition-stretching';
 import { TRAINING_LIBRARY, getWeeksAfterCut, getBestMatchingPlan, calibrateWorkout } from '@/lib/training-library';
 import { BookOpen, Award, Settings, Eye, HelpCircle, Download } from 'lucide-react';
 import CoachDashboard from '@/components/CoachDashboard';
+import MasterDashboard from '@/components/MasterDashboard';
 
 
 const BarChart = dynamic(
@@ -102,60 +103,15 @@ const UltraLogoIcon = ({ color }: { color: string }) => (
 );
 
 export default function Home() {
-  // Estados Globais da SPA
-  const [userRole, setUserRole] = useState<string>(() => {
-    if (typeof window === 'undefined') return 'athlete';
-    return localStorage.getItem('user_role') || 'athlete';
-  });
-
-  const [activeUserName, setActiveUserName] = useState<string>(() => {
-    if (typeof window === 'undefined') return '';
-    return localStorage.getItem('active_user_name') || '';
-  });
-
-  const [activeUser, setActiveUser] = useState<number | null>(() => {
-    if (typeof window === 'undefined') return null;
-    
-    // Verificar se há parâmetros na URL primeiro (ex: Strava Redirect)
-    const params = new URLSearchParams(window.location.search);
-    const urlUserId = params.get('userId');
-    if (urlUserId) {
-      const parsedId = parseInt(urlUserId, 10);
-      if (!isNaN(parsedId)) {
-        localStorage.setItem('active_user_id', String(parsedId));
-        localStorage.setItem('is_authenticated', 'true');
-        return parsedId;
-      }
-    }
-
-    const savedUserId = localStorage.getItem('active_user_id');
-    const savedAuthenticated = localStorage.getItem('is_authenticated');
-    if (savedUserId && savedAuthenticated === 'true') {
-      const parsedId = parseInt(savedUserId, 10);
-      if (!isNaN(parsedId)) return parsedId;
-    }
-    return null;
-  });
-
-  const [loading, setLoading] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-
-    // Se houver parâmetros de usuário na URL ou no localStorage, precisamos carregar os dados
-    const params = new URLSearchParams(window.location.search);
-    const urlUserId = params.get('userId');
-    if (urlUserId && !isNaN(parseInt(urlUserId, 10))) return true;
-
-    const savedUserId = localStorage.getItem('active_user_id');
-    const savedAuthenticated = localStorage.getItem('is_authenticated');
-    if (savedUserId && savedAuthenticated === 'true') {
-      const parsedId = parseInt(savedUserId, 10);
-      if (!isNaN(parsedId)) return true;
-    }
-    return false;
-  });
+  // Estados Globais da SPA - Inicialização segura para evitar Hydration Mismatch no Next.js
+  const [userRole, setUserRole] = useState<string>('athlete');
+  const [activeUserName, setActiveUserName] = useState<string>('');
+  const [activeUser, setActiveUser] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [minLoadingTimePassed, setMinLoadingTimePassed] = useState<boolean>(true);
   const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitializedRef = useRef<boolean>(false);
 
   const [activeTab, setActiveTab] = useState<string>('planilha'); // 'planilha', 'coach', 'simulador', 'nutricao', 'alongamento'
   
@@ -1172,6 +1128,11 @@ export default function Home() {
 
   // Inicialização da sessão e leitura de URL
   useEffect(() => {
+    const savedUserId = localStorage.getItem('active_user_id');
+    const savedAuthenticated = localStorage.getItem('is_authenticated');
+    const savedRole = localStorage.getItem('user_role') || 'athlete';
+    const savedName = localStorage.getItem('active_user_name') || '';
+
     const params = new URLSearchParams(window.location.search);
     const urlUserId = params.get('userId');
     const syncStatus = params.get('strava_sync');
@@ -1187,6 +1148,37 @@ export default function Home() {
       alert('Erro interno no servidor ao processar o callback do Strava.');
     }
 
+    let currentUserId: number | null = null;
+    if (urlUserId) {
+      const parsedId = parseInt(urlUserId, 10);
+      if (!isNaN(parsedId)) {
+        localStorage.setItem('active_user_id', String(parsedId));
+        localStorage.setItem('is_authenticated', 'true');
+        currentUserId = parsedId;
+      }
+    } else if (savedUserId && savedAuthenticated === 'true') {
+      const parsedId = parseInt(savedUserId, 10);
+      if (!isNaN(parsedId)) {
+        currentUserId = parsedId;
+      }
+    }
+
+    setUserRole(savedRole);
+    setActiveUserName(savedName);
+    setActiveUser(currentUserId);
+    isInitializedRef.current = true;
+
+    if (currentUserId) {
+      if (savedRole === 'athlete') {
+        fetchDashboard(currentUserId);
+        fetchRaces(currentUserId);
+      } else {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
+
     if (urlUserId) {
       // Limpar query string para manter a URL limpa
       const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
@@ -1195,6 +1187,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (!isInitializedRef.current) return;
+
     if (activeUser) {
       localStorage.setItem('active_user_id', String(activeUser));
       localStorage.setItem('is_authenticated', 'true');
@@ -2323,6 +2317,25 @@ export default function Home() {
           )}
         </div>
       </div>
+    );
+  }
+
+  // SE USUÁRIO ATIVO FOR O MASTER (DIRETORIA), REDIRECIONAR PARA O PAINEL MASTER
+  if (activeUser && userRole === 'master') {
+    return (
+      <MasterDashboard 
+        userId={String(activeUser)} 
+        userName={activeUserName || 'Diretor'} 
+        onLogout={() => {
+          setActiveUser(null);
+          setUserRole('athlete');
+          setActiveUserName('');
+          localStorage.removeItem('active_user_id');
+          localStorage.removeItem('is_authenticated');
+          localStorage.removeItem('user_role');
+          localStorage.removeItem('active_user_name');
+        }}
+      />
     );
   }
 

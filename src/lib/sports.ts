@@ -42,6 +42,22 @@ export const SPORTS_CONFIG: SportConfig[] = [
     stravaTypes: ['WeightTraining']
   },
   {
+    id: 'Saude',
+    name: 'Saúde & Qualidade de Vida',
+    emoji: '🌱',
+    color: 'var(--neon-lime)',
+    isEndurance: false,
+    stravaTypes: []
+  },
+  {
+    id: 'Musculacao',
+    name: 'Musculação (Grupos Musculares)',
+    emoji: '🏋️‍♀️',
+    color: 'var(--neon-orange)',
+    isEndurance: false,
+    stravaTypes: ['WeightTraining']
+  },
+  {
     id: 'Descanso',
     name: 'Descanso',
     emoji: '💤',

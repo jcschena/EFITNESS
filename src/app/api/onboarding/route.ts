@@ -17,30 +17,26 @@ export async function POST(req: Request) {
     let userRole = 'athlete';
     let coachId = null;
 
-    if (accessKey === 'SUPERCOACH2026') {
-      userRole = 'coach';
-    } else {
-      // Validar chave de acesso no banco
-      const keyRecord = await db.get('SELECT * FROM access_keys WHERE key_code = ? AND active = 1', accessKey);
-      if (!keyRecord) {
-        return NextResponse.json({
-          success: false,
-          error: 'Chave de acesso inválida ou expirada. Solicite a chave correta ao administrador.'
-        }, { status: 403 });
-      }
-
-      // Verificar limite de alunos
-      const countObj = await db.get('SELECT COUNT(*) as count FROM users WHERE coach_id = ? AND role = \'athlete\'', keyRecord.coach_id);
-      const athleteCount = countObj ? countObj.count : 0;
-      if (athleteCount >= keyRecord.max_athletes) {
-        return NextResponse.json({
-          success: false,
-          error: 'O limite de alunos para esta chave de acesso foi atingido.'
-        }, { status: 400 });
-      }
-
-      coachId = keyRecord.coach_id;
+    // Validar chave de acesso no banco
+    const keyRecord = await db.get('SELECT * FROM access_keys WHERE key_code = ? AND active = 1', accessKey);
+    if (!keyRecord) {
+      return NextResponse.json({
+        success: false,
+        error: 'Chave de acesso inválida ou expirada. Solicite a chave correta ao administrador.'
+      }, { status: 403 });
     }
+
+    // Verificar limite de alunos
+    const countObj = await db.get('SELECT COUNT(*) as count FROM users WHERE coach_id = ? AND role = \'athlete\'', keyRecord.coach_id);
+    const athleteCount = countObj ? countObj.count : 0;
+    if (athleteCount >= keyRecord.max_athletes) {
+      return NextResponse.json({
+        success: false,
+        error: 'O limite de alunos para esta chave de acesso foi atingido.'
+      }, { status: 400 });
+    }
+
+    coachId = keyRecord.coach_id;
 
     if (!username || !password) {
       return NextResponse.json({

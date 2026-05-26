@@ -265,6 +265,8 @@ class PostgreSQLAdapter implements DatabaseClient {
         await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS status TEXT DEFAULT \'active\';');
         await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS pix_key TEXT;');
         await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS pix_instructions TEXT;');
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS parent_coach_id INTEGER;');
+        await this.exec('ALTER TABLE users ADD COLUMN IF NOT EXISTS teacher_id INTEGER;');
       } catch (e) {
         console.warn('Erro ao rodar migrations de colunas financeiras no Postgres:', e);
       }
@@ -523,6 +525,12 @@ class SQLiteAdapter implements DatabaseClient {
     try {
       await this.db.exec('ALTER TABLE users ADD COLUMN pix_instructions TEXT;');
     } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN parent_coach_id INTEGER;');
+    } catch (e) {}
+    try {
+      await this.db.exec('ALTER TABLE users ADD COLUMN teacher_id INTEGER;');
+    } catch (e) {}
 
     try {
       await this.db.exec(`
@@ -649,7 +657,9 @@ function getInitialSchemaDDL(): string {
       payment_status TEXT DEFAULT 'paid',
       status TEXT DEFAULT 'active',
       pix_key TEXT,
-      pix_instructions TEXT
+      pix_instructions TEXT,
+      parent_coach_id INTEGER,
+      teacher_id INTEGER
     );
 
     CREATE TABLE IF NOT EXISTS goals (
@@ -832,7 +842,75 @@ export function generateWorkoutsForPlan(
   const normalizedGoal = goalType ? goalType.trim() : 'Corrida';
   const normalizedLevel = level ? level.trim() : 'intermediario';
 
-  if (normalizedGoal === 'Triathlon') {
+  if (normalizedGoal === 'Saude') {
+    if (normalizedLevel === 'sedentario') {
+      workoutsToInsert.push(
+        { day: 1, type: 'Caminhada', dist: 3.0, dur: 1800, pace: '10:00/km', power: 0, tss: 10, title: 'Caminhada Aeróbica Leve', desc: 'Caminhada contínua em ritmo confortável para oxigenação e saúde cardiovascular.' },
+        { day: 2, type: 'Ioga', dist: 0.0, dur: 1200, pace: 'N/A', power: 0, tss: 5, title: 'Mobilidade & Flexibilidade Iniciante', desc: 'Alongamentos suaves focando em respiração e melhora da flexibilidade articular.' },
+        { day: 3, type: 'Forca', dist: 0.0, dur: 1800, pace: 'N/A', power: 0, tss: 12, title: 'Fortalecimento Core & Peso Corporal', desc: 'Exercícios funcionais básicos (pontes, prancha de joelhos, sentar e levantar) para estabilidade.' },
+        { day: 4, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso Ativo', desc: 'Permita que as articulações descansem, faça apenas atividades rotineiras.' },
+        { day: 5, type: 'Caminhada', dist: 3.5, dur: 2100, pace: '10:00/km', power: 0, tss: 12, title: 'Caminhada de Consistência', desc: 'Caminhada focada em manter a regularidade. Mantenha a postura ereta.' },
+        { day: 6, type: 'Ioga', dist: 0.0, dur: 1500, pace: 'N/A', power: 0, tss: 8, title: 'Alongamento & Respiração', desc: 'Foco no relaxamento muscular e redução do estresse mental.' },
+        { day: 7, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso Semanal', desc: 'Dia livre para lazer e repouso completo.' }
+      );
+    } else if (normalizedLevel === 'elite') {
+      workoutsToInsert.push(
+        { day: 1, type: 'Corrida', dist: 8.0, dur: 2880, pace: '6:00/km', power: 0, tss: 40, title: 'Corrida Aeróbica Contínua Z2', desc: 'Corrida leve focada na eficiência cardiorrespiratória e controle de batimentos.' },
+        { day: 2, type: 'Forca', dist: 0.0, dur: 3000, pace: 'N/A', power: 0, tss: 25, title: 'Musculação / Fortalecimento Geral', desc: 'Treino de força focado nos grandes grupos musculares (agachamentos, puxadas, empurrar).' },
+        { day: 3, type: 'Ciclismo', dist: 25.0, dur: 3300, pace: '27.3 km/h', power: 140, tss: 45, title: 'Ciclismo Aeróbico Regenerativo', desc: 'Giro no plano mantendo cadência uniforme para estímulo mitocondrial.' },
+        { day: 4, type: 'Ioga', dist: 0.0, dur: 1800, pace: 'N/A', power: 0, tss: 15, title: 'Sessão de Mobilidade Ativa', desc: 'Exercícios de mobilidade dinâmica para quadril, coluna torácica e ombros.' },
+        { day: 5, type: 'Forca', dist: 0.0, dur: 3000, pace: 'N/A', power: 0, tss: 25, title: 'Treino Funcional / Core', desc: 'Exercícios integrados com foco em estabilidade, equilíbrio e força de core.' },
+        { day: 6, type: 'Corrida', dist: 10.0, dur: 3900, pace: '6:30/km', power: 0, tss: 50, title: 'Trote Longo ao Ar Livre', desc: 'Corrida em ritmo confortável e prazeroso em parques ou trilhas leves.' },
+        { day: 7, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Alongamento Fisiológico & Descanso', desc: 'Alongamentos passivos e repouso total para renovação celular.' }
+      );
+    } else {
+      // Intermediário (Saúde)
+      workoutsToInsert.push(
+        { day: 1, type: 'Corrida', dist: 5.0, dur: 2100, pace: '7:00/km', power: 0, tss: 25, title: 'Trote Leve Aeróbico', desc: 'Trote confortável sem pressa, controle a respiração.' },
+        { day: 2, type: 'Forca', dist: 0.0, dur: 2400, pace: 'N/A', power: 0, tss: 18, title: 'Musculação / Fortalecimento Core', desc: 'Exercícios de força gerais para manutenção de massa magra e postura.' },
+        { day: 3, type: 'Ciclismo', dist: 15.0, dur: 2250, pace: '24.0 km/h', power: 110, tss: 25, title: 'Ciclismo Leve de Lazer', desc: 'Pedal em intensidade leve para soltura de membros inferiores.' },
+        { day: 4, type: 'Ioga', dist: 0.0, dur: 1500, pace: 'N/A', power: 0, tss: 10, title: 'Alongamento & Mobilidade Geral', desc: 'Foco na flexibilidade das pernas, quadril e região lombar.' },
+        { day: 5, type: 'Forca', dist: 0.0, dur: 2400, pace: 'N/A', power: 0, tss: 18, title: 'Fortalecimento Funcional', desc: 'Treino resistido focado na estabilidade articular dos joelhos e quadril.' },
+        { day: 6, type: 'Caminhada', dist: 5.0, dur: 3000, pace: '10:00/km', power: 0, tss: 15, title: 'Caminhada Ativa ao Ar Livre', desc: 'Caminhada com ritmo um pouco mais acelerado em ambiente agradável.' },
+        { day: 7, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso Semanal', desc: 'Dia livre para recuperação.' }
+      );
+    }
+  } else if (normalizedGoal === 'Musculacao') {
+    if (normalizedLevel === 'sedentario') {
+      // Iniciante: A/B split
+      workoutsToInsert.push(
+        { day: 1, type: 'Musculacao', dist: 0.0, dur: 2700, pace: 'N/A', power: 0, tss: 20, title: 'Musculação - Treino A: Membros Superiores', desc: 'Foco na adaptação neuromuscular. Peito (Supino Máquina), Costas (Puxada Alta), Ombros (Desenvolvimento Halteres), Bíceps (Rosca Direta) e Tríceps (Polia). Realizar 3 séries de 12 a 15 repetições com carga moderada.' },
+        { day: 2, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso / Recuperação', desc: 'Permita que as fibras musculares se recuperem do estímulo inicial.' },
+        { day: 3, type: 'Musculacao', dist: 0.0, dur: 2700, pace: 'N/A', power: 0, tss: 20, title: 'Musculação - Treino B: Membros Inferiores & Core', desc: 'Foco na estabilidade. Quadríceps (Leg Press / Cadeira Extensora), Posterior (Cadeira Flexora), Panturrilha (Máquina em pé) e Abdômen (Prancha e Supra). Realizar 3 séries de 12 a 15 repetições.' },
+        { day: 4, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso Ativo (Caminhada Leve)', desc: 'Caminhada leve para circulação e relaxamento muscular.' },
+        { day: 5, type: 'Musculacao', dist: 0.0, dur: 2700, pace: 'N/A', power: 0, tss: 20, title: 'Musculação - Treino A: Membros Superiores', desc: 'Repetição do treino A. Peito (Supino Máquina), Costas (Puxada Alta), Ombros (Desenvolvimento), Bíceps e Tríceps. 3 séries de 12 repetições.' },
+        { day: 6, type: 'Musculacao', dist: 0.0, dur: 2700, pace: 'N/A', power: 0, tss: 20, title: 'Musculação - Treino B: Membros Inferiores & Core', desc: 'Repetição do treino B. Pernas completas e core para ganho de base muscular.' },
+        { day: 7, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso Semanal', desc: 'Dia livre para lazer e repouso completo.' }
+      );
+    } else if (normalizedLevel === 'elite') {
+      // Elite: A/B/C/D/E/F split
+      workoutsToInsert.push(
+        { day: 1, type: 'Musculacao', dist: 0.0, dur: 3600, pace: 'N/A', power: 0, tss: 35, title: 'Musculação - Treino A: Peitoral & Tríceps', desc: 'Foco em hipertrofia máxima. Supino Reto com Barra, Supino Inclinado com Halteres, Crossover, Tríceps Testa e Tríceps Corda. 4 séries de 8 a 12 repetições próximas à falha muscular.' },
+        { day: 2, type: 'Musculacao', dist: 0.0, dur: 3600, pace: 'N/A', power: 0, tss: 35, title: 'Musculação - Treino B: Dorsal & Bíceps', desc: 'Foco em amplitude e espessura. Puxada Alta, Remada Curvada, Serrote com Halteres, Rosca Direta com Barra W, Rosca Scott. 4 séries de 8 a 12 repetições com técnica excelente.' },
+        { day: 3, type: 'Musculacao', dist: 0.0, dur: 3900, pace: 'N/A', power: 0, tss: 40, title: 'Musculação - Treino C: Coxas (Quadríceps & Glúteos)', desc: 'Treino de alta carga de esforço. Agachamento Livre, Leg Press 45, Cadeira Extensora, Avanço com Halteres. 4 séries de 10 a 12 repetições.' },
+        { day: 4, type: 'Musculacao', dist: 0.0, dur: 3300, pace: 'N/A', power: 0, tss: 30, title: 'Musculação - Treino D: Ombros, Trapézio & Core', desc: 'Desenvolvimento Militar com Barra, Elevação Lateral, Elevação Posterior (Crucifixo Invertido), Encolhimento de Ombros e Abdominais na Polia. 4 séries de 10 a 12 repetições.' },
+        { day: 5, type: 'Musculacao', dist: 0.0, dur: 3600, pace: 'N/A', power: 0, tss: 35, title: 'Musculação - Treino E: Posterior de Coxa & Panturrilhas', desc: 'Stiff com Barra, Mesa Flexora, Cadeira Flexora, Panturrilha em Pé e Panturrilha Sentado. 4 séries de 12 repetições com foco na fase excêntrica.' },
+        { day: 6, type: 'Musculacao', dist: 0.0, dur: 3000, pace: 'N/A', power: 0, tss: 25, title: 'Musculação - Treino F: Braços Completo (Bíceps/Tríceps Super-Série)', desc: 'Treino de pump. Super-série: Rosca Direta no Cabo + Tríceps Polia; Rosca Alternada Inclinada + Tríceps Francês. Realizar 3 a 4 super-séries.' },
+        { day: 7, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Recuperação Fisiológica & Supercompensação', desc: 'Descanso total. Nutrição hiperproteica e repouso anabólico completo.' }
+      );
+    } else {
+      // Intermediário: A/B/C split
+      workoutsToInsert.push(
+        { day: 1, type: 'Musculacao', dist: 0.0, dur: 3000, pace: 'N/A', power: 0, tss: 25, title: 'Musculação - Treino A: Peito, Ombros & Tríceps (Empurrar)', desc: 'Treino focado nos músculos empurradores. Supino Inclinado com Halteres, Supino Reto Máquina, Elevação Lateral, Desenvolvimento com Halteres, Tríceps Testa e Tríceps Polia. 3 a 4 séries de 10 a 12 repetições.' },
+        { day: 2, type: 'Musculacao', dist: 0.0, dur: 3000, pace: 'N/A', power: 0, tss: 25, title: 'Musculação - Treino B: Costas, Trapézio & Bíceps (Puxar)', desc: 'Treino focado nos músculos puxadores. Puxada Alta Pronada, Remada Sentada Baixa na Polia, Crucifixo Invertido, Rosca Direta com Barra e Rosca Concentrada. 3 a 4 séries de 10 a 12 repetições.' },
+        { day: 3, type: 'Musculacao', dist: 0.0, dur: 3300, pace: 'N/A', power: 0, tss: 30, title: 'Musculação - Treino C: Coxas & Panturrilhas (Membros Inferiores)', desc: 'Agachamento no Hack, Leg Press 45, Cadeira Extensora, Cadeira Flexora, Panturrilha Sentado e Panturrilha em Pé. 3 a 4 séries de 12 repetições.' },
+        { day: 4, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso / Alongamento', desc: 'Permita que suas articulações e musculatura descansem. Alongamento leve.' },
+        { day: 5, type: 'Musculacao', dist: 0.0, dur: 3000, pace: 'N/A', power: 0, tss: 25, title: 'Musculação - Treino A: Peito, Ombros & Tríceps (Empurrar)', desc: 'Repetição do Treino A. Foco na progressão de carga controlada.' },
+        { day: 6, type: 'Musculacao', dist: 0.0, dur: 3000, pace: 'N/A', power: 0, tss: 25, title: 'Musculação - Treino B: Costas, Trapézio & Bíceps (Puxar)', desc: 'Repetição do Treino B. Foco na cadência e contração muscular.' },
+        { day: 7, type: 'Descanso', dist: 0.0, dur: 0, pace: 'N/A', power: 0, tss: 0, title: 'Descanso Semanal', desc: 'Recupere-se para começar o próximo ciclo.' }
+      );
+    }
+  } else if (normalizedGoal === 'Triathlon') {
     if (normalizedLevel === 'sedentario') {
       workoutsToInsert.push(
         { day: 1, type: 'Natacao', dist: 0.8, dur: 1500, pace: '3:07/100m', power: 0, tss: 15, title: 'Natação Técnica Iniciante', desc: 'Foco na respiração bilateral e alinhamento do quadril. Use flutuador se necessário.' },
@@ -1162,6 +1240,15 @@ export function generateWorkoutsForPlan(
 
 export async function ensureCoachAndKeys(db: DatabaseClient) {
   try {
+    const master = await db.get("SELECT * FROM users WHERE username = 'master'");
+    if (!master) {
+      console.log("Usuário Master não encontrado. Criando...");
+      await db.run(`
+        INSERT INTO users (name, level, age, weight, threshold_hr, threshold_pace, weekly_target_hours, strava_connected, birth_date, username, password, role)
+        VALUES ('Diretoria Ultra', 'elite', 35, 75.0, 160, '4:00', 10, 0, '1991-01-01', 'master', 'MASTER2026', 'master')
+      `);
+    }
+
     const coach = await db.get("SELECT * FROM users WHERE username = 'coach'");
     let coachId: number | undefined;
     if (!coach) {

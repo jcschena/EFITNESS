@@ -13,10 +13,14 @@ export async function GET(req: Request) {
     const coachId = parseInt(coachIdStr, 10);
     const db = await getDb();
 
-    // 1. Obter informações de Pix do treinador
-    const coach = await db.get('SELECT id, name, pix_key, pix_instructions FROM users WHERE id = ? AND role = \'coach\'', coachId);
+    // 1. Obter informações de Pix do treinador e verificar se é um sub-professor subordinado
+    const coach = await db.get('SELECT id, name, pix_key, pix_instructions, parent_coach_id FROM users WHERE id = ? AND role = \'coach\'', coachId);
     if (!coach) {
       return NextResponse.json({ success: false, error: 'Treinador não encontrado' }, { status: 404 });
+    }
+
+    if (coach.parent_coach_id !== null) {
+      return NextResponse.json({ success: false, error: 'Acesso negado. Apenas o administrador da assessoria pode acessar finanças.' }, { status: 403 });
     }
 
     // 2. Obter lista de atletas com suas informações financeiras
@@ -72,10 +76,14 @@ export async function POST(req: Request) {
 
     const db = await getDb();
 
-    // Validar se o coach existe e é realmente um treinador
-    const coach = await db.get('SELECT id FROM users WHERE id = ? AND role = \'coach\'', coachId);
+    // Validar se o coach existe, é realmente um treinador, e se é uma assessoria líder (parent_coach_id é nulo)
+    const coach = await db.get('SELECT id, parent_coach_id FROM users WHERE id = ? AND role = \'coach\'', coachId);
     if (!coach) {
       return NextResponse.json({ success: false, error: 'Treinador não autorizado.' }, { status: 403 });
+    }
+
+    if (coach.parent_coach_id !== null) {
+      return NextResponse.json({ success: false, error: 'Acesso negado. Apenas o administrador da assessoria pode gerenciar finanças.' }, { status: 403 });
     }
 
     if (action === 'update_pix') {

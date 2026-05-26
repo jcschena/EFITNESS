@@ -13,6 +13,8 @@ interface Athlete {
   thresholdHr: number;
   thresholdPace: string;
   stravaConnected: boolean;
+  teacherId?: number | null;
+  teacherName?: string | null;
   metrics: {
     ctl: number;
     atl: number;
@@ -41,7 +43,7 @@ interface CoachDashboardProps {
 }
 
 export default function CoachDashboard({ userId, userName, onLogout }: CoachDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'athletes' | 'keys' | 'library' | 'finance'>('athletes');
+  const [activeTab, setActiveTab] = useState<'athletes' | 'keys' | 'library' | 'finance' | 'teachers'>('athletes');
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [accessKeys, setAccessKeys] = useState<AccessKey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,15 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [feedbacksLoading, setFeedbacksLoading] = useState(false);
   const [feedbackInput, setFeedbackInput] = useState('');
+  
+  // Estados de Hierarquia de Professores (Sub-professores)
+  const [isSubTeacher, setIsSubTeacher] = useState(false);
+  const [teachers, setTeachers] = useState<any[]>([]);
+  const [teachersLoading, setTeachersLoading] = useState(false);
+  const [newTeacherName, setNewTeacherName] = useState('');
+  const [newTeacherUsername, setNewTeacherUsername] = useState('');
+  const [newTeacherPassword, setNewTeacherPassword] = useState('');
+  const [teacherSubmitLoading, setTeacherSubmitLoading] = useState(false);
 
   // Estados para a Biblioteca de Planilhas
   const [libraryPlans, setLibraryPlans] = useState<any[]>([]);
@@ -367,6 +378,10 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
       if (data.success) {
         setAthletes(data.athletes || []);
         setAccessKeys(data.accessKeys || []);
+        setIsSubTeacher(!!data.isSubTeacher);
+        if (data.teachers) {
+          setTeachers(data.teachers);
+        }
       } else {
         setError(data.error || 'Erro ao carregar dados');
       }
@@ -447,6 +462,107 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
       alert('Erro de rede ao salvar treino');
     } finally {
       setSaveLoading(false);
+    }
+  };
+
+  // Funções de Gerenciamento de Professores
+  const fetchTeachers = async () => {
+    setTeachersLoading(true);
+    try {
+      const res = await fetch(`/api/coach/teachers?coachId=${userId}`);
+      const data = await res.json();
+      if (data.success) {
+        setTeachers(data.teachers || []);
+      } else {
+        alert(data.error || 'Erro ao buscar professores');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao buscar professores');
+    } finally {
+      setTeachersLoading(false);
+    }
+  };
+
+  const handleCreateTeacher = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTeacherName || !newTeacherUsername || !newTeacherPassword) return;
+    setTeacherSubmitLoading(true);
+    try {
+      const res = await fetch('/api/coach/teachers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'register_teacher',
+          coachId: userId,
+          name: newTeacherName,
+          username: newTeacherUsername,
+          password: newTeacherPassword
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNewTeacherName('');
+        setNewTeacherUsername('');
+        setNewTeacherPassword('');
+        alert(data.message || 'Professor cadastrado com sucesso!');
+        fetchTeachers();
+        fetchCoachData(); // Atualiza contadores
+      } else {
+        alert(data.error || 'Erro ao cadastrar professor');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao cadastrar professor');
+    } finally {
+      setTeacherSubmitLoading(false);
+    }
+  };
+
+  const handleDeleteTeacher = async (teacherId: number) => {
+    if (!confirm('Tem certeza que deseja excluir este professor? Os alunos serão desvinculados.')) return;
+    try {
+      const res = await fetch('/api/coach/teachers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_teacher',
+          coachId: userId,
+          teacherId
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message);
+        fetchTeachers();
+        fetchCoachData();
+      } else {
+        alert(data.error || 'Erro ao excluir professor');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao excluir professor');
+    }
+  };
+
+  const handleAssignTeacher = async (athleteId: number, teacherIdStr: string) => {
+    const teacherId = teacherIdStr ? parseInt(teacherIdStr, 10) : null;
+    try {
+      const res = await fetch('/api/coach/assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          coachId: parseInt(userId, 10),
+          athleteId,
+          teacherId
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message);
+        fetchCoachData();
+      } else {
+        alert(data.error || 'Erro ao atribuir professor');
+      }
+    } catch (err) {
+      alert('Erro de rede ao atribuir professor');
     }
   };
 
@@ -910,7 +1026,7 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
         </section>
 
         {/* NAVEGAÇÃO ENTRE ABAS */}
-        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.06)', marginBottom: '24px', gap: '24px' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.06)', marginBottom: '24px', gap: '24px', flexWrap: 'wrap' }}>
           <button 
             onClick={() => setActiveTab('athletes')}
             style={{
@@ -931,26 +1047,53 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
             <Users size={18} />
             Gerenciar Alunos
           </button>
-          <button 
-            onClick={() => setActiveTab('keys')}
-            style={{
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'keys' ? '2px solid #00f2fe' : '2px solid transparent',
-              color: activeTab === 'keys' ? '#00f2fe' : '#9ca3af',
-              fontSize: '1rem',
-              fontWeight: 600,
-              padding: '12px 6px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <Key size={18} />
-            Chaves de Acesso (Cupons)
-          </button>
+          
+          {!isSubTeacher && (
+            <>
+              <button 
+                onClick={() => setActiveTab('keys')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: activeTab === 'keys' ? '2px solid #00f2fe' : '2px solid transparent',
+                  color: activeTab === 'keys' ? '#00f2fe' : '#9ca3af',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  padding: '12px 6px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Key size={18} />
+                Chaves de Acesso (Cupons)
+              </button>
+              
+              <button 
+                onClick={() => { setActiveTab('teachers'); fetchTeachers(); }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: activeTab === 'teachers' ? '2px solid #00f2fe' : '2px solid transparent',
+                  color: activeTab === 'teachers' ? '#00f2fe' : '#9ca3af',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  padding: '12px 6px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Users size={18} />
+                Professores
+              </button>
+            </>
+          )}
+
           <button 
             onClick={() => { setActiveTab('library'); fetchLibraryPlans(); }}
             style={{
@@ -971,26 +1114,29 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
             <BookOpen size={18} />
             Biblioteca de Planilhas
           </button>
-          <button 
-            onClick={() => { setActiveTab('finance'); fetchFinanceData(); }}
-            style={{
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'finance' ? '2px solid #00f2fe' : '2px solid transparent',
-              color: activeTab === 'finance' ? '#00f2fe' : '#9ca3af',
-              fontSize: '1rem',
-              fontWeight: 600,
-              padding: '12px 6px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <TrendingUp size={18} />
-            Financeiro 💰
-          </button>
+
+          {!isSubTeacher && (
+            <button 
+              onClick={() => { setActiveTab('finance'); fetchFinanceData(); }}
+              style={{
+                background: 'none',
+                border: 'none',
+                borderBottom: activeTab === 'finance' ? '2px solid #00f2fe' : '2px solid transparent',
+                color: activeTab === 'finance' ? '#00f2fe' : '#9ca3af',
+                fontSize: '1rem',
+                fontWeight: 600,
+                padding: '12px 6px',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <TrendingUp size={18} />
+              Financeiro 💰
+            </button>
+          )}
         </div>
 
         {/* LOADING & ERROR */}
@@ -1042,6 +1188,7 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
                       <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', color: '#9ca3af', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600 }}>
                         <th style={{ padding: '16px' }}>Aluno</th>
                         <th style={{ padding: '16px' }}>Nível</th>
+                        {!isSubTeacher && <th style={{ padding: '16px' }}>Professor Atribuído</th>}
                         <th style={{ padding: '16px' }}>CTL (Fitness)</th>
                         <th style={{ padding: '16px' }}>ATL (Fadiga)</th>
                         <th style={{ padding: '16px' }}>TSB (Forma)</th>
@@ -1053,7 +1200,7 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
                     <tbody>
                       {filteredAthletes.length === 0 ? (
                         <tr>
-                          <td colSpan={8} style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>Nenhum aluno cadastrado ou encontrado.</td>
+                          <td colSpan={isSubTeacher ? 8 : 9} style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>Nenhum aluno cadastrado ou encontrado.</td>
                         </tr>
                       ) : (
                         filteredAthletes.map(athlete => {
@@ -1076,6 +1223,29 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
                                   {athlete.level === 'elite' ? 'Elite' : athlete.level === 'sedentario' ? 'Iniciante' : 'Intermediário'}
                                 </span>
                               </td>
+                              {!isSubTeacher && (
+                                <td style={{ padding: '16px' }}>
+                                  <select
+                                    value={athlete.teacherId || ''}
+                                    onChange={e => handleAssignTeacher(athlete.id, e.target.value)}
+                                    style={{
+                                      background: '#0d0d12',
+                                      border: '1px solid rgba(255,255,255,0.08)',
+                                      borderRadius: '6px',
+                                      padding: '6px 8px',
+                                      color: '#f3f4f6',
+                                      fontSize: '0.8rem',
+                                      outline: 'none',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    <option value="">Nenhum (Dono)</option>
+                                    {teachers.map(t => (
+                                      <option key={t.id} value={t.id}>{t.name}</option>
+                                    ))}
+                                  </select>
+                                </td>
+                              )}
                               <td style={{ padding: '16px', color: '#38bdf8', fontWeight: 600 }}>{athlete.metrics.ctl}</td>
                               <td style={{ padding: '16px', color: '#fb923c', fontWeight: 600 }}>{athlete.metrics.atl}</td>
                               <td style={{ padding: '16px' }}>
@@ -1282,6 +1452,164 @@ export default function CoachDashboard({ userId, userName, onLogout }: CoachDash
                         <>
                           <Plus size={16} />
                           Criar Chave
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </div>
+
+              </div>
+            )}
+
+            {/* ABA: PROFESSORES */}
+            {activeTab === 'teachers' && !isSubTeacher && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '30px', alignItems: 'start' }} className="animate-slide-up">
+                
+                {/* LISTAGEM DE PROFESSORES */}
+                <div style={{ background: 'rgba(20, 20, 28, 0.3)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', overflow: 'hidden' }}>
+                  {teachersLoading ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+                      <RefreshCw className="animate-spin" size={24} color="#00f2fe" style={{ animation: 'spin 1s linear infinite' }} />
+                    </div>
+                  ) : (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', color: '#9ca3af', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                          <th style={{ padding: '16px' }}>Nome do Professor</th>
+                          <th style={{ padding: '16px' }}>Usuário</th>
+                          <th style={{ padding: '16px' }}>Senha</th>
+                          <th style={{ padding: '16px' }}>Alunos Sob Gestão</th>
+                          <th style={{ padding: '16px', textAlign: 'right' }}>Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {teachers.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>Nenhum professor cadastrado nesta assessoria.</td>
+                          </tr>
+                        ) : (
+                          teachers.map(t => (
+                            <tr key={t.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.9rem' }}>
+                              <td style={{ padding: '16px', fontWeight: 700, color: '#f3f4f6' }}>{t.name}</td>
+                              <td style={{ padding: '16px', color: '#9ca3af' }}>{t.username}</td>
+                              <td style={{ padding: '16px', fontFamily: 'monospace', color: '#9ca3af' }}>{t.password}</td>
+                              <td style={{ padding: '16px', fontWeight: 600, color: '#00f2fe' }}>{t.athleteCount} alunos</td>
+                              <td style={{ padding: '16px', textAlign: 'right' }}>
+                                <button
+                                  onClick={() => handleDeleteTeacher(t.id)}
+                                  style={{
+                                    background: 'rgba(239, 68, 68, 0.1)',
+                                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                                    borderRadius: '6px',
+                                    padding: '6px 12px',
+                                    color: '#ef4444',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  Excluir
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+
+                {/* CADASTRO DE PROFESSOR */}
+                <div style={{ background: 'rgba(20, 20, 28, 0.5)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '20px' }}>
+                  <h4 style={{ margin: '0 0 16px 0', fontSize: '1rem', fontWeight: 700, color: '#f3f4f6' }}>Cadastrar Novo Professor</h4>
+                  <form onSubmit={handleCreateTeacher} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>NOME COMPLETO</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Prof. Carlos Silva"
+                        value={newTeacherName}
+                        onChange={e => setNewTeacherName(e.target.value)}
+                        required
+                        style={{
+                          width: '100%',
+                          background: '#0d0d12',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          borderRadius: '8px',
+                          padding: '10px 12px',
+                          color: '#f3f4f6',
+                          fontSize: '0.9rem',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>USUÁRIO DE ACESSO</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: carlos.coach"
+                        value={newTeacherUsername}
+                        onChange={e => setNewTeacherUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))}
+                        required
+                        style={{
+                          width: '100%',
+                          background: '#0d0d12',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          borderRadius: '8px',
+                          padding: '10px 12px',
+                          color: '#f3f4f6',
+                          fontSize: '0.9rem',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', fontWeight: 600 }}>SENHA</label>
+                      <input 
+                        type="text" 
+                        placeholder="Crie uma senha temporária"
+                        value={newTeacherPassword}
+                        onChange={e => setNewTeacherPassword(e.target.value)}
+                        required
+                        style={{
+                          width: '100%',
+                          background: '#0d0d12',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          borderRadius: '8px',
+                          padding: '10px 12px',
+                          color: '#f3f4f6',
+                          fontSize: '0.9rem',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+
+                    <button 
+                      type="submit" 
+                      disabled={teacherSubmitLoading}
+                      style={{
+                        width: '100%',
+                        background: 'linear-gradient(135deg, #00f2fe, #4facfe)',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '12px',
+                        color: '#0a0a0f',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        boxShadow: '0 4px 15px rgba(0, 242, 254, 0.25)'
+                      }}
+                    >
+                      {teacherSubmitLoading ? 'Cadastrando...' : (
+                        <>
+                          <Plus size={16} />
+                          Cadastrar Professor
                         </>
                       )}
                     </button>
